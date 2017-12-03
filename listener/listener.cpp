@@ -10,6 +10,7 @@
 #include <ctype.h>
 #include <vector>
 #include <signal.h>
+//#include <iostream>
 
 using namespace std;
 
@@ -61,7 +62,7 @@ bool do_read(int fd, char *buf) {
  */
 void close_connections() {
 	const char* err_message = "-ERR Server shutting down\n";
-	for (int i = 0; i < comm_fds.size(); i++) {
+	for (int i = 0; i < (int) comm_fds.size(); i++) {
 		int comm_fd = comm_fds[i];
 		write(comm_fd, err_message, strlen(err_message) + 1);
 		close(comm_fd);
@@ -166,6 +167,19 @@ int main(int argc, char *argv[])
 	opterr = 0;
 	char buffer[256];
 
+	while ((c = getopt(argc, argv, "p:a")) != -1)
+	{
+		switch(c)
+		{
+		case 'p':
+			port_num = atoi(optarg);
+			break;
+		case 'a':
+			fprintf(stderr, "Deepan Saravanan (deepans)\n");
+			exit(1);
+		}
+	}
+
 	//open socket as a file descriptor
 	int sockfd = socket(PF_INET, SOCK_STREAM, 0);
 
@@ -191,12 +205,22 @@ int main(int argc, char *argv[])
 	socklen_t clientaddrlen = sizeof(clientaddr);
 	//int *fd = (int*)malloc(sizeof(int));
 	int fd = accept(sockfd, (struct sockaddr*) &clientaddr, &clientaddrlen);
+	printf("connection set\n");
 	//struct arg_struct args;
 	//args.fd = *fd;
 	//args.inx = i;
 
-	read(fd,buffer,255);
-	printf("Here is the message: %s", buffer);
+	while (true) {
+		bzero(buffer, sizeof(buffer));
+		int x = read(fd, &buffer[0], sizeof(buffer) - 1);
+		printf("%i\n", x);
+		//cout << "info read\n";
+		//do_read(fd, buffer)
+		printf("Here is the message: %s", buffer);
+	}
+
+	/*read(fd, buffer, 255);
+	printf("Here is the message: %s\n", buffer);
 
 	//start child thread with new connection
 	//passing in the FD and inx in vector of FD's
@@ -204,5 +228,5 @@ int main(int argc, char *argv[])
 	//pthread_create(&thread, NULL, worker, (void *)&args);
 	i += 1;
 	close_connections();
-	exit(1);
+	exit(1);*/
 }

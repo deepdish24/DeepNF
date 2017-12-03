@@ -8,6 +8,8 @@
 #include <iostream>
 #include <fstream>
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/socket.h>
 
 using json = nlohmann::json;
 
@@ -58,8 +60,12 @@ void Orchestrator::setup_containers() {
     for (auto it = func_to_ip.begin(); it != func_to_ip.end(); ++it) {
         std::string function = it->first;
         std::string ip_addr = it->second;
-        std::cout << it->first << ", " << it->second << "\n";
+        //std::cout << it->first << ", " << it->second << "\n";
         int sockfd = sockets[ip_addr];
-        write(sockfd, function.c_str(), function.length());
+        std::string x = function + "\r\n";
+        std::cout << x;
+        const char* buf = x.c_str();
+        //send(sockfd, )
+        write(sockfd, buf, strlen(buf));
     }
 }

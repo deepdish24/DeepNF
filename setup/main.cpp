@@ -16,7 +16,7 @@ int main(int argc, char *argv[]) {
     }
     std::string filepath(argv[1]);
     Orchestrator orca(filepath);
-    orca.setup_containers();
+    //orca.setup_containers();
 
     return 0;
 }
