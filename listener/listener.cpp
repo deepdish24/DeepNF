@@ -206,17 +206,21 @@ int main(int argc, char *argv[])
 	//int *fd = (int*)malloc(sizeof(int));
 	int fd = accept(sockfd, (struct sockaddr*) &clientaddr, &clientaddrlen);
 	printf("connection set\n");
+	char ack[15];
+	strcpy(ack, "ok good!\n");
 	//struct arg_struct args;
 	//args.fd = *fd;
 	//args.inx = i;
 
 	while (true) {
 		bzero(buffer, sizeof(buffer));
-		int x = read(fd, &buffer[0], sizeof(buffer) - 1);
-		printf("%i\n", x);
-		//cout << "info read\n";
-		//do_read(fd, buffer)
-		printf("Here is the message: %s", buffer);
+		int x = read(fd, buffer, sizeof(buffer) - 1);
+		if (x == 0) {
+			break;
+		} else {
+			printf("Here is the message: %s", buffer);
+			write(fd, ack, strlen(ack));
+		}
 	}
 
 	/*read(fd, buffer, 255);

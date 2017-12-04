@@ -23,7 +23,7 @@ private:
     std::unordered_map<std::string, int> sockets = {};
     std::unordered_map<std::string, std::string> func_to_ip = {};
     std::unordered_map<std::string, std::string> func_to_rules = {};
-    void setup_sockaddr(struct sockaddr_in &servaddr, std::string ip, int port);
+    //void setup_sockaddr(struct sockaddr_in &servaddr, std::string ip, int port);
     //void parse_file(const std::string file);
 public:
     Orchestrator(std::string filepath);
