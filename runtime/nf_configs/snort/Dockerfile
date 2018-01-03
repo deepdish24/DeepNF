@@ -46,4 +46,4 @@ RUN cd snort-${SNORT_VERSION} && \
 COPY local.rules /etc/snort/rules/
 COPY snort.conf /etc/snort/
 
-CMD ["snort", "-N", "-A", "console", "-q", "-c", "/etc/snort/snort.conf", "-Q", "-i", "eth1:eth2;"]
+#CMD ["snort", "-N", "-A", "console", "-q", "-c", "/etc/snort/snort.conf", "-Q", "-i", "eth1:eth2;"]
