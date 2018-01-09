@@ -6,14 +6,13 @@
 using namespace std;
 
 
-
 /**
  * Creates the containers using Dockerfiles.
  */
 void setup_nodes(Node *nodes, int num_nodes) {
 	// create new containers for classifier and merger
-	system("docker run -t -i --name classifier ubuntu");
-	system("docker run -t -i --name merger ubuntu");
+	system("docker run -t -i --name classifier ubuntu echo \"classifier created\"");
+	system("docker run -t -i --name merger ubuntu echo \"merger created\"");
 	
 	for (int i = 0; i < num_nodes; i += 1) {
 		Node n = nodes[i];
@@ -36,30 +35,65 @@ void setup_nodes(Node *nodes, int num_nodes) {
 	}
 }
 
-/**
- * Adds OVS flow rules between the containers.
- * reference: https://paper.dropbox.com/doc/Flows-in-OpenVSwitch-nVRg9phHBr5JSZO2vFwCJ?_tk=share_copylink
- */
-void make_flow_rules() {
-	// TODO: get the format from Vicky and automate...
-
+void setup_bridge_ports(Node *nodes, int num_nodes) {
 	// create a bridge
 	system("sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-vsctl del-br ovs-br1");
 	system("sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-vsctl add-br ovs-br1");
 	system("sudo ifconfig ovs-br1 173.16.1.1 netmask 255.255.255.0 up");
 
-	// connect containers to bridge
+	// connect containers to the bridge
 	system("sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br1 eth1 classifier --ipaddress=173.16.1.2");
-	system("sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br1 eth1 container1");
-	system("sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br1 eth2 container1");
-	system("sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br1 eth1 containe2");
-	system("sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br1 eth2 container2");
 	system("sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br1 eth1 merger");
 
-	// add flow rules
-	system("sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-ofctl add-flow ovs-br1 in_port=1,actions=2");
-	system("sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-ofctl add-flow ovs-br1 in_port=3,actions=4");
-	system("sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-ofctl add-flow ovs-br1 in_port=5,actions=6");
+	int ofport = 3;
+	int ip_suffix = 3;
+	for (int i = 0; i < num_nodes; i += 1) {
+		Node n = nodes[i];
+		string add_port_command = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br1";
+		switch(n.get_nf()) {
+			case snort:
+			system((add_port_command + " eth1 " + n.get_name()).c_str());
+			n.inport = ofport ++;
+			system((add_port_command + " eth2 " + n.get_name()).c_str());
+			n.outport = ofport ++;
+			break;
+			
+			case haproxy:
+			system((add_port_command + " eth1 " + n.get_name() + " --ipaddress=173.16.1." + to_string(ip_suffix ++)).c_str());
+			n.inport = ofport ++;
+			n.outport = n.inport;
+			break;
+			
+			default: break;
+		}
+	}
+}
+
+/**
+ * Adds OVS flow rules between the containers.
+ * reference: https://paper.dropbox.com/doc/Flows-in-OpenVSwitch-nVRg9phHBr5JSZO2vFwCJ?_tk=share_copylink
+ */
+void make_flow_rules(Node *nodes, int num_nodes) {
+	string add_flow_command = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-ofctl add-flow ovs-br1 in_port=";
+	for (int i = 0; i < num_nodes; i += 1) {
+		Node n = nodes[i];
+		if (i == 0) { // flow from classifier to this node
+			system((add_flow_command + "1,actions=" + to_string(n.inport)).c_str());
+		} else if (i == num_nodes - 1) { // flow from this node to merger
+			system((add_flow_command + to_string(n.outport) + ",actions=2").c_str());
+		} else { // flow from output port of this node to all its successors ports
+			int num_successors = n.get_num_successors();
+			cout << "len:" << num_successors << endl;
+			string outport_ports = "";
+			for (int j = 0; j < num_successors; j++) {
+				outport_ports += to_string(n.get_successors()[j]);
+				if (j < num_successors - 1) {
+					outport_ports += ",";
+				}
+			}
+			system((add_flow_command + to_string(n.outport) + ",actions=" + outport_ports).c_str());
+		}
+	}
 }
 
 /**
@@ -77,7 +111,10 @@ int main(int argc, char *argv[]) {
 	Node n2 ("n2", haproxy);
 	Node nodes[2] = { n1, n2 };
 	setup_nodes(nodes, 2);
-	make_flow_rules();
+	setup_bridge_ports(nodes, 2);
+	int n1_succ[1] = { n2.inport };
+	n1.set_successors(n1_succ, 1);
+	make_flow_rules(nodes, 2);
 	start_network_functions();
 	return 0;
 }
