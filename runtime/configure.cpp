@@ -12,7 +12,7 @@ using namespace std;
 void setup_nodes(Node *nodes, int num_nodes) {
 	// create new containers for classifier and merger
 	system("docker run -t -i --name classifier ubuntu echo \"classifier created\"");
-	system("docker run -t -i --name merger ubuntu echo \"merger created\"");
+	system("docker run -t -i --name merger ubuntu echo \"merger created\"");	
 	
 	for (int i = 0; i < num_nodes; i += 1) {
 		Node n = nodes[i];
@@ -36,6 +36,7 @@ void setup_nodes(Node *nodes, int num_nodes) {
 }
 
 void setup_bridge_ports(Node *nodes, int num_nodes) {
+	
 	// create a bridge
 	system("sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-vsctl del-br ovs-br1");
 	system("sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-vsctl add-br ovs-br1");
@@ -107,6 +108,7 @@ void start_network_functions() {
  * Takes in node info, NF config files and flow rules from user and automates the setup of runtime components.
  */
 int main(int argc, char *argv[]) {
+	
 	Node n1 ("n1", snort);
 	Node n2 ("n2", haproxy);
 	Node nodes[2] = { n1, n2 };
