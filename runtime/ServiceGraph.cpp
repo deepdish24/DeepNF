@@ -1,5 +1,6 @@
 #include <map>
 #include <set>
+#include <vector>
 #include <stdexcept> 
 #include <iostream>
 
@@ -50,6 +51,16 @@ public:
 		nodes.erase(name);
 	}
 
+	vector<Node> get_nodes() {
+		vector<Node> result;
+		map<string, Node>::iterator i;
+		for (i = nodes.begin(); i != nodes.end(); i++) {
+			Node n = i->second;
+			result.push_back(n);
+		}
+		return result;
+	}
+
 	bool add_edge(Node a, Node b) {
 		raise_illegal_node_exceptions(a);
 		raise_illegal_node_exceptions(b);
@@ -91,15 +102,15 @@ public:
 		}
 	}
 
-	set<Node*> get_neighbors(Node n) {
+	vector<Node> get_neighbors(Node n) {
 		raise_illegal_node_exceptions(n);
 		string node_name = n.get_name();
-		set<Node*> result;
+		vector<Node> result;
 		if (adjList.count(node_name) > 0) {
 			set<string>::iterator i;
 			for (i = adjList[node_name].begin(); i != adjList[node_name].end(); i++) {
-				Node *p = &nodes.find(*i)->second;
-				result.insert(p);
+				Node p = nodes.find(*i)->second;
+				result.push_back(p);
 			}
 		}
 		return result;

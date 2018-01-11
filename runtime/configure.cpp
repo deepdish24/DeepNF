@@ -1,7 +1,8 @@
 
 #include <stdlib.h>
 #include <iostream>
-#include "Node.cpp"
+
+#include "ServiceGraph.cpp"
 
 using namespace std;
 
@@ -9,12 +10,13 @@ using namespace std;
 /**
  * Creates the containers using Dockerfiles.
  */
-void setup_nodes(Node *nodes, int num_nodes) {
+void setup_nodes(vector<Node> nodes) {
+
 	// create new containers for classifier and merger
 	system("docker run -t -i --name classifier ubuntu echo \"classifier created\"");
 	system("docker run -t -i --name merger ubuntu echo \"merger created\"");	
 	
-	for (int i = 0; i < num_nodes; i += 1) {
+	for (int i = 0; i < nodes.size(); i++) {
 		Node n = nodes[i];
 		// store Dockerfile in node config directory
 		switch(n.get_nf()) {
@@ -35,7 +37,7 @@ void setup_nodes(Node *nodes, int num_nodes) {
 	}
 }
 
-void setup_bridge_ports(Node *nodes, int num_nodes) {
+void setup_bridge_ports(vector<Node> nodes) {
 	
 	// create a bridge
 	system("sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-vsctl del-br ovs-br1");
@@ -48,7 +50,7 @@ void setup_bridge_ports(Node *nodes, int num_nodes) {
 
 	int ofport = 3;
 	int ip_suffix = 3;
-	for (int i = 0; i < num_nodes; i += 1) {
+	for (int i = 0; i < nodes.size(); i++) {
 		Node n = nodes[i];
 		string add_port_command = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br1";
 		switch(n.get_nf()) {
@@ -74,21 +76,21 @@ void setup_bridge_ports(Node *nodes, int num_nodes) {
  * Adds OVS flow rules between the containers.
  * reference: https://paper.dropbox.com/doc/Flows-in-OpenVSwitch-nVRg9phHBr5JSZO2vFwCJ?_tk=share_copylink
  */
-void make_flow_rules(Node *nodes, int num_nodes) {
+void make_flow_rules(ServiceGraph g) {
 	string add_flow_command = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-ofctl add-flow ovs-br1 in_port=";
-	for (int i = 0; i < num_nodes; i += 1) {
+	vector<Node> nodes = g.get_nodes();
+	for (int i = 0; i < nodes.size(); i++) {
 		Node n = nodes[i];
-		if (i == 0) { // flow from classifier to this node
+		if (g.is_source(n)) { // flow from classifier to this node
 			system((add_flow_command + "1,actions=" + to_string(n.inport)).c_str());
-		} else if (i == num_nodes - 1) { // flow from this node to merger
+		} else if (g.is_sink(n)) { // flow from this node to merger
 			system((add_flow_command + to_string(n.outport) + ",actions=2").c_str());
 		} else { // flow from output port of this node to all its successors ports
-			int num_successors = n.get_num_successors();
-			cout << "len:" << num_successors << endl;
+			vector<Node> neighbors = g.get_neighbors(n);
 			string outport_ports = "";
-			for (int j = 0; j < num_successors; j++) {
-				outport_ports += to_string(n.get_successors()[j]);
-				if (j < num_successors - 1) {
+			for (int j = 0; j < neighbors.size(); j++) {
+				outport_ports += to_string(neighbors[j].inport);
+				if (j < neighbors.size() - 1) {
 					outport_ports += ",";
 				}
 			}
@@ -109,14 +111,19 @@ void start_network_functions() {
  */
 int main(int argc, char *argv[]) {
 	
+	// making a dummy service graph
+	ServiceGraph g;
 	Node n1 ("n1", snort);
 	Node n2 ("n2", haproxy);
-	Node nodes[2] = { n1, n2 };
-	setup_nodes(nodes, 2);
-	setup_bridge_ports(nodes, 2);
-	int n1_succ[1] = { n2.inport };
-	n1.set_successors(n1_succ, 1);
-	make_flow_rules(nodes, 2);
+	g.add_node(n1);
+	g.add_node(n2);
+
+	vector<Node> nodes = g.get_nodes();
+	setup_nodes(nodes);
+	setup_bridge_ports(nodes);
+	
+	make_flow_rules(g);
 	start_network_functions();
 	return 0;
 }
+
