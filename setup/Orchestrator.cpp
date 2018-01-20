@@ -18,8 +18,11 @@ Orchestrator::Orchestrator(std::string filepath) {
     std::ifstream fileInput(filepath);
     j << fileInput;
 
+    functions = j["functions"];
     std::vector<std::string> ips = j["ips"];
     std::vector<int> ports = j["ports"];
+
+    /* setting up sockaddr data structures to connect to ip + port */
     for (int i = 0; i < (int) ips.size(); i++) {
         std::string ip = ips[i];
         int port_num = ports[i];
@@ -33,8 +36,16 @@ Orchestrator::Orchestrator(std::string filepath) {
         sockets[ip] = sockfd;
     }
 
-    //TODO: partition functions to ip's in an efficient manner (support for more than 1 ip)
+    //Need to parse positional, userDependencies, and priorities
+    //What exactly do we send to merger?
+
+    std::vector<std::vector<std::string>> positionals = j["positional"];
     std::vector<std::vector<std::string>> dependencies = j["dependencies"];
+    std::vector<std::vector<std::string>> priorities = j["priorities"];
+
+    std::vector<Intermediary> ims = parsePolicies(dependencies, priorities);
+    
+    //TODO: partition functions to ip's in an efficient manner (support for more than 1 ip)
     std::string ip_one = ips[0];
     for (int i = 0; i < (int) dependencies.size(); i++) {
         struct DependencyPair dp;
@@ -43,6 +54,11 @@ Orchestrator::Orchestrator(std::string filepath) {
         func_to_ip[dp.function1] = ip_one;
         func_to_ip[dp.function2] = ip_one;
     }
+}
+
+std::vector<Intermediary> parsePolicies(std::vector<std::vector<std::string>> dependencies, 
+    std::vector<std::vector<std::string>> priorities) {
+    return {};
 }
 
 void Orchestrator::setup_containers() {

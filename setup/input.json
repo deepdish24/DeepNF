@@ -1,7 +1,12 @@
 {
     "ips": ["127.0.0.1"],
     "ports": [11000],
-    "dependencies": [["snort", "iptables"]],
+    "functions": ["snort", "iptables", "haproxy", "firewall"],
+    "positional": [["snort", "first"], ["iptables", "last"]],
+    "orderDependencies": [["snort", "iptables"]],
+    "priorities": [["haproxy", "firewall"]],
     "snort": "/path/to/snort_rules",
-    "iptables": "/path/to/iptables_rules"
+    "iptables": "/path/to/iptables_rules",
+    "haproxy": "/path/to/iptables_rules",
+    "firewall": "/path/to/iptables_rules"
 }
