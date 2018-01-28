@@ -14,7 +14,7 @@ class ServiceGraph {
 	map<string, ServiceGraphNode> node_map;
 
 	// map of machine id to set of node ids in the machine 
-	map<string, set<string>> machine_nodes;
+	map<string, set<string> > machine_nodes;
 
 
 	/**
@@ -83,7 +83,7 @@ public:
 	 */
 	ServiceGraphNode get_node(string id) {
 		raise_illegal_node_exception(id);
-		return node_map.find(id)->second
+		return node_map.find(id)->second;
 	}
 
 	/**
@@ -147,7 +147,7 @@ public:
 	 */
 	void assign_node_to_machine(string macid, string nodeid) {
 		raise_illegal_node_exception(nodeid);
-		map<string, set<string>>::iterator it = machine_nodes.find(macid)
+		map<string, set<string> >::iterator it = machine_nodes.find(macid);
 		if (it == machine_nodes.end()) {
 			set<string> v;
 			v.insert(nodeid);
