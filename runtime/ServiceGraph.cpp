@@ -13,6 +13,9 @@ class ServiceGraph {
 	// map from node id to ServiceGraphNode
 	map<string, ServiceGraphNode> node_map;
 
+	// map of machine id to set of node ids in the machine 
+	map<string, set<string>> machine_nodes;
+
 
 	/**
 	 * Throws exception if ServiceGraphNode with given name does not exist in graph.
@@ -135,8 +138,30 @@ public:
 		return node_map.size();
 	}
 
+	/**
+	 * Adds node with given id to the list of nodes in the machine with given machine id.
+	 * Creates a new entry for machine with given id, if it does not currently exist.
+	 *
+	 * @param macid The id of a machine.
+	 * @param nodeid The id of a ServiceGraphNode
+	 */
+	void assign_node_to_machine(string macid, string nodeid) {
+		raise_illegal_node_exception(nodeid);
+		map<string, set<string>>::iterator it = machine_nodes.find(macid)
+		if (it == machine_nodes.end()) {
+			set<string> v;
+			v.insert(nodeid);
+			machine_nodes.insert(make_pair(macid, v));
+		} else {
+			it->second.insert(nodeid);
+		}
+	}
+
 };
 
+/**
+ * Testing
+ */
 // int main(int argc, char *argv[]) {
 // 	ServiceGraph g;
 // 	ServiceGraphNode n1 ("n1", snort);
