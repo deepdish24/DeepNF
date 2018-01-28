@@ -10,12 +10,13 @@ using namespace std;
 
 class ServiceGraph {
 
+	// map from node id to ServiceGraphNode
 	map<string, ServiceGraphNode> node_map;
 
-	// map<string, set<string> > adjList;
 
-	// map<string, int> indegree;
-
+	/**
+	 * Throws exception if ServiceGraphNode with given name does not exist in graph.
+	 */
 	void raise_illegal_node_exception(string n) {
 		if (node_map.count(n) == 0) {
 			throw invalid_argument("Given node is not present in the service graph.");  
@@ -24,6 +25,12 @@ class ServiceGraph {
 
 public:
 
+	/**
+	 * Add a node to the graph.
+	 *
+	 * @param n The ServiceGraphNode to insert into the graph.
+	 * @return 	True if the node was inserted successfully, false otherwise.
+	 */
 	bool add_node(ServiceGraphNode n) {
 		string node_name = n.get_id();
 		if (node_map.count(node_name) == 0) {
@@ -33,23 +40,29 @@ public:
 		return false;
 	}
 
+	/**
+	 * Remove a node from the graph.
+	 *
+	 * @param name The id of the ServiceGraphNode to remove.
+	 */
 	void remove_node(string name) {
 		raise_illegal_node_exception(name);
-		// // remove out edges
-		// if (adjList.count(name) > 0) {
-		// 	adjList.erase(name);
-		// }
+		
 		// remove in edges
 		map<string, ServiceGraphNode>::iterator i;
 		for (i = node_map.begin(); i != node_map.end(); i++) {
 			ServiceGraphNode v = i->second;
 			v.remove_neighbor(name);
 		}
-		// remove node from all data structures
-		// indegree.erase(name);
+		// remove node from node map
 		node_map.erase(name);
 	}
 
+	/**
+	 * Gets a list of ServiceGraphNode objects that are nodes in the graph.
+	 *
+	 * @return A vector of ServiceGraphNode objects.
+	 */
 	vector<ServiceGraphNode> get_node_list() {
 		vector<ServiceGraphNode> result;
 		map<string, ServiceGraphNode>::iterator i;
@@ -60,18 +73,35 @@ public:
 		return result;
 	}
 
-	map<string, ServiceGraphNode> get_node_map() {
-		return node_map;
+	/**
+	 * Gets the ServiceGraphNode object with the given node id.
+	 *
+	 * @return A ServiceGraphNode.
+	 */
+	ServiceGraphNode get_node(string id) {
+		raise_illegal_node_exception(id);
+		return node_map.find(id)->second
 	}
 
+	/**
+	 * Adds a directed edge from the first node to the second.
+	 *
+	 * @param a The id of a ServiceGraphNode in the graph.
+	 * @param b The id of a ServiceGraphNode in the graph.
+	 */
 	void add_edge(string a, string b) {
 		raise_illegal_node_exception(a);
 		raise_illegal_node_exception(b);
 		ServiceGraphNode *from_node = &(node_map.find(a)->second);
 		from_node->add_neighbor(b);
-		// node_map[a] = from_node;
 	}
 
+	/**
+	 * Removes any edge from the first node to the second.
+	 *
+	 * @param a The id of a ServiceGraphNode in the graph.
+	 * @param b The id of a ServiceGraphNode in the graph.
+	 */
 	void remove_edge(string a, string b) {
 		raise_illegal_node_exception(a);
 		raise_illegal_node_exception(b);
@@ -79,6 +109,12 @@ public:
 		from_node->remove_neighbor(b);
 	}
 
+	/**
+	 * Gets the neighbors of a ServiceGraphNode with given id.
+	 *
+	 * @param id The id of a ServiceGraphNode in the graph.
+	 * @return A vector of ServiceGraphNode objects.
+	 */
 	vector<ServiceGraphNode> get_neighbors(string id) {
 		raise_illegal_node_exception(id);
 		ServiceGraphNode n = node_map.find(id)->second;
@@ -99,15 +135,6 @@ public:
 		return node_map.size();
 	}
 
-	// bool is_source(ServiceGraphNode n) {
-	// 	raise_illegal_node_exception(n);
-	// 	return indegree.count(n.get_id()) == 0;
-	// }
-
-	// bool is_sink(ServiceGraphNode n) {
-	// 	raise_illegal_node_exception(n);
-	// 	return adjList.count(n.get_id()) == 0;
-	// }
 };
 
 // int main(int argc, char *argv[]) {
