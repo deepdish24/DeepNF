@@ -1,12 +1,12 @@
 {
     "ips": ["127.0.0.1"],
     "ports": [11000],
-    "functions": ["snort", "iptables", "haproxy", "firewall"],
+    "functions": ["snort", "iptables", "haproxy", "openvpn"],
     "positional": [["snort", "first"], ["iptables", "last"]],
-    "orderDependencies": [["snort", "iptables"]],
+    "orderDependencies": [["iptables", "snort"]],
     "priorities": [["haproxy", "firewall"]],
     "snort": "/path/to/snort_rules",
     "iptables": "/path/to/iptables_rules",
     "haproxy": "/path/to/iptables_rules",
-    "firewall": "/path/to/iptables_rules"
+    "firewall": "/path/to/iptables_rule"
 }

@@ -7,17 +7,21 @@
 #define ORCHESTRATOR_H
 
 #include <string>
+#include "json.hpp"
 #include <vector>
 #include <unordered_map>
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#include <tuple>
+
+using json = nlohmann::json;
 
 enum Action {
-    READ,
-    WRITE,
-    ADD,
-    RM,
-    DROP
+    READ = 1,
+    WRITE = 2,
+    ADD = 3,
+    RM = 4,
+    DROP = 5
 };
 
 enum Field {
@@ -42,12 +46,14 @@ struct Intermediary {
     std::string function1Name;
     std::string function2Name;
     bool isParallelizable;
-    std::vector<ActionPair>;
+    std::vector<ActionPair> actions = {};
 };
 
 class Orchestrator {
 private:
-    std::vector<std::string> functions = {};
+    json userInput;
+    json actionTable;
+    //std::vector<std::string> functions = {};
     std::vector<DependencyPair> userDependencies = {};
     std::unordered_map<std::string, int> sockets = {};
     std::unordered_map<std::string, std::string> func_to_ip = {};
@@ -55,8 +61,10 @@ private:
 
     //void setup_sockaddr(struct sockaddr_in &servaddr, std::string ip, int port);
     //void parse_file(const std::string file);
+    bool isParallelizable(std::vector<std::string> orderDep, json actionTable, std::vector<Field> &conflictingActions);
+    std::string fieldToString(Field a);
 public:
-    Orchestrator(std::string filepath);
+    Orchestrator(std::string filepath, std::string action_file_path);
     void setup_containers();
     void start_packet_stream();
 };
