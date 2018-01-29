@@ -6,10 +6,12 @@
 #include "Orchestrator.h"
 #include <iostream>
 #include <fstream>
+#include <cstdio>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <ios>
+#include <tuple>
 
 Orchestrator::Orchestrator(std::string filepath, std::string action_file_path) {
     std::ifstream fileInput(filepath);
@@ -39,28 +41,19 @@ Orchestrator::Orchestrator(std::string filepath, std::string action_file_path) {
         sockets[ip] = sockfd;
     }
 
-    //Need to parse positional, userDependencies, and priorities
-    //What exactly do we send to merger?
-
     std::vector<std::vector<std::string>> positionals = userInput["positional"];
     std::vector<std::vector<std::string>> dependencies = userInput["orderDependencies"];
     std::vector<std::vector<std::string>> priorities = userInput["priorities"];
-
-    for (int i = 0; i < (int) dependencies.size(); i++) {
-        std::vector<Field> conflictingActions = {};
-        bool parallel = isParallelizable(dependencies[i], actionTable, conflictingActions);
-        std::cout << dependencies[i][0] << ", " << dependencies[i][1] << "\n";
-        std::cout << "can parallelize: " << parallel << "\n";
-        std::cout << "conflicting actions: " << conflictingActions.size() << "\n";
-        for (int j = 0; j < (int) conflictingActions.size(); j++) {
-            std::cout << "action: " << fieldToString(conflictingActions[j]) << "\n";
-        }
-        std::cout << "============\n";
-    }
-
-    //std::vector<Intermediary> ims = parsePolicies(dependencies, priorities);
+    parseOrderDependencies(dependencies);
+    parsePriorityDependencies(priorities);
     
-    //TODO: partition functions to ip's in an efficient manner (support for more than 1 ip)
+
+    //std::vector<std::tuple<std::string, std::string>> parsedOrder = {};
+    //std::vector<std::tuple<std::string, std::string>> parsedPriorities = {};
+
+    //Need to check for pairwise conflicts between priority functions
+
+
     std::string ip_one = ips[0];
     for (int i = 0; i < (int) dependencies.size(); i++) {
         struct DependencyPair dp;
@@ -77,6 +70,40 @@ Orchestrator::Orchestrator(std::string filepath, std::string action_file_path) {
 }*/
 
 /* function checks if nf1 before nf2 can be parallelized */
+
+void Orchestrator::parsePriorityDependencies(std::vector<std::vector<std::string>> priorities) {
+    for (int i = 0; i < (int) priorities.size(); i++) {
+        std::vector<Field> conflictingActions = {};
+        bool parallel = isParallelizable(priorities[i], actionTable, conflictingActions);
+        std::string f1 = priorities[i][0];
+        std::string f2 = priorities[i][1];
+        if (parallel) {
+            parsedPriorities.push_back(std::make_tuple(f1, f2));
+            if ((int) conflictingActions.size() > 0) {
+                pair_to_conflicts[f1][f2] = conflictingActions;
+            }
+        } else {
+            perror("priority constraint not parallelizable");
+        }
+    }
+}
+
+void Orchestrator::parseOrderDependencies(std::vector<std::vector<std::string>> dependencies) {
+    for (int i = 0; i < (int) dependencies.size(); i++) {
+        std::vector<Field> conflictingActions = {};
+        bool parallel = isParallelizable(dependencies[i], actionTable, conflictingActions);
+        std::string f1 = dependencies[i][0];
+        std::string f2 = dependencies[i][1];
+        if (parallel) {
+            parsedPriorities.push_back(std::make_tuple(f1, f2));
+            if ((int) conflictingActions.size() > 0) {
+                pair_to_conflicts[f1][f2] = conflictingActions;
+            }
+        } else {
+            parsedOrder.push_back(std::make_tuple(f1, f2));
+        }
+    }
+}
 
 Action stringToAction(std::string action) {
     Action a;
