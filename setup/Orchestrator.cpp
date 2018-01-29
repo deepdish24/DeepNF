@@ -19,8 +19,6 @@ Orchestrator::Orchestrator(std::string filepath, std::string action_file_path) {
 
     fileInput >> userInput;
     actionTableInput >> actionTable;
-    //userInput << fileInput;
-    //actionTable << actionTableInput;
 
     std::vector<std::string> functions = userInput["functions"];
     std::vector<std::string> ips = userInput["ips"];
@@ -46,13 +44,44 @@ Orchestrator::Orchestrator(std::string filepath, std::string action_file_path) {
     std::vector<std::vector<std::string>> priorities = userInput["priorities"];
     parseOrderDependencies(dependencies);
     parsePriorityDependencies(priorities);
-    
 
-    //std::vector<std::tuple<std::string, std::string>> parsedOrder = {};
-    //std::vector<std::tuple<std::string, std::string>> parsedPriorities = {};
+    /*for (int i = 0; i < (int) parsedOrder.size(); i++) {
+        std::cout << "Order NF1: " << std::get<0>(parsedOrder[i]) << "\n";
+        std::cout << "Order NF2: " << std::get<1>(parsedOrder[i]) << "\n";
+    }
 
-    //Need to check for pairwise conflicts between priority functions
+    for (int i = 0; i < (int) parsedPriorities.size(); i++) {
+        std::cout << "prioritiy NF1: " << std::get<0>(parsedPriorities[i]) << "\n";
+        std::cout << "prioritiy NF2: " << std::get<1>(parsedPriorities[i]) << "\n";
+    }*/
 
+    for (int i = 0; i < (int) functions.size(); i++) {
+        //creating on stack
+        //ServiceGraphNode n(functions[i]);
+        ServiceGraphNode *s = new ServiceGraphNode(functions[i]);
+        std::cout << "Function " << functions[i] << " node created with address: " << s << std::endl;
+        func_to_nodes[functions[i]] = s;
+    }
+
+    std::set<ServiceGraphNode*> orderTreeNodes = {};
+
+    for (int i = 0; i < (int) parsedOrder.size(); i++) {
+        std::string nf1 = std::get<0>(parsedOrder[i]);
+        std::string nf2 = std::get<1>(parsedOrder[i]);
+        ServiceGraphNode *node1 = func_to_nodes[nf1];
+        ServiceGraphNode *node2 = func_to_nodes[nf2];
+        std::cout << node1 << std::endl;
+        std::cout << node2 << std::endl;
+        (*node1).add_neighbor(node2);
+        (*node2).set_parent(node1);
+        orderTreeNodes.insert(node1);
+        orderTreeNodes.insert(node2);
+    }
+
+    std::cout << "set size: " << orderTreeNodes.size() << std::endl;
+    ServiceGraphNode *node1 = func_to_nodes["iptables"];
+    std::cout << (*node1).neighbors.size() << std::endl;
+    //std::cout << ((func_to_nodes["iptables"])->neighbors).size() << std::endl;
 
     std::string ip_one = ips[0];
     for (int i = 0; i < (int) dependencies.size(); i++) {
@@ -64,13 +93,7 @@ Orchestrator::Orchestrator(std::string filepath, std::string action_file_path) {
     }
 }
 
-/*std::vector<Intermediary> parsePolicies(std::vector<std::vector<std::string>> dependencies, 
-    std::vector<std::vector<std::string>> priorities) {
-    return {};
-}*/
-
-/* function checks if nf1 before nf2 can be parallelized */
-
+/* Function to parse priority dependencies and produce conflicting actions */
 void Orchestrator::parsePriorityDependencies(std::vector<std::vector<std::string>> priorities) {
     for (int i = 0; i < (int) priorities.size(); i++) {
         std::vector<Field> conflictingActions = {};
@@ -88,6 +111,9 @@ void Orchestrator::parsePriorityDependencies(std::vector<std::vector<std::string
     }
 }
 
+/* Function that parses order dependencies to determine which can be run in parallel.
+   Adds those that can be parallelized as priority dependencies. Conflicting actions
+   noted. */
 void Orchestrator::parseOrderDependencies(std::vector<std::vector<std::string>> dependencies) {
     for (int i = 0; i < (int) dependencies.size(); i++) {
         std::vector<Field> conflictingActions = {};
@@ -146,6 +172,7 @@ Field stringToField(std::string field) {
     return f;
 }
 
+/* function checks if nf1 before nf2 can be parallelized */
 bool Orchestrator::isParallelizable(std::vector<std::string> orderDep, json actionTable,
     std::vector<Field> &conflictingActions) {
     std::map<std::string, std::string> nf1 = actionTable[orderDep[0]];
@@ -161,13 +188,11 @@ bool Orchestrator::isParallelizable(std::vector<std::string> orderDep, json acti
             Action a2 = stringToAction(nf2[packetLocation]);
             if ((a1 == READ || a1 == WRITE) && a2 == WRITE) {
                 std::string loc(packetLocation);
-                //std::cout << "loc: " << packetLocation << "\n";
                 conflictingActions.push_back(stringToField(packetLocation));
             } else if (a1 == WRITE) {
                 return false;
             }
         }
-        //std::cout << "~~~~~~~~~~~~" << "\n";
     }
     return true;
 }

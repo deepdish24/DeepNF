@@ -13,6 +13,7 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <tuple>
+#include "ServiceGraphNode.cpp"
 
 using json = nlohmann::json;
 
@@ -54,11 +55,11 @@ private:
     json userInput;
     json actionTable;
     //std::vector<std::string> functions = {};
+    std::unordered_map<std::string, ServiceGraphNode*> func_to_nodes = {};
     std::unordered_map<std::string, std::unordered_map<std::string, std::vector<Field>>> pair_to_conflicts = {};
-    //std::unordered_map<DependencyPair, std::vector<Field>> pair_to_conflicts = {};
     std::vector<std::tuple<std::string, std::string>> parsedOrder = {};
     std::vector<std::tuple<std::string, std::string>> parsedPriorities = {};
-    std::vector<DependencyPair> userDependencies = {};
+
     std::unordered_map<std::string, int> sockets = {};
     std::unordered_map<std::string, std::string> func_to_ip = {};
     std::unordered_map<std::string, std::string> func_to_rules = {};
