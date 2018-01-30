@@ -6,4 +6,4 @@ set (DeepNF_VERSION_MINOR 0)
 
 add_subdirectory(src/listener)
 add_subdirectory(src/runtime)
-# add_subdirectory(src/setup)
+add_subdirectory(src/setup)

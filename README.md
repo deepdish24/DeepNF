@@ -1,6 +1,10 @@
 ### DeepNF
 Distributed NFV scheduling framework for senior design
 
+### Downloading dependencies
+1. Install nlohmann's json library:
+    => brew tap nlohmann/json; brew install nlohmann_json
+
 ### Building
 1. Create build directory:
     => mkdir build && cd build
@@ -9,9 +13,12 @@ Distributed NFV scheduling framework for senior design
 3. Build the project
     => make
 
-### Running the code
+### Running the code (from /build)
 To run listener program:
     ./src/listener/listener
 
 To run runtime program:
     ./src/runtime/runtime
+
+To run setup program:
+    ./src/setup/setup
