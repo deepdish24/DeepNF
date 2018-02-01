@@ -1,7 +1,7 @@
 
 #include <stdlib.h>
 #include <iostream>
-#include "Node.cpp"
+#include "../common/Node.h"
 
 using namespace std;
 

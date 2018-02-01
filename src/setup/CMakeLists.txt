@@ -11,3 +11,4 @@ set(HEADERS
 )
 
 add_executable(setup ${SOURCE_FILES} ${HEADERS})
+target_link_libraries(setup common)
