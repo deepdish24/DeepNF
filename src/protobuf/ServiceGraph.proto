@@ -13,3 +13,8 @@ message Node {
     repeated uint64 in_edges = 5;
     repeated uint64 out_edges = 6;
 }
+
+message ServiceGraph {
+    uint64 id = 1;
+
+}

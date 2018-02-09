@@ -5,6 +5,7 @@ set(SOURCE_FILES
     Node.cpp
     Machine.cpp
     ServiceGraph.cpp
+    ServiceGraphUtil.cpp
 )
 
 set(HEADERS
@@ -13,6 +14,7 @@ set(HEADERS
     Machine.h
     ServiceGraph.h
     NF.h
+    ServiceGraphUtil.h
 )
 
 add_library(common ${SOURCE_FILES} ${HEADERS})
