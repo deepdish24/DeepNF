@@ -65,4 +65,12 @@ string MachineConfigurator::get_node_machine_id(string node_name) {
 	return it->second;
 }
 
+string MachineConfigurator::get_node_ip(string node_name) {
+	map<string, string>::iterator it = node_ip_map.find(node_name);
+	if (it == node_ip_map.end()) {
+		return NULL;
+	}
+	return it->second;
+}
+
 #endif
