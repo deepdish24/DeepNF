@@ -10,14 +10,10 @@ class MachineConfigurator {
 	
 private:
 
-	// maps node name to machine id
-	map<string, string> node_machine_map;
 	// maps machine id to IP address
 	map<string, string> machine_ip_map;
 	// maps machine id to the OVS bridge's IP address
 	map<string, string> machine_bridge_ip_map;
-	// maps node name to node ip address
-	map<string, string> node_ip_map;
 
 public:
 	// machine id of the machine to be configured
@@ -37,11 +33,6 @@ public:
 	string get_dockerfile(NF nf);
 
 	string get_bridge_ip();
-
-	string get_node_machine_id(string node_name);
-
-	string get_node_ip(string node_name);
-
 };
 
 #endif

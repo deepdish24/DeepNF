@@ -24,6 +24,14 @@ public:
 	string config_dir;
     // set of pointers to node neighbors
     set<RuntimeNode*> neighbors;
+    // input Open Flow port number
+    int inport;
+    // output OpenFlow port number
+    int outport;
+    // machine id
+    string machine_id;
+    // string IP address assigned to this node
+    string ip;
   
     
     RuntimeNode(string n, NF f);
