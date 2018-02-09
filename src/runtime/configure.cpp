@@ -73,6 +73,7 @@ void start_network_functions() {
  * Takes in node info, NF config files and flow rules from user and automates the setup of runtime components.
  */
 int main(int argc, char *argv[]) {
+	
 	Node n1 ("n1", snort);
 	Node n2 ("n2", haproxy);
 	Node nodes[2] = { n1, n2 };
