@@ -1,3 +1,5 @@
+#pragma once
+
 #include <string>
 #include <vector>
 #include <sys/stat.h>
@@ -5,12 +7,9 @@
 #include <stdlib.h>
 #include <errno.h>
 
-#include "ServiceGraph.h"
 
-ServiceGraph::ServiceGraph() {
+namespace service_graph_util
+{
 
-}
-
-ServiceGraph::~ServiceGraph() {
 
 }

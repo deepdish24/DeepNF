@@ -1,11 +1,10 @@
-#ifndef RUNTIMENODE_H
-#define RUNTIMENODE_H
+#pragma once
 
 #include <string>
 #include <stdlib.h>
 #include <set>
 
-#include "NF.cpp"
+#include "NF.h"
 
 
 using namespace std;
@@ -30,5 +29,3 @@ public:
     void add_neighbor(RuntimeNode *n);
 
 };
-
-#endif

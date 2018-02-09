@@ -1,29 +1,26 @@
-#ifndef MACHINECONFIGURATOR_H
-#define MACHINECONFIGURATOR_H
-
+#pragma once
 #include <map>
 #include <vector>
 
-#include "RuntimeNode.cpp"
+#include "RuntimeNode.h"
+#include "Machine.h"
 
 class MachineConfigurator {
 	
 private:
 
-	// maps node name to machine id
-	map<string, string> node_machine_map;
-	// maps machine id to IP address
-	map<string, string> machine_ip_map;
-	// maps machine id to the OVS bridge's IP address
-	map<string, string> machine_bridge_ip_map;
+    // maps machine id to machine object
+    std::map<string, Machine> machine_map;
+    // maps node name to machine object
+    std::map<string, Machine> node_machine_map;
 	// maps node name to node ip address
-	map<string, string> node_ip_map;
+	std::map<string, string> node_ip_map;
 
 public:
 	// machine id of the machine to be configured
 	string machine_id;
 	// list of nodes in the entire system
-	vector<RuntimeNode> nodes;
+	std::vector<RuntimeNode> nodes;
 
 	
 	MachineConfigurator(string id);
@@ -43,5 +40,3 @@ public:
 	string get_node_ip(string node_name);
 
 };
-
-#endif

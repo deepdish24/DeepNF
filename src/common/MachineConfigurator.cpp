@@ -1,6 +1,3 @@
-#ifndef MACHINECONFIGURATOR_CPP
-#define MACHINECONFIGURATOR_CPP
-
 #include <errno.h>
 #include <sys/stat.h>
 
@@ -50,19 +47,13 @@ string MachineConfigurator::get_dockerfile(NF nf) {
 }
 
 string MachineConfigurator::get_bridge_ip() {
-	map<string, string>::iterator it = machine_bridge_ip_map.find(machine_id);
-	if (it == machine_bridge_ip_map.end()) {
-		return NULL;
-	}
-	return it->second;
+    Machine m = machine_map.at(machine_id);
+    return m.get_bridge_ip();
 }
 
 string MachineConfigurator::get_node_machine_id(string node_name) {
-	map<string, string>::iterator it = node_machine_map.find(node_name);
-	if (it == node_machine_map.end()) {
-		return NULL;
-	}
-	return it->second;
+    Machine m = node_machine_map.at(node_name);
+    return m.get_id();
 }
 
 string MachineConfigurator::get_node_ip(string node_name) {
@@ -72,5 +63,3 @@ string MachineConfigurator::get_node_ip(string node_name) {
 	}
 	return it->second;
 }
-
-#endif
