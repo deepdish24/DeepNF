@@ -14,3 +14,7 @@ Machine::Machine() {
 Machine::~Machine() {
 
 }
+
+string Machine::get_id() { return id; }
+string Machine::get_ip() { return ip; }
+string Machine::get_bridge_ip() { return bridge_ip; }

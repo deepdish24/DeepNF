@@ -19,7 +19,7 @@ void Node::set_image_name() {
 	}
 };
 
-	
+
 Node::Node(string n, NF f) {
     name = n;
     nf = f;
