@@ -1,38 +1,46 @@
-#ifndef MACHINECONFIGURATOR_H
-#define MACHINECONFIGURATOR_H
+#pragma once
 
 #include <map>
 #include <vector>
 
-#include "RuntimeNode.cpp"
+#include "RuntimeNode.h"
+#include "Machine.h"
 
 class MachineConfigurator {
 	
 private:
+	
+	// machine id of the machine to be configured
+	int machine_id;
 
-	// maps machine id to IP address
-	map<string, string> machine_ip_map;
-	// maps machine id to the OVS bridge's IP address
-	map<string, string> machine_bridge_ip_map;
+    // maps machine id to machine object
+    std::map<int, Machine> machine_map;
+
+    // maps node id to node
+    std::map<int, RuntimeNode> node_map;
 
 public:
-	// machine id of the machine to be configured
-	string machine_id;
-	// list of nodes in the entire system
-	vector<RuntimeNode> nodes;
-
 	
-	MachineConfigurator(string id);
+	
+	MachineConfigurator(Machine m);
 
-	void make_config_dir(string node_name);
+	void make_config_dir(int node_id);
 
-	string get_config_dir(string node_name);
+	int get_machine_id();
 
-	string get_docker_image_name(string node_name, NF nf);
+	std::string get_config_dir(int node_id);
 
-	string get_dockerfile(NF nf);
+	std::string get_docker_image_name(int node_id, NF nf);
 
-	string get_bridge_ip();
+	std::string get_dockerfile(NF nf);
+
+	Machine get_machine_with_id(int mac_id);
+
+	RuntimeNode get_node_with_id(int node_id);
+
+	std::vector<RuntimeNode> get_nodes_for_machine(int mac_id);
+
+	void add_machine(Machine m);
+
+	void add_node(RuntimeNode n);
 };
-
-#endif

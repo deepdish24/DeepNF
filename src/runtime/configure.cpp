@@ -1,25 +1,43 @@
-#ifndef CONFIGURE_CPP
-#define CONFIGURE_CPP
-
-
 #include <stdlib.h>
 #include <iostream>
 
-#include "MachineConfigurator.h"
-#include "RuntimeServiceGraph.cpp"
-
-using namespace std;
-
+#include "../common/RuntimeNode.h"
+#include "../common/MachineConfigurator.h"
 
 MachineConfigurator get_machine_configurator() {
-	MachineConfigurator c ("0");
-	RuntimeNode n1 ("n1", snort);
-	RuntimeNode n2 ("n2", haproxy);
-	RuntimeNode n2 ("n3", snort);
-	vector<RuntimeNode> nodes { n1, n2, n3 };
-	c.nodes = nodes;
+	RuntimeNode n1 (1, snort);
+	RuntimeNode n2 (2, haproxy);
+	RuntimeNode n3 (3, snort);
+
+	Machine m (0);
+	m.add_node_id(1);
+	m.add_node_id(2);
+	m.add_node_id(3);
+
+	MachineConfigurator c (m);
+	
+	c.add_node(n1);
+	c.add_node(n2);
+	c.add_node(n3);
 
 	return c;
+}
+
+/**
+ * Returns a list of nodes on this machine
+ */
+std::vector<RuntimeNode> get_internal_nodes(MachineConfigurator c) {
+	return c.get_nodes_for_machine(c.get_machine_id());
+}
+
+bool is_source_node(RuntimeNode n, vector<RuntimeNode> nodes) {
+	std::set<int> nbrs;
+	for (RuntimeNode n : nodes) {
+		std::vector<int> ns = n.get_neighbors();
+		nbrs.insert(ns.begin(), ns.end());
+	}
+
+	return nbrs.count(n.get_id()) == 0;
 }
 
 /**
@@ -27,25 +45,25 @@ MachineConfigurator get_machine_configurator() {
  */
 void setup_nodes(MachineConfigurator conf) {
 
+	std::vector<RuntimeNode> nodes = get_internal_nodes(conf);
+
 	// create new containers for classifier and merger
 	system("docker run -t -i --name classifier ubuntu echo \"classifier created\"");
 	system("docker run -t -i --name merger ubuntu echo \"merger created\"");	
 	
-	for (int i = 0; i < conf.nodes.size(); i++) {
-		RuntimeNode n = conf.nodes[i];
-		if (get_node_machine_id(n.name) != conf.machine_id) {
-			continue;
-		}
+	for (RuntimeNode n : nodes) {
+		int node_id = n.get_id();
+		NF node_nf = n.get_nf();
 
-		string dockerfile_path = conf.get_dockerfile(n.nf);
-		if (dockerfile_path == NULL) {
+		std::string dockerfile_path = conf.get_dockerfile(node_nf);
+		if (dockerfile_path == "") {
 			// TODO: raise exception
 		}
 
-		string config_dir = conf.get_config_dir(n.name);
+		std::string config_dir = conf.get_config_dir(node_id);
 
-		string image_name = conf.get_docker_image_name(n.name, n.nf);
-		if (image_name == NULL) {
+		std::string image_name = conf.get_docker_image_name(node_id, node_nf);
+		if (image_name == "") {
 			// TODO: raise exception
 		}
 
@@ -56,44 +74,44 @@ void setup_nodes(MachineConfigurator conf) {
 		system(("docker build -t=" + image_name + " " + config_dir).c_str());
 
 		// create a new Docker container for the node
-		system(("docker run --name " + n.name + " -t -i " + image_name + ":latest").c_str());
+		system(("docker run --name " + std::to_string(node_id) + " -t -i " + image_name + ":latest").c_str());
 	}
 }
 
 void setup_bridge_ports(MachineConfigurator conf) {
-	
+
 	// create a bridge
 	system("sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-vsctl del-br ovs-br1");
 	system("sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-vsctl add-br ovs-br1");
 	
-	string bridge_ip = conf.get_bridge_ip();
-	if (bridge_ip == NULL) {
-		// TODO: raise exception
-	}
-	system("sudo ifconfig ovs-br1 " + bridge_ip + " netmask 255.255.255.0 up");
+	// get bridge ip
+	Machine cur_machine = conf.get_machine_with_id(conf.get_machine_id());
+	std::string bridge_ip = cur_machine.get_bridge_ip();
+	
+	system(("sudo ifconfig ovs-br1 " + bridge_ip + " netmask 255.255.255.0 up").c_str());
 	
 	// connect containers to the bridge
-	system("sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br1 eth1 classifier");
-	system("sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br1 eth1 merger");
+	std::string add_port_merger = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br1 eth1 classifier";
+	std::string add_port_classifier = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br1 eth1 merger";
+	system(add_port_classifier.c_str());
+	system(add_port_merger.c_str());
 
+	std::vector<RuntimeNode> nodes = get_internal_nodes(conf);
 	int ofport = 3;
-	for (int i = 0; i < conf.nodes.size(); i++) {
-		RuntimeNode n = conf.nodes[i];
-		if (get_node_machine_id(n.name) != conf.machine_id) {
-			continue;
-		}
-
-		string add_port_command = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br1";
+	for (RuntimeNode n : nodes) {
+		
+		std::string add_port_command = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br1";
+		std::string node_id = std::to_string(n.get_id());
 		switch(n.get_nf()) {
 			case snort:
-			system((add_port_command + " eth1 " + n.name).c_str());
+			system((add_port_command + " eth1 " + node_id).c_str());
 			n.inport = ofport ++;
-			system((add_port_command + " eth2 " + n.name).c_str());
+			system((add_port_command + " eth2 " + node_id).c_str());
 			n.outport = ofport ++;
 			break;
 			
 			case haproxy:
-			system((add_port_command + " eth1 " + n.name + " --ipaddress=173.16.1." + to_string(ip_suffix ++)).c_str());
+			system((add_port_command + " eth1 " + node_id + " --ipaddress=" + n.ip).c_str());
 			n.inport = ofport ++;
 			n.outport = n.inport;
 			break;
@@ -107,25 +125,28 @@ void setup_bridge_ports(MachineConfigurator conf) {
  * Adds OVS flow rules between the containers.
  * reference: https://paper.dropbox.com/doc/Flows-in-OpenVSwitch-nVRg9phHBr5JSZO2vFwCJ?_tk=share_copylink
  */
-void make_flow_rules(ServiceGraph g) {
-	string add_flow_command = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-ofctl add-flow ovs-br1 in_port=";
-	vector<Node> nodes = g.get_nodes();
-	for (int i = 0; i < nodes.size(); i++) {
-		Node n = nodes[i];
-		if (g.is_source(n)) { // flow from classifier to this node
-			system((add_flow_command + "1,actions=" + to_string(n.inport)).c_str());
-		} else if (g.is_sink(n)) { // flow from this node to merger
-			system((add_flow_command + to_string(n.outport) + ",actions=2").c_str());
+void make_flow_rules(MachineConfigurator conf) {
+	std::string add_flow_command = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-ofctl add-flow ovs-br1 in_port=";
+	
+	std::vector<RuntimeNode> nodes = get_internal_nodes(conf);
+	
+	for (RuntimeNode n : nodes) {
+		
+		if (is_source_node(n, nodes)) { // flow from classifier to this node
+			system((add_flow_command + "1,actions=" + std::to_string(n.inport)).c_str());
+		} else if (n.get_neighbors().size() == 0) { // if node is a sink, flow from this node to merger
+			system((add_flow_command + std::to_string(n.outport) + ",actions=2").c_str());
 		} else { // flow from output port of this node to all its successors ports
-			vector<Node> neighbors = g.get_neighbors(n);
-			string outport_ports = "";
-			for (int j = 0; j < neighbors.size(); j++) {
-				outport_ports += to_string(neighbors[j].inport);
-				if (j < neighbors.size() - 1) {
+			std::vector<int> neighbors = n.get_neighbors();
+			std::string outport_ports = "";
+			for (int j = 0; j < (int) neighbors.size(); j++) {
+				RuntimeNode neighbor = conf.get_node_with_id(neighbors[j]);
+				outport_ports += std::to_string(neighbor.inport);
+				if (j < (int)neighbors.size() - 1) {
 					outport_ports += ",";
 				}
 			}
-			system((add_flow_command + to_string(n.outport) + ",actions=" + outport_ports).c_str());
+			system((add_flow_command + std::to_string(n.outport) + ",actions=" + outport_ports).c_str());
 		}
 	}
 }
@@ -146,11 +167,9 @@ int main(int argc, char *argv[]) {
 	MachineConfigurator conf = get_machine_configurator();
 	
 	setup_nodes(conf);
-	setup_bridge_ports(g);
+	setup_bridge_ports(conf);
 	
-	make_flow_rules(g);
+	make_flow_rules(conf);
 	start_network_functions();
 	return 0;
 }
-
-#endif

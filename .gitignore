@@ -1,5 +1,5 @@
-build
-.idea/workspace.xml
+build/*
+.idea/*
 
 .DS_Store
 */.DS_Store

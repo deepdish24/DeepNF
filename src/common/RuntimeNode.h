@@ -1,42 +1,46 @@
-#ifndef RUNTIMENODE_H
-#define RUNTIMENODE_H
+#pragma once
 
 #include <string>
 #include <stdlib.h>
 #include <set>
+#include <vector>
 
-#include "NF.cpp"
+#include "NF.h"
 
 
 using namespace std;
 
 class RuntimeNode {
 
+private:
+
+    // node id
+    int id;
+    // network function running on the node
+    NF nf;
+    // list of IDs of the neighbors of this node
+    std::vector<int> neighbors;
+
 public:
-	
-	// name of container
-	string name;
-	// network function running on the node
-	NF nf;
-	// name of docker image
-	string image_name;
-	// directory containing the rules and config files for the network function
-	string config_dir;
-    // set of pointers to node neighbors
-    set<RuntimeNode*> neighbors;
+
     // input Open Flow port number
     int inport;
     // output OpenFlow port number
     int outport;
     // machine id
-    string machine_id;
-    // string IP address assigned to this node
-    string ip;
+    int machine_id;
+    // std::string IP address assigned to this node
+    std::string ip;
   
     
-    RuntimeNode(string n, NF f);
-    void add_neighbor(RuntimeNode *n);
+    RuntimeNode(int id, NF f);
+    
+    void add_neighbor(int node_id);
+
+    std::vector<int> get_neighbors();
+
+    int get_id();
+
+    NF get_nf();
 
 };
-
-#endif

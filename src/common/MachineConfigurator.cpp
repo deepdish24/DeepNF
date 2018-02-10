@@ -1,18 +1,18 @@
-#ifndef MACHINECONFIGURATOR_CPP
-#define MACHINECONFIGURATOR_CPP
-
 #include <errno.h>
 #include <sys/stat.h>
 
 #include "MachineConfigurator.h"
 
 
-MachineConfigurator::MachineConfigurator(string id) {
-	machine_id = id;
+MachineConfigurator::MachineConfigurator(Machine m) {
+	machine_id = m.get_id();
+	machine_map.insert(make_pair(machine_id, m));
 }
 
-void MachineConfigurator::make_config_dir(string node_name) {
-	string path = get_config_dir(node_name);
+int MachineConfigurator::get_machine_id() { return machine_id; }
+
+void MachineConfigurator::make_config_dir(int node_id) {
+	std::string path = get_config_dir(node_id);
 
 	if (mkdir(path.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) == EEXIST) {
 		system(("rm -r " + path).c_str());
@@ -20,28 +20,28 @@ void MachineConfigurator::make_config_dir(string node_name) {
 	}
 }
 
-string MachineConfigurator::get_config_dir(string node_name) {
-	return "/home/ec2-user/" + node_name;
+std::string MachineConfigurator::get_config_dir(int node_id) {
+	return "/home/ec2-user/" + std::to_string(node_id);
 }
 
-string MachineConfigurator::get_docker_image_name(string node_name, NF nf) {
+std::string MachineConfigurator::get_docker_image_name(int node_id, NF nf) {
 	switch(nf) {
-		case snort: return node_name + "_snort";
+		case snort: return std::to_string(node_id) + "_snort";
 		break;
-		case haproxy: return node_name + "_haproxy";
+		case haproxy: return std::to_string(node_id) + "_haproxy";
 		break;
-		default: return NULL;
+		default: return "";
 	}
 }
 
-string MachineConfigurator::get_dockerfile(NF nf) {
-	string path = "/home/ec2-user/DeepNF/runtime/nf_configs/";
+std::string MachineConfigurator::get_dockerfile(NF nf) {
+	std::string path = "/home/ec2-user/DeepNF/runtime/nf_configs/";
 	switch(nf) {
 		case snort: path += "snort";
 		break;
 		case haproxy: path += "haproxy";
 		break;
-		default: return NULL;
+		default: return "";
 	}
 
 	path += "Dockerfile";
@@ -49,12 +49,34 @@ string MachineConfigurator::get_dockerfile(NF nf) {
 	return path;
 }
 
-string MachineConfigurator::get_bridge_ip() {
-	map<string, string>::iterator it = machine_bridge_ip_map.find(machine_id);
-	if (it == machine_bridge_ip_map.end()) {
-		return NULL;
-	}
-	return it->second;
+Machine MachineConfigurator::get_machine_with_id(int mac_id) {
+	return machine_map.at(mac_id);
 }
 
-#endif
+RuntimeNode MachineConfigurator::get_node_with_id(int node_id) {
+	return node_map.at(node_id);
+}
+
+std::vector<RuntimeNode> MachineConfigurator::get_nodes_for_machine(int mac_id) {
+	std::vector<RuntimeNode> result;
+	
+	Machine m = machine_map.at(mac_id);
+	for (int i : m.get_node_ids()) {
+		result.push_back(node_map.at(i));
+	}
+
+	return result;
+}
+
+void MachineConfigurator::add_machine(Machine m) {
+	machine_map.insert(make_pair(m.get_id(), m));
+}
+
+void MachineConfigurator::add_node(RuntimeNode n) {
+	node_map.insert(make_pair(n.get_id(), n));
+}
+
+
+
+
+
