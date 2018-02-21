@@ -212,3 +212,29 @@ void Orchestrator::setup_containers() {
         }
     }
 }
+
+// Given a service graph node, determine if it is a root node
+bool isLeaf(ServiceGraphNode *n){
+    if (!(*n).neighbors.empty()){
+        return false;
+    } 
+    else {
+        return true;
+    }
+}
+
+// Given a service graph node, determine the root node pointing to it
+ServiceGraphNode* findRootNode(ServiceGraphNode* n){
+    ServiceGraphNode *parentOfN = (*n).parent;
+    if (parentOfN == NULL){
+        return n;
+    }
+    else {
+        ServiceGraphNode *currNode;
+        while (parentOfN != NULL){
+            currNode = parentOfN;
+            parentOfN = (*currNode).parent;
+        }
+        return currNode;
+    }
+}

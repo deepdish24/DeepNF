@@ -7,7 +7,7 @@
 #define ORCHESTRATOR_H
 
 #include <string>
-#include "json.hpp"
+#include "nlohmann/json.hpp"
 #include <vector>
 #include <unordered_map>
 #include <sys/socket.h>
@@ -70,6 +70,14 @@ private:
     void parsePriorityDependencies(std::vector<std::vector<std::string>> priorities);
     void parseOrderDependencies(std::vector<std::vector<std::string>> dependencies);
     std::string fieldToString(Field a);
+
+    // Check if the given node is a leaf node
+    bool isLeaf(ServiceGraphNode* n);
+
+    // Returns the root node assoicated with n
+    ServiceGraphNode* findRootNode(ServiceGraphNode* n);
+
+    
 public:
     Orchestrator(std::string filepath, std::string action_file_path);
     void setup_containers();
