@@ -42,6 +42,12 @@ Orchestrator::Orchestrator(std::string filepath, std::string action_file_path) {
     std::vector<std::vector<std::string>> positionals = userInput["positional"];
     std::vector<std::vector<std::string>> dependencies = userInput["orderDependencies"];
     std::vector<std::vector<std::string>> priorities = userInput["priorities"];
+
+    // Check size of the positional to make sure it is positive and at most 2
+    if (positionals.size() > 2 || positionals.size() < 0){
+        throw std::invalid_argument("Incorrect number of positional NFs detected");
+    }
+
     parseOrderDependencies(dependencies);
     parsePriorityDependencies(priorities);
 
@@ -214,7 +220,7 @@ void Orchestrator::setup_containers() {
 }
 
 // Given a service graph node, determine if it is a root node
-bool isLeaf(ServiceGraphNode *n){
+bool Orchestrator::isLeaf(ServiceGraphNode *n){
     if (!(*n).neighbors.empty()){
         return false;
     } 
@@ -224,7 +230,7 @@ bool isLeaf(ServiceGraphNode *n){
 }
 
 // Given a service graph node, determine the root node pointing to it
-ServiceGraphNode* findRootNode(ServiceGraphNode* n){
+ServiceGraphNode* Orchestrator::findRootNode(ServiceGraphNode* n){
     ServiceGraphNode *parentOfN = (*n).parent;
     if (parentOfN == NULL){
         return n;
