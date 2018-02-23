@@ -78,7 +78,7 @@ void setup_nodes(MachineConfigurator conf) {
 		system(("docker build -t=" + image_name + " " + config_dir).c_str());
 
 		// create a new Docker container for the node
-		system(("docker run --name " + std::to_string("node" + node_id) + " -t -i " + image_name + ":latest").c_str());
+		system(("docker run --name " + "node" + std::to_string(node_id) + " -t -i " + image_name + ":latest").c_str());
 	}
 }
 
