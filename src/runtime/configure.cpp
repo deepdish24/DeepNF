@@ -164,6 +164,7 @@ void make_flow_rules(MachineConfigurator conf) {
 		} else {
 			outport_ports += std::to_string(p) + ",";
 		}
+		i++;
 	}
 	std::cout << (add_flow_command + "1,actions=" + outport_ports) << std::endl;
 	system((add_flow_command + "1,actions=" + outport_ports).c_str());
