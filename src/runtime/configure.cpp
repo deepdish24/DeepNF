@@ -144,7 +144,6 @@ void make_flow_rules(MachineConfigurator conf) {
 	for (RuntimeNode n : nodes) {
 		
 		if (is_source_node(n, nodes)) { // flow from classifier to this node
-			std::cout << n.inport << std::endl;
 			source_node_inports.push_back(n.inport);
 			// system((add_flow_command + "1,actions=" + std::to_string(n.inport)).c_str());
 		}
@@ -161,7 +160,7 @@ void make_flow_rules(MachineConfigurator conf) {
 					outport_ports += ",";
 				}
 			}
-			std::cout << (add_flow_command + std::to_string(n.outport) + ",actions=" + outport_ports) << std::endl;
+			
 			system((add_flow_command + std::to_string(n.outport) + ",actions=" + outport_ports).c_str());
 		}
 	}
@@ -175,7 +174,7 @@ void make_flow_rules(MachineConfigurator conf) {
 		}
 		i++;
 	}
-	std::cout << (add_flow_command + "1,actions=" + outport_ports) << std::endl;
+
 	system((add_flow_command + "1,actions=" + outport_ports).c_str());
 }
 
@@ -221,8 +220,7 @@ void reset(MachineConfigurator c) {
 int main(int argc, char *argv[]) {
 	
 	MachineConfigurator conf = get_machine_configurator();
-	
-	if (argc > 1 && argv[1] == "-r") {
+	if (argc > 0 && argv[1] == "-r") {
 		reset(conf);
 	} else {
 		// making a dummy service graph
