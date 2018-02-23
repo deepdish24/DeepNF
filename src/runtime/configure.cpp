@@ -205,7 +205,7 @@ void reset(MachineConfigurator c) {
 	// clean up merger and classifier
 	system((del_ports_cmd + "classifier").c_str());
 	system((del_ports_cmd + "merger").c_str());
-	system(("docker stop classifier merger; docker rm classifier merger").c_str());
+	system("docker stop classifier merger; docker rm classifier merger");
 
 	std::vector<RuntimeNode> nodes = get_internal_nodes(c);
 	for (RuntimeNode n : nodes) {
