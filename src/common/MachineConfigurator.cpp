@@ -35,7 +35,7 @@ std::string MachineConfigurator::get_docker_image_name(int node_id, NF nf) {
 }
 
 std::string MachineConfigurator::get_dockerfile(NF nf) {
-	std::string path = "/home/ec2-user/DeepNF/runtime/nf_configs/";
+	std::string path = "/home/ec2-user/DeepNF/src/runtime/nf_configs/";
 	switch(nf) {
 		case snort: path += "snort";
 		break;
