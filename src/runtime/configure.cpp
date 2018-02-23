@@ -182,8 +182,22 @@ void make_flow_rules(MachineConfigurator conf) {
 /**
  * Runs the NF on each node
  */
-void start_network_functions() {
-	// TODO: implement
+void start_network_functions(MachineConfigurator c) {
+	std::string docker_exec_command = "docker exec -it ";
+	std::vector<RuntimeNode> nodes = get_internal_nodes(c);
+	std::string exec_nf_cmd;
+	for (RuntimeNode n : nodes) {
+		std::string exec_nf_cmd = docker_exec_command + n.get_name() + " ";
+		switch(n.get_nf()) {
+		case snort:
+			exec_nf_cmd += "snort -N -A console -q -c /etc/snort/snort.conf -Q -i eth1:eth2"; 
+			break;
+		case haproxy:
+			exec_nf_cmd += "service haproxy start";
+			break;
+		}
+		system(exec_nf_cmd.c_str());
+	}
 }
 
 /**
@@ -193,11 +207,9 @@ int main(int argc, char *argv[]) {
 	
 	// making a dummy service graph
 	MachineConfigurator conf = get_machine_configurator();
-	
 	setup_nodes(conf);
 	conf = setup_bridge_ports(conf);
-	
 	make_flow_rules(conf);
-	start_network_functions();
+	start_network_functions(conf);
 	return 0;
 }
