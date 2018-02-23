@@ -138,6 +138,7 @@ void make_flow_rules(MachineConfigurator conf) {
 	for (RuntimeNode n : nodes) {
 		
 		if (is_source_node(n, nodes)) { // flow from classifier to this node
+			std::cout << n.inport << std::endl;
 			source_node_inports.push_back(n.inport);
 			// system((add_flow_command + "1,actions=" + std::to_string(n.inport)).c_str());
 		} else if (n.get_neighbors().size() == 0) { // if node is a sink, flow from this node to merger
