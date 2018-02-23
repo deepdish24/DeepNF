@@ -80,7 +80,7 @@ void setup_nodes(MachineConfigurator conf) {
 		system(("docker build -t=" + image_name + " " + config_dir).c_str());
 
 		// create a new Docker container for the node
-		system(("docker run --name " + n.get_name() + " -t -i " + image_name + ":latest").c_str());
+		system(("docker run --name " + n.get_name() + " -d -t -i " + image_name + ":latest").c_str());
 	}
 }
 
