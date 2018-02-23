@@ -183,9 +183,9 @@ int main(int argc, char *argv[]) {
 	MachineConfigurator conf = get_machine_configurator();
 	
 	setup_nodes(conf);
-	// setup_bridge_ports(conf);
+	setup_bridge_ports(conf);
 	
-	// make_flow_rules(conf);
+	make_flow_rules(conf);
 	start_network_functions();
 	return 0;
 }
