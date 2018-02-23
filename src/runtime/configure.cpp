@@ -13,7 +13,7 @@ MachineConfigurator get_machine_configurator() {
 	n3.ip = "173.16.1.4";
 
 	Machine m (0);
-	m.set_bridge_ip("173.16.1.1")
+	m.set_bridge_ip("173.16.1.1");
 	m.add_node_id(1);
 	m.add_node_id(2);
 	m.add_node_id(3);
@@ -164,7 +164,7 @@ void make_flow_rules(MachineConfigurator conf) {
 			outport_ports += std::to_string(p) + ",";
 		}
 	}
-	system((add_flow_command + "1,actions=" + outport_ports.c_str());
+	system((add_flow_command + "1,actions=" + outport_ports).c_str());
 }
 
 /**
