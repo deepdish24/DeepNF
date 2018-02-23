@@ -41,6 +41,8 @@ public:
 
     int get_id();
 
+    std::string get_name();
+
     NF get_nf();
 
 };

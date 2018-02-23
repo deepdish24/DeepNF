@@ -78,7 +78,7 @@ void setup_nodes(MachineConfigurator conf) {
 		system(("docker build -t=" + image_name + " " + config_dir).c_str());
 
 		// create a new Docker container for the node
-		system(("docker run --name node" + std::to_string(node_id) + " -t -i " + image_name + ":latest").c_str());
+		system(("docker run --name " + n.get_name() + " -t -i " + image_name + ":latest").c_str());
 	}
 }
 
@@ -105,17 +105,17 @@ void setup_bridge_ports(MachineConfigurator conf) {
 	for (RuntimeNode n : nodes) {
 		
 		std::string add_port_command = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br1";
-		std::string node_id = std::to_string(n.get_id());
+		// std::string node_id = std::to_string(n.get_id());
 		switch(n.get_nf()) {
 			case snort:
-			system((add_port_command + " eth1 " + node_id).c_str());
+			system((add_port_command + " eth1 " + n.get_name()).c_str());
 			n.inport = ofport ++;
-			system((add_port_command + " eth2 " + node_id).c_str());
+			system((add_port_command + " eth2 " + n.get_name()).c_str());
 			n.outport = ofport ++;
 			break;
 			
 			case haproxy:
-			system((add_port_command + " eth1 " + node_id + " --ipaddress=" + n.ip).c_str());
+			system((add_port_command + " eth1 " + n.get_name() + " --ipaddress=" + n.ip).c_str());
 			n.inport = ofport ++;
 			n.outport = n.inport;
 			break;
