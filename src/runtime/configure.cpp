@@ -11,6 +11,8 @@ MachineConfigurator get_machine_configurator() {
 	n1.ip = "173.16.1.2";
 	n2.ip = "173.16.1.3";
 	n3.ip = "173.16.1.4";
+	n1.add_neighbor(2);
+	n2.add_neighbor(3);
 
 	Machine m (0);
 	m.set_bridge_ip("173.16.1.1");
