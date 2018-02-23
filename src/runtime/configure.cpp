@@ -220,8 +220,7 @@ void reset(MachineConfigurator c) {
 int main(int argc, char *argv[]) {
 	
 	MachineConfigurator conf = get_machine_configurator();
-	std::cout << argc << " " << argv[1] << std:: endl;
-	if (argc > 1 && argv[1] == "-r") {
+	if (argc > 1 && std::string(argv[1]).find("-r") == 0) {
 		reset(conf);
 	} else {
 		// making a dummy service graph
