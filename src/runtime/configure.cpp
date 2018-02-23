@@ -8,8 +8,12 @@ MachineConfigurator get_machine_configurator() {
 	RuntimeNode n1 (1, snort);
 	RuntimeNode n2 (2, haproxy);
 	RuntimeNode n3 (3, snort);
+	n1.ip = "173.16.1.2";
+	n2.ip = "173.16.1.3";
+	n3.ip = "173.16.1.4";
 
 	Machine m (0);
+	m.set_bridge_ip("173.16.1.1")
 	m.add_node_id(1);
 	m.add_node_id(2);
 	m.add_node_id(3);
@@ -129,11 +133,13 @@ void make_flow_rules(MachineConfigurator conf) {
 	std::string add_flow_command = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-ofctl add-flow ovs-br1 in_port=";
 	
 	std::vector<RuntimeNode> nodes = get_internal_nodes(conf);
+	std::vector<int> source_node_inports;
 	
 	for (RuntimeNode n : nodes) {
 		
 		if (is_source_node(n, nodes)) { // flow from classifier to this node
-			system((add_flow_command + "1,actions=" + std::to_string(n.inport)).c_str());
+			source_node_inports.push_back(n.inport);
+			// system((add_flow_command + "1,actions=" + std::to_string(n.inport)).c_str());
 		} else if (n.get_neighbors().size() == 0) { // if node is a sink, flow from this node to merger
 			system((add_flow_command + std::to_string(n.outport) + ",actions=2").c_str());
 		} else { // flow from output port of this node to all its successors ports
@@ -149,6 +155,16 @@ void make_flow_rules(MachineConfigurator conf) {
 			system((add_flow_command + std::to_string(n.outport) + ",actions=" + outport_ports).c_str());
 		}
 	}
+	std::string outport_ports = "";
+	int i = 0;
+	for (int p : source_node_inports) {
+		if (i == source_node_inports.size() - 1) {
+			outport_ports += std::to_string(p);
+		} else {
+			outport_ports += std::to_string(p) + ",";
+		}
+	}
+	system((add_flow_command + "1,actions=" + outport_ports.c_str());
 }
 
 /**

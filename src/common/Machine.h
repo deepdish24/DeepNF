@@ -13,6 +13,7 @@ class Machine
         std::string get_ip();
         std::string get_bridge_ip();
         std::vector<int> get_node_ids();
+        void set_bridge_ip(std::string bridge_ip);
         void add_node_id(int n);
 
     private:

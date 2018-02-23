@@ -24,6 +24,8 @@ std::string Machine::get_bridge_ip() { return bridge_ip; }
 
 std::vector<int> Machine::get_node_ids() { return nodes; }
 
+void Machine::set_bridge_ip(std::string bridge_ip) { this->bridge_ip = bridge_ip; }
+
 void Machine::add_node_id(int n) {
 	nodes.push_back(n);
 }
