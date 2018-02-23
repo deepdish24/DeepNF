@@ -65,8 +65,8 @@ void setup_nodes(MachineConfigurator conf) {
 		}
 
 		std::string config_dir = conf.get_config_dir(node_id);
-		conf.make_config_dir();
-		
+		conf.make_config_dir(node_id);
+
 		std::string image_name = conf.get_docker_image_name(node_id, node_nf);
 		if (image_name == "") {
 			// TODO: raise exception
