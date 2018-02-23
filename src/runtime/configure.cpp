@@ -54,8 +54,8 @@ void setup_nodes(MachineConfigurator conf) {
 	std::vector<RuntimeNode> nodes = get_internal_nodes(conf);
 
 	// create new containers for classifier and merger
-	system("docker run -t -i --name classifier ubuntu echo \"classifier created\"");
-	system("docker run -t -i --name merger ubuntu echo \"merger created\"");	
+	system("docker run -d -t -i --name classifier ubuntu echo \"classifier created\"");
+	system("docker run -d -t -i --name merger ubuntu echo \"merger created\"");	
 	
 	for (RuntimeNode n : nodes) {
 		int node_id = n.get_id();
@@ -87,18 +87,18 @@ void setup_nodes(MachineConfigurator conf) {
 MachineConfigurator setup_bridge_ports(MachineConfigurator conf) {
 
 	// create a bridge
-	system("sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-vsctl del-br ovs-br1");
-	system("sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-vsctl add-br ovs-br1");
+	system("sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-vsctl del-br ovs-br");
+	system("sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-vsctl add-br ovs-br");
 	
 	// get bridge ip
 	Machine cur_machine = conf.get_machine_with_id(conf.get_machine_id());
 	std::string bridge_ip = cur_machine.get_bridge_ip();
 	
-	system(("sudo ifconfig ovs-br1 " + bridge_ip + " netmask 255.255.255.0 up").c_str());
+	system(("sudo ifconfig ovs-br " + bridge_ip + " netmask 255.255.255.0 up").c_str());
 	
 	// connect containers to the bridge
-	std::string add_port_classifier = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br1 eth1 classifier";
-	std::string add_port_merger = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br1 eth1 merger";
+	std::string add_port_classifier = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br eth1 classifier";
+	std::string add_port_merger = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br eth1 merger";
 	system(add_port_classifier.c_str());
 	system(add_port_merger.c_str());
 
@@ -107,7 +107,7 @@ MachineConfigurator setup_bridge_ports(MachineConfigurator conf) {
 	int ofport = 3;
 	for (RuntimeNode n : nodes) {
 		
-		std::string add_port_command = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br1";
+		std::string add_port_command = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br";
 		// std::string node_id = std::to_string(n.get_id());
 		switch(n.get_nf()) {
 			case snort:
@@ -136,7 +136,7 @@ MachineConfigurator setup_bridge_ports(MachineConfigurator conf) {
  * reference: https://paper.dropbox.com/doc/Flows-in-OpenVSwitch-nVRg9phHBr5JSZO2vFwCJ?_tk=share_copylink
  */
 void make_flow_rules(MachineConfigurator conf) {
-	std::string add_flow_command = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-ofctl add-flow ovs-br1 in_port=";
+	std::string add_flow_command = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-ofctl add-flow ovs-br in_port=";
 	
 	std::vector<RuntimeNode> nodes = get_internal_nodes(conf);
 	std::vector<int> source_node_inports;
@@ -183,7 +183,7 @@ void make_flow_rules(MachineConfigurator conf) {
  * Runs the NF on each node
  */
 void start_network_functions(MachineConfigurator c) {
-	std::string docker_exec_command = "docker run -it ";
+	std::string docker_exec_command = "docker exec -it ";
 	std::vector<RuntimeNode> nodes = get_internal_nodes(c);
 	std::string exec_nf_cmd;
 	for (RuntimeNode n : nodes) {

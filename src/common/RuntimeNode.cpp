@@ -17,5 +17,5 @@ int RuntimeNode::get_id() { return id; }
 
 NF RuntimeNode::get_nf() { return nf; }
 
-std::string RuntimeNode::get_name() { return "node" + std::to_string(id); }
+std::string RuntimeNode::get_name() { return "n" + std::to_string(id); }
 
