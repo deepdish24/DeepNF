@@ -21,7 +21,7 @@ void MachineConfigurator::make_config_dir(int node_id) {
 }
 
 std::string MachineConfigurator::get_config_dir(int node_id) {
-	return "/home/ec2-user/" + std::to_string(node_id);
+	return "/home/ec2-user/" + std::to_string(node_id) + "/";
 }
 
 std::string MachineConfigurator::get_docker_image_name(int node_id, NF nf) {
