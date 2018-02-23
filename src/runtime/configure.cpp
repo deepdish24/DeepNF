@@ -202,6 +202,11 @@ void start_network_functions(MachineConfigurator c) {
 void reset(MachineConfigurator c) {
 	std::string del_ports_cmd = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker del-ports ovs-br ";
 
+	// clean up merger and classifier
+	system((del_ports_cmd + "classifier").c_str());
+	system((del_ports_cmd + "merger").c_str());
+	system(("docker stop classifier merger; docker rm classifier merger").c_str());
+
 	std::vector<RuntimeNode> nodes = get_internal_nodes(c);
 	for (RuntimeNode n : nodes) {
 		// remove all veth pairs for this node
