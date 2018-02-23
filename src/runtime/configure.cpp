@@ -54,8 +54,8 @@ void setup_nodes(MachineConfigurator conf) {
 	std::vector<RuntimeNode> nodes = get_internal_nodes(conf);
 
 	// create new containers for classifier and merger
-	system("docker run -d -t -i --name classifier ubuntu echo \"classifier created\"");
-	system("docker run -d -t -i --name merger ubuntu echo \"merger created\"");	
+	system("docker run -d -t -i --name classifier ubuntu /bin/bash");
+	system("docker run -d -t -i --name merger ubuntu /bin/bash");	
 	
 	for (RuntimeNode n : nodes) {
 		int node_id = n.get_id();
@@ -80,14 +80,14 @@ void setup_nodes(MachineConfigurator conf) {
 		system(("docker build -t=" + image_name + " " + config_dir).c_str());
 
 		// create a new Docker container for the node
-		system(("docker run --name " + n.get_name() + " -d -t -i " + image_name + ":latest").c_str());
+		system(("docker run -d -t -i --name " + n.get_name() + " " + image_name + ":latest /bin/bash").c_str());
 	}
 }
 
 MachineConfigurator setup_bridge_ports(MachineConfigurator conf) {
 
 	// create a bridge
-	system("sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-vsctl del-br ovs-br");
+	// system("sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-vsctl del-br ovs-br");
 	system("sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-vsctl add-br ovs-br");
 	
 	// get bridge ip
