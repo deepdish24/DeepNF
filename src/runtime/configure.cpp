@@ -5,6 +5,7 @@
 #include "../common/MachineConfigurator.h"
 
 MachineConfigurator get_machine_configurator() {
+	
 	RuntimeNode n1 (1, snort);
 	RuntimeNode n2 (2, haproxy);
 	RuntimeNode n3 (3, snort);
@@ -87,7 +88,6 @@ void setup_nodes(MachineConfigurator conf) {
 MachineConfigurator setup_bridge_ports(MachineConfigurator conf) {
 
 	// create a bridge
-	// system("sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-vsctl del-br ovs-br");
 	system("sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-vsctl add-br ovs-br");
 	
 	// get bridge ip
@@ -183,7 +183,7 @@ void make_flow_rules(MachineConfigurator conf) {
  * Runs the NF on each node
  */
 void start_network_functions(MachineConfigurator c) {
-	std::string docker_exec_command = "docker exec -it ";
+	std::string docker_exec_command = "docker exec -d -t -i ";
 	std::vector<RuntimeNode> nodes = get_internal_nodes(c);
 	std::string exec_nf_cmd;
 	for (RuntimeNode n : nodes) {
@@ -200,16 +200,38 @@ void start_network_functions(MachineConfigurator c) {
 	}
 }
 
+void reset(MachineConfigurator c) {
+	std::string del_ports_cmd = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker del-ports ovs-br ";
+
+	std::vector<RuntimeNode> nodes = get_internal_nodes(c);
+	for (RuntimeNode n : nodes) {
+		// remove all veth pairs for this node
+		system((del_ports_cmd + n.get_name()).c_str());
+		// stop and remove the docker container for this node
+		system(("docker stop " + n.get_name() + "; docker rm " + n.get_name()).c_str());
+	}
+
+	// delete the bridge
+	system("sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-vsctl del-br ovs-br");
+}
+
 /**
  * Takes in node info, NF config files and flow rules from user and automates the setup of runtime components.
  */
 int main(int argc, char *argv[]) {
 	
-	// making a dummy service graph
 	MachineConfigurator conf = get_machine_configurator();
-	setup_nodes(conf);
-	conf = setup_bridge_ports(conf);
-	make_flow_rules(conf);
-	start_network_functions(conf);
+	
+	if (argc > 1 && argv[1] == "-r") {
+		reset(conf);
+	} else {
+		// making a dummy service graph
+		setup_nodes(conf);
+		conf = setup_bridge_ports(conf);
+		make_flow_rules(conf);
+		start_network_functions(conf);
+	}
+
 	return 0;
 }
+
