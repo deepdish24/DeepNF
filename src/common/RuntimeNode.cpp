@@ -3,6 +3,8 @@
 RuntimeNode::RuntimeNode(int n, NF f) {
 	this->id = n; 
 	nf = f;
+	inport = 0;
+	outport = 0;
 }
 
 void RuntimeNode::add_neighbor(int node_id) {
