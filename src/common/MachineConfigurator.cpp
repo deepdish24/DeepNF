@@ -44,7 +44,7 @@ std::string MachineConfigurator::get_dockerfile(NF nf) {
 		default: return "";
 	}
 
-	path += "Dockerfile";
+	path += "/Dockerfile";
 
 	return path;
 }
