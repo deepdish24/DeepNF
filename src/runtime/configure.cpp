@@ -97,8 +97,8 @@ MachineConfigurator setup_bridge_ports(MachineConfigurator conf) {
 	system(("sudo ifconfig ovs-br1 " + bridge_ip + " netmask 255.255.255.0 up").c_str());
 	
 	// connect containers to the bridge
-	std::string add_port_merger = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br1 eth1 classifier";
-	std::string add_port_classifier = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br1 eth1 merger";
+	std::string add_port_classifier = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br1 eth1 classifier";
+	std::string add_port_merger = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br1 eth1 merger";
 	system(add_port_classifier.c_str());
 	system(add_port_merger.c_str());
 
@@ -147,7 +147,9 @@ void make_flow_rules(MachineConfigurator conf) {
 			std::cout << n.inport << std::endl;
 			source_node_inports.push_back(n.inport);
 			// system((add_flow_command + "1,actions=" + std::to_string(n.inport)).c_str());
-		} else if (n.get_neighbors().size() == 0) { // if node is a sink, flow from this node to merger
+		}
+
+		if (n.get_neighbors().size() == 0) { // if node is a sink, flow from this node to merger
 			system((add_flow_command + std::to_string(n.outport) + ",actions=2").c_str());
 		} else { // flow from output port of this node to all its successors ports
 			std::vector<int> neighbors = n.get_neighbors();
