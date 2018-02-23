@@ -43,4 +43,6 @@ public:
 	void add_machine(Machine m);
 
 	void add_node(RuntimeNode n);
+
+	void update_node(RuntimeNode n);
 };

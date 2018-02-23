@@ -76,6 +76,10 @@ void MachineConfigurator::add_node(RuntimeNode n) {
 	node_map.insert(make_pair(n.get_id(), n));
 }
 
+void MachineConfigurator::update_node(RuntimeNode n) {
+	node_map.erase(n.get_id());
+	node_map.insert(std::make_pair(n.get_id(), n));
+}
 
 
 

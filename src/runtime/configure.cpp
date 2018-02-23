@@ -84,7 +84,7 @@ void setup_nodes(MachineConfigurator conf) {
 	}
 }
 
-void setup_bridge_ports(MachineConfigurator conf) {
+MachineConfigurator setup_bridge_ports(MachineConfigurator conf) {
 
 	// create a bridge
 	system("sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-vsctl del-br ovs-br1");
@@ -103,6 +103,7 @@ void setup_bridge_ports(MachineConfigurator conf) {
 	system(add_port_merger.c_str());
 
 	std::vector<RuntimeNode> nodes = get_internal_nodes(conf);
+
 	int ofport = 3;
 	for (RuntimeNode n : nodes) {
 		
@@ -124,7 +125,10 @@ void setup_bridge_ports(MachineConfigurator conf) {
 			
 			default: break;
 		}
+		conf.update_node(n);
 	}
+
+	return conf;
 }
 
 /**
@@ -189,7 +193,7 @@ int main(int argc, char *argv[]) {
 	MachineConfigurator conf = get_machine_configurator();
 	
 	setup_nodes(conf);
-	setup_bridge_ports(conf);
+	conf = setup_bridge_ports(conf);
 	
 	make_flow_rules(conf);
 	start_network_functions();
