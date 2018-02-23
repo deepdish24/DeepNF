@@ -160,7 +160,7 @@ void make_flow_rules(MachineConfigurator conf) {
 					outport_ports += ",";
 				}
 			}
-			
+
 			system((add_flow_command + std::to_string(n.outport) + ",actions=" + outport_ports).c_str());
 		}
 	}
@@ -220,7 +220,8 @@ void reset(MachineConfigurator c) {
 int main(int argc, char *argv[]) {
 	
 	MachineConfigurator conf = get_machine_configurator();
-	if (argc > 0 && argv[1] == "-r") {
+	std::cout << argc << " " << argv[1] << std:: endl;
+	if (argc > 1 && argv[1] == "-r") {
 		reset(conf);
 	} else {
 		// making a dummy service graph
