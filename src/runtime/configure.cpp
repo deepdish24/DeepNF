@@ -190,7 +190,7 @@ void start_network_functions(MachineConfigurator c) {
 		std::string exec_nf_cmd = docker_exec_command + c.get_docker_image_name(n.get_id(), n.get_nf()) + " ";
 		switch(n.get_nf()) {
 		case snort:
-			exec_nf_cmd += "snort -N -A console -q -c /etc/snort/snort.conf --daq afpacket -Q -i eth3:eth4"; 
+			exec_nf_cmd += "snort -N -A console -q -c /etc/snort/snort.conf -Q -i eth3:eth4"; 
 			break;
 		case haproxy:
 			exec_nf_cmd += "service haproxy start";
