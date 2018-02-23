@@ -111,9 +111,9 @@ MachineConfigurator setup_bridge_ports(MachineConfigurator conf) {
 		// std::string node_id = std::to_string(n.get_id());
 		switch(n.get_nf()) {
 			case snort:
-			system((add_port_command + " eth3 " + n.get_name()).c_str());
+			system((add_port_command + " eth1 " + n.get_name()).c_str());
 			n.inport = ofport ++;
-			system((add_port_command + " eth4 " + n.get_name()).c_str());
+			system((add_port_command + " eth2 " + n.get_name()).c_str());
 			n.outport = ofport ++;
 			break;
 			
@@ -187,10 +187,10 @@ void start_network_functions(MachineConfigurator c) {
 	std::vector<RuntimeNode> nodes = get_internal_nodes(c);
 	std::string exec_nf_cmd;
 	for (RuntimeNode n : nodes) {
-		std::string exec_nf_cmd = docker_exec_command + c.get_docker_image_name(n.get_id(), n.get_nf()) + " ";
+		std::string exec_nf_cmd = docker_exec_command + n.get_name() + " ";
 		switch(n.get_nf()) {
 		case snort:
-			exec_nf_cmd += "snort -N -A console -q -c /etc/snort/snort.conf -Q -i eth3:eth4"; 
+			exec_nf_cmd += "snort -N -A console -q -c /etc/snort/snort.conf -Q -i eth1:eth2"; 
 			break;
 		case haproxy:
 			exec_nf_cmd += "service haproxy start";
