@@ -187,6 +187,7 @@ void start_network_functions(MachineConfigurator c) {
 	std::vector<RuntimeNode> nodes = get_internal_nodes(c);
 	std::string exec_nf_cmd;
 	for (RuntimeNode n : nodes) {
+		system(("docker start " + n.get_name()).c_str());
 		std::string exec_nf_cmd = docker_exec_command + n.get_name() + " ";
 		switch(n.get_nf()) {
 		case snort:
