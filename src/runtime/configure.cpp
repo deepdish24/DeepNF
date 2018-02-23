@@ -52,8 +52,8 @@ void setup_nodes(MachineConfigurator conf) {
 	std::vector<RuntimeNode> nodes = get_internal_nodes(conf);
 
 	// create new containers for classifier and merger
-	system("docker run -t -i --name classifier ubuntu echo \"classifier created\"");
-	system("docker run -t -i --name merger ubuntu echo \"merger created\"");	
+	std::cout << ("docker run -t -i --name classifier ubuntu echo \"classifier created\"");
+	std::cout << ("docker run -t -i --name merger ubuntu echo \"merger created\"");	
 	
 	for (RuntimeNode n : nodes) {
 		int node_id = n.get_id();
@@ -72,33 +72,33 @@ void setup_nodes(MachineConfigurator conf) {
 			// TODO: raise exception
 		}
 		// store Dockerfile in node config directory
-		system(("cp " + dockerfile_path + " " + config_dir).c_str());
+		std::cout << (("cp " + dockerfile_path + " " + config_dir).c_str());
 		
 		// build Docker image with the network function installed and configured
-		system(("docker build -t=" + image_name + " " + config_dir).c_str());
+		std::cout << (("docker build -t=" + image_name + " " + config_dir).c_str());
 
 		// create a new Docker container for the node
-		system(("docker run --name " + std::to_string(node_id) + " -t -i " + image_name + ":latest").c_str());
+		std::cout << (("docker run --name " + std::to_string(node_id) + " -t -i " + image_name + ":latest").c_str());
 	}
 }
 
 void setup_bridge_ports(MachineConfigurator conf) {
 
 	// create a bridge
-	system("sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-vsctl del-br ovs-br1");
-	system("sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-vsctl add-br ovs-br1");
+	std::cout << ("sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-vsctl del-br ovs-br1");
+	std::cout << ("sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-vsctl add-br ovs-br1");
 	
 	// get bridge ip
 	Machine cur_machine = conf.get_machine_with_id(conf.get_machine_id());
 	std::string bridge_ip = cur_machine.get_bridge_ip();
 	
-	system(("sudo ifconfig ovs-br1 " + bridge_ip + " netmask 255.255.255.0 up").c_str());
+	std::cout << (("sudo ifconfig ovs-br1 " + bridge_ip + " netmask 255.255.255.0 up").c_str());
 	
 	// connect containers to the bridge
 	std::string add_port_merger = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br1 eth1 classifier";
 	std::string add_port_classifier = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br1 eth1 merger";
-	system(add_port_classifier.c_str());
-	system(add_port_merger.c_str());
+	std::cout << (add_port_classifier.c_str());
+	std::cout << (add_port_merger.c_str());
 
 	std::vector<RuntimeNode> nodes = get_internal_nodes(conf);
 	int ofport = 3;
@@ -108,14 +108,14 @@ void setup_bridge_ports(MachineConfigurator conf) {
 		std::string node_id = std::to_string(n.get_id());
 		switch(n.get_nf()) {
 			case snort:
-			system((add_port_command + " eth1 " + node_id).c_str());
+			std::cout << ((add_port_command + " eth1 " + node_id).c_str());
 			n.inport = ofport ++;
-			system((add_port_command + " eth2 " + node_id).c_str());
+			std::cout << ((add_port_command + " eth2 " + node_id).c_str());
 			n.outport = ofport ++;
 			break;
 			
 			case haproxy:
-			system((add_port_command + " eth1 " + node_id + " --ipaddress=" + n.ip).c_str());
+			std::cout << ((add_port_command + " eth1 " + node_id + " --ipaddress=" + n.ip).c_str());
 			n.inport = ofport ++;
 			n.outport = n.inport;
 			break;
@@ -139,9 +139,9 @@ void make_flow_rules(MachineConfigurator conf) {
 		
 		if (is_source_node(n, nodes)) { // flow from classifier to this node
 			source_node_inports.push_back(n.inport);
-			// system((add_flow_command + "1,actions=" + std::to_string(n.inport)).c_str());
+			// std::cout << ((add_flow_command + "1,actions=" + std::to_string(n.inport)).c_str());
 		} else if (n.get_neighbors().size() == 0) { // if node is a sink, flow from this node to merger
-			system((add_flow_command + std::to_string(n.outport) + ",actions=2").c_str());
+			std::cout << ((add_flow_command + std::to_string(n.outport) + ",actions=2").c_str());
 		} else { // flow from output port of this node to all its successors ports
 			std::vector<int> neighbors = n.get_neighbors();
 			std::string outport_ports = "";
@@ -152,7 +152,7 @@ void make_flow_rules(MachineConfigurator conf) {
 					outport_ports += ",";
 				}
 			}
-			system((add_flow_command + std::to_string(n.outport) + ",actions=" + outport_ports).c_str());
+			std::cout << ((add_flow_command + std::to_string(n.outport) + ",actions=" + outport_ports).c_str());
 		}
 	}
 	std::string outport_ports = "";
@@ -164,7 +164,7 @@ void make_flow_rules(MachineConfigurator conf) {
 			outport_ports += std::to_string(p) + ",";
 		}
 	}
-	system((add_flow_command + "1,actions=" + outport_ports).c_str());
+	std::cout << ((add_flow_command + "1,actions=" + outport_ports).c_str());
 }
 
 /**
