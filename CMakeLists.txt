@@ -3,7 +3,6 @@ cmake_minimum_required (VERSION 3.7)
 
 set (DeepNF_VERSION_MAJOR 1)
 set (DeepNF_VERSION_MINOR 0)
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I/usr/local/Cellar/nlohmann_json/3.1.0/include") 
 
 include(ExternalProject)
 ExternalProject_Add(google_protobuf

@@ -1,8 +1,8 @@
 #include <stdlib.h>
 #include <iostream>
 
-#include "../common/RuntimeNode.h"
-#include "../common/MachineConfigurator.h"
+#include "../../common/RuntimeNode.h"
+#include "../../common/MachineConfigurator.h"
 
 MachineConfigurator get_machine_configurator() {
 	
@@ -221,6 +221,7 @@ void reset(MachineConfigurator c) {
 
 /**
  * Takes in node info, NF config files and flow rules from user and automates the setup of runtime components.
+ * Optional flag -r to remove all resources and undo the configuration.
  */
 int main(int argc, char *argv[]) {
 	
