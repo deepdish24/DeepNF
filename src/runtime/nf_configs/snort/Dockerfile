@@ -3,7 +3,7 @@ FROM ubuntu:latest
 MAINTAINER Akash Subramanian <skythelimit.96@gmail.com>
 
 RUN apt-get update -y && \
-    apt-get update -y && \
+    apt-get upgrade -y && \
     apt-get install -y \
     openssh-server ethtool build-essential libpcap-dev libpcre3-dev libdumbnet-dev bison flex zlib1g-dev liblzma-dev openssl libssl-dev
 
