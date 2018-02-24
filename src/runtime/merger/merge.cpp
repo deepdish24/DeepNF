@@ -16,6 +16,25 @@ void my_callback(u_char *args, const struct pcap_pkthdr* pkthdr, const u_char* p
     count++;
 }
 
+void another_callback(u_char *arg, const struct pcap_pkthdr* pkthdr,
+        const u_char* packet)
+{
+    int i=0;
+    static int count=0;
+ 
+    printf("Packet Count: %d\n", ++count);    /* Number of Packets */
+    printf("Recieved Packet Size: %d\n", pkthdr->len);    /* Length of header */
+    printf("Payload:\n");                     /* And now the data */
+    for(i=0;i<pkthdr->len;i++) {
+        if(isprint(packet[i]))                /* Check if the packet data is printable */
+            printf("%c ",packet[i]);          /* Print it */
+        else
+            printf(" . ",packet[i]);          /* If not print a . */
+        if((i%16==0 && i!=0) || i==pkthdr->len-1)
+            printf("\n");
+    }
+}
+
 int main(int argc,char **argv)
 {
     int i;
@@ -65,6 +84,6 @@ int main(int argc,char **argv)
     }
  
     /* loop for callback function */
-    pcap_loop(descr, -1, my_callback, NULL);
+    pcap_loop(descr, -1, another_callback, NULL);
     return 0;
 }
