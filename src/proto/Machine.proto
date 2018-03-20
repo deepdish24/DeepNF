@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+message Machine {
+    uint64 id = 1;
+    string ip = 2;
+    string bridge_ip = 3;
+    repeated uint64 nodes = 4;
+}

@@ -1,10 +1,9 @@
 
-#include "ServiceGraphUtil.h"
-//#include "src/protobuf/Node.proto"
+#include "src/proto/Machine.pb.h"
 
-//using namespace google::protobuf::io;
+using namespace google::protobuf::io;
 
-namespace service_graph_util
+namespace service_graph_utilxw
 {
 
 
