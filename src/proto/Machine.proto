@@ -1,8 +1,29 @@
 syntax = "proto3";
 
-message Machine {
+message MachineMsg {
     uint64 id = 1;
     string ip = 2;
     string bridge_ip = 3;
     repeated uint64 nodes = 4;
+}
+
+message RuntimeNodeMsg {
+    enum NF {
+        SNORT = 0;
+        HAPROXY = 1;
+    }
+
+    uint64 id = 1;
+    NF nf = 2;
+    repeated uint64 neighbors = 3;
+    uint64 inport = 4;
+    uint64 output = 5;
+    uint64 machine_id = 6;
+    string ip = 7;
+}
+
+message MachineConfiguratorMsg {
+    uint64 machine_id = 1;
+    map<uint64, MachineMsg> machine_map = 2;
+    map<uint64, RuntimeNodeMsg> node_map = 3;
 }

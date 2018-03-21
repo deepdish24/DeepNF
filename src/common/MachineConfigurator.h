@@ -14,15 +14,15 @@ private:
 	int machine_id;
 
     // maps machine id to machine object
-    std::map<int, Machine> machine_map;
+    std::map<int, Machine*> machine_map;
 
     // maps node id to node
-    std::map<int, RuntimeNode> node_map;
+    std::map<int, RuntimeNode*> node_map;
 
 public:
 	
 	
-	MachineConfigurator(Machine m);
+	MachineConfigurator(Machine* m);
 
 	void make_config_dir(int node_id);
 
@@ -34,15 +34,15 @@ public:
 
 	std::string get_dockerfile(NF nf);
 
-	Machine get_machine_with_id(int mac_id);
+	Machine* get_machine_with_id(int mac_id);
 
-	RuntimeNode get_node_with_id(int node_id);
+	RuntimeNode* get_node_with_id(int node_id);
 
-	std::vector<RuntimeNode> get_nodes_for_machine(int mac_id);
+	std::vector<RuntimeNode*> get_nodes_for_machine(int mac_id);
 
-	void add_machine(Machine m);
+	void add_machine(Machine* m);
 
-	void add_node(RuntimeNode n);
+	void add_node(RuntimeNode* n);
 
-	void update_node(RuntimeNode n);
+	void update_node(RuntimeNode* n);
 };

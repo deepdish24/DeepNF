@@ -31,6 +31,7 @@ foreach(PROTOCOL_BUFFER ${PROTOCOL_BUFFERS})
 endforeach()
 
 include_directories(${GENERATED_DIR} ${CMAKE_BINARY_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/src)
+include_directories("usr/local/include/google/protobuf")
 link_directories(${CMAKE_BINARY_DIR}/lib)
 #link_directories(${CMAKE_BINARY_DIR}/lib64)
 

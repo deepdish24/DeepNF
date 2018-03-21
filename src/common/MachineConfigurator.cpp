@@ -4,8 +4,8 @@
 #include "MachineConfigurator.h"
 
 
-MachineConfigurator::MachineConfigurator(Machine m) {
-	machine_id = m.get_id();
+MachineConfigurator::MachineConfigurator(Machine* m) {
+	machine_id = m->get_id();
 	machine_map.insert(make_pair(machine_id, m));
 }
 
@@ -49,36 +49,31 @@ std::string MachineConfigurator::get_dockerfile(NF nf) {
 	return path;
 }
 
-Machine MachineConfigurator::get_machine_with_id(int mac_id) {
+Machine* MachineConfigurator::get_machine_with_id(int mac_id) {
 	return machine_map.at(mac_id);
 }
 
-RuntimeNode MachineConfigurator::get_node_with_id(int node_id) {
+RuntimeNode* MachineConfigurator::get_node_with_id(int node_id) {
 	return node_map.at(node_id);
 }
 
-std::vector<RuntimeNode> MachineConfigurator::get_nodes_for_machine(int mac_id) {
-	std::vector<RuntimeNode> result;
+std::vector<RuntimeNode*> MachineConfigurator::get_nodes_for_machine(int mac_id) {
+	std::vector<RuntimeNode*> result;
 	
-	Machine m = machine_map.at(mac_id);
-	for (int i : m.get_node_ids()) {
+	Machine* m = machine_map.at(mac_id);
+	for (int i : m->get_node_ids()) {
 		result.push_back(node_map.at(i));
 	}
 
 	return result;
 }
 
-void MachineConfigurator::add_machine(Machine m) {
-	machine_map.insert(make_pair(m.get_id(), m));
+void MachineConfigurator::add_machine(Machine* m) {
+	machine_map.insert(make_pair(m->get_id(), m));
 }
 
-void MachineConfigurator::add_node(RuntimeNode n) {
-	node_map.insert(make_pair(n.get_id(), n));
-}
-
-void MachineConfigurator::update_node(RuntimeNode n) {
-	node_map.erase(n.get_id());
-	node_map.insert(std::make_pair(n.get_id(), n));
+void MachineConfigurator::add_node(RuntimeNode* n) {
+	node_map.insert(make_pair(n->get_id(), n));
 }
 
 

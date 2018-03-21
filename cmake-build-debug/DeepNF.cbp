@@ -64,6 +64,10 @@
 				<Option type="2"/>
 				<Option compiler="clang"/>
 				<Compiler>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/generated"/>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/include"/>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src"/>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/usr/local/include/google/protobuf"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1"/>
 					<Add directory="/usr/local/include"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/9.0.0/include"/>
@@ -86,6 +90,10 @@
 				<Option type="2"/>
 				<Option compiler="clang"/>
 				<Compiler>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/generated"/>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/include"/>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src"/>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/usr/local/include/google/protobuf"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1"/>
 					<Add directory="/usr/local/include"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/9.0.0/include"/>
@@ -108,6 +116,10 @@
 				<Option type="1"/>
 				<Option compiler="clang"/>
 				<Compiler>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/generated"/>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/include"/>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src"/>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/usr/local/include/google/protobuf"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1"/>
 					<Add directory="/usr/local/include"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/9.0.0/include"/>
@@ -130,6 +142,10 @@
 				<Option type="1"/>
 				<Option compiler="clang"/>
 				<Compiler>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/generated"/>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/include"/>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src"/>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/usr/local/include/google/protobuf"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1"/>
 					<Add directory="/usr/local/include"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/9.0.0/include"/>
@@ -152,6 +168,10 @@
 				<Option type="1"/>
 				<Option compiler="clang"/>
 				<Compiler>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/generated"/>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/include"/>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src"/>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/usr/local/include/google/protobuf"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1"/>
 					<Add directory="/usr/local/include"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/9.0.0/include"/>
@@ -174,6 +194,10 @@
 				<Option type="1"/>
 				<Option compiler="clang"/>
 				<Compiler>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/generated"/>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/include"/>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src"/>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/usr/local/include/google/protobuf"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1"/>
 					<Add directory="/usr/local/include"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/9.0.0/include"/>
@@ -196,6 +220,10 @@
 				<Option type="1"/>
 				<Option compiler="clang"/>
 				<Compiler>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/generated"/>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/include"/>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src"/>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/usr/local/include/google/protobuf"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1"/>
 					<Add directory="/usr/local/include"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/9.0.0/include"/>
@@ -218,6 +246,10 @@
 				<Option type="1"/>
 				<Option compiler="clang"/>
 				<Compiler>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/generated"/>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/include"/>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src"/>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/usr/local/include/google/protobuf"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1"/>
 					<Add directory="/usr/local/include"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/9.0.0/include"/>
@@ -240,6 +272,10 @@
 				<Option type="1"/>
 				<Option compiler="clang"/>
 				<Compiler>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/generated"/>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/include"/>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src"/>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/usr/local/include/google/protobuf"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1"/>
 					<Add directory="/usr/local/include"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/9.0.0/include"/>
@@ -262,6 +298,10 @@
 				<Option type="1"/>
 				<Option compiler="clang"/>
 				<Compiler>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/generated"/>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/include"/>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src"/>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/usr/local/include/google/protobuf"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1"/>
 					<Add directory="/usr/local/include"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/9.0.0/include"/>
@@ -308,10 +348,7 @@
 		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/listener/listener.cpp">
 			<Option target="listener"/>
 		</Unit>
-		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/protobuf/Machine.proto">
-			<Option target="protocol_buffers"/>
-		</Unit>
-		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/protobuf/ServiceGraph.proto">
+		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/proto/Machine.proto">
 			<Option target="protocol_buffers"/>
 		</Unit>
 		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/runtime/config/configure.cpp">
