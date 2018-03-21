@@ -18,3 +18,7 @@ set(HEADERS
 )
 
 add_library(common ${SOURCE_FILES} ${HEADERS})
+
+set_source_files_properties(${PROTOCOL_BUFFERS} PROPERTIES GENERATED TRUE)
+target_link_libraries(common protobuf)
+add_dependencies(common protocol_buffers)

@@ -1,0 +1,1 @@
+cmd='/Applications/CLion.app/Contents/bin/cmake/bin/cmake;-GUnix Makefiles;/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/google_protobuf-prefix/src/google_protobuf/cmake;-Dprotobuf_BUILD_TESTS:BOOL=OFF;-Dprotobuf_BUILD_EXAMPLES:BOOL=OFF;-DCMAKE_INSTALL_PREFIX=/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug'

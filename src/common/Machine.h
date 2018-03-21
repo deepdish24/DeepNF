@@ -15,6 +15,7 @@ class Machine
         std::vector<int> get_node_ids();
         void set_bridge_ip(std::string bridge_ip);
         void add_node_id(int n);
+        void set_ip(std::string ip);
 
     private:
         int id;
