@@ -68,6 +68,15 @@ std::vector<RuntimeNode*> MachineConfigurator::get_nodes_for_machine(int mac_id)
 	return result;
 }
 
+std::map<int, Machine*> MachineConfigurator::get_machine_map() {
+    return machine_map;
+}
+
+std::map<int, RuntimeNode*> MachineConfigurator::get_node_map() {
+    return node_map;
+}
+
+
 void MachineConfigurator::add_machine(Machine* m) {
 	machine_map.insert(make_pair(m->get_id(), m));
 }
