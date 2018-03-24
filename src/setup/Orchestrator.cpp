@@ -13,7 +13,6 @@
 #include <ios>
 #include <tuple>
 #include <typeinfo>
-#include "../"
 
 Orchestrator::Orchestrator(std::string filepath, std::string action_file_path) {
     std::ifstream fileInput(filepath);
