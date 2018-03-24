@@ -7,7 +7,7 @@ using namespace google::protobuf::io;
 namespace service_graph_util
 {
 
-    /** Functions in this anonymous namespace can only be accessed by functions in service_graph_util **/
+    // functions defined in anonymous namespaces cannot be called from other classes (kinda like private functions)
     namespace {
 
         /**
@@ -34,6 +34,7 @@ namespace service_graph_util
          * @return  A MachineMsg representation of m
          */
         MachineMsg message_from_machine(Machine* m) {
+            printf("message_from_machine\n");
             MachineMsg message;
             message.set_id(m->get_id());
             message.set_ip(m->get_ip());
@@ -45,6 +46,7 @@ namespace service_graph_util
 
             return message;
         }
+
 
         /**
           * Initializes a RuntimeNode object that is equivalent to the RuntimeNodeMsg* input and returns
@@ -79,7 +81,10 @@ namespace service_graph_util
             }
 
             return rn;
+
+            return NULL;
         }
+
 
         /**
           * Takes in a pointer to a RuntimeNode object, then creates and returns a RuntimeNodeMsg representation of that Machine
@@ -116,6 +121,7 @@ namespace service_graph_util
             return message;
         }
 
+
         /**
          * Initializes a MachineConfigurator object that is equivalent to the MachineConfiguratorMsg* input and returns
          * a pointer to it.
@@ -125,6 +131,8 @@ namespace service_graph_util
          */
         MachineConfigurator* machine_configurator_from_message(MachineConfiguratorMsg* message) {
             int machine_id = message->machine_id();
+//            Machine* m = new Machine(machine_id); // remove later
+
             google::protobuf::Map<google::protobuf::uint64, MachineMsg> machine_map =
                     message->machine_map();
             Machine* m = machine_from_message(&machine_map[machine_id]);
@@ -149,37 +157,40 @@ namespace service_graph_util
             return mc;
         }
 
+
         /**
-        * Takes in a pointer to a MachineConfigurator object, then creates and returns a pointer to a
-        * MachineConfiguratorMsg representation of that MachineConfigurator
+        * Takes in a pointer to a MachineConfigurator object, then creates and returns a MachineConfiguratorMsg
+        * representation of that MachineConfigurator
         *
         * @param mc		The MachineConfigurtor object to convert
         * @return  A MachineConfiguratorMsg representation of m
         */
-        MachineConfiguratorMsg* message_from_machine_configurator(MachineConfigurator* mc) {
+        MachineConfiguratorMsg message_from_machine_configurator(MachineConfigurator *mc) {
+            printf("message_from_machine_configurator\n");
 
-            MachineConfiguratorMsg* message = new MachineConfiguratorMsg;
+            MachineConfiguratorMsg message;
 
-            message->set_machine_id(mc->get_machine_id());
+            message.set_machine_id(mc->get_machine_id());
+            printf(" message->set_machine_id(mc->get_machine_id());\n");
 
             // add machines to message
             google::protobuf::Map<google::protobuf::uint64, MachineMsg>* machine_msg_map =
-                    message->mutable_machine_map();
+                    message.mutable_machine_map();
             for (auto val : mc->get_machine_map()) {
                 (*machine_msg_map)[val.first] = message_from_machine(val.second);
             }
 
             // add runtime nodes to message
             google::protobuf::Map<google::protobuf::uint64, RuntimeNodeMsg>* node_msg_map =
-                    message->mutable_node_map();
+                    message.mutable_node_map();
             for (auto val : mc->get_node_map()) {
                 (*node_msg_map)[val.first] = message_from_runtime_node(val.second);
             }
 
             return message;
         }
-
     }
+
 
     /**
      * Serializes the given MachineConfigurator into a string
@@ -188,14 +199,15 @@ namespace service_graph_util
      * @return  A string-serialized version of the MachineConfigurator
      */
     std::string machine_configurator_to_string(MachineConfigurator* mc) {
-        MachineConfiguratorMsg* mc_msg = message_from_machine_configurator(mc);
+        printf("machine_configurator_to_string\n");
+        MachineConfiguratorMsg mc_msg = message_from_machine_configurator(mc);
 
         std::string msg;
-        mc_msg->SerializeToString(&msg);
+        mc_msg.SerializeToString(&msg);
 
-        delete mc_msg;
         return msg;
     }
+
 
     /**
      * Deserializes the given string into a MachineConfigurator
@@ -204,11 +216,10 @@ namespace service_graph_util
      * @return A pointer to the deserialized MachineConfigurator object
      */
     MachineConfigurator* string_to_machine_configurator(std::string msg) {
-        MachineConfiguratorMsg* message = new MachineConfiguratorMsg;
-        message->ParseFromString(msg);
-        MachineConfigurator* mc = machine_configurator_from_message(message);
+        MachineConfiguratorMsg message;
+        message.ParseFromString(msg);
+        MachineConfigurator* mc = machine_configurator_from_message(&message);
 
-        delete message;
         return mc;
     }
 }
