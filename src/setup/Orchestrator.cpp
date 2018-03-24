@@ -12,6 +12,8 @@
 #include <sys/socket.h>
 #include <ios>
 #include <tuple>
+#include <typeinfo>
+#include "../"
 
 Orchestrator::Orchestrator(std::string filepath, std::string action_file_path) {
     std::ifstream fileInput(filepath);
@@ -44,50 +46,136 @@ Orchestrator::Orchestrator(std::string filepath, std::string action_file_path) {
     std::vector<std::vector<std::string>> priorities = userInput["priorities"];
 
     // Check size of the positional to make sure it is positive and at most 2
-    if (positionals.size() > 2 || positionals.size() < 0){
+    if (positionals.size() < 1 || positionals.size() > 2) {
         throw std::invalid_argument("Incorrect number of positional NFs detected");
+    }
+
+    if (positionals.size() == 2 && positionals[0][1].compare(positionals[1][1]) == 0) {
+        throw std::invalid_argument("Two NFS assigned to same position");
     }
 
     parseOrderDependencies(dependencies);
     parsePriorityDependencies(priorities);
 
-    /*for (int i = 0; i < (int) parsedOrder.size(); i++) {
-        std::cout << "Order NF1: " << std::get<0>(parsedOrder[i]) << "\n";
-        std::cout << "Order NF2: " << std::get<1>(parsedOrder[i]) << "\n";
-    }
-
-    for (int i = 0; i < (int) parsedPriorities.size(); i++) {
-        std::cout << "prioritiy NF1: " << std::get<0>(parsedPriorities[i]) << "\n";
-        std::cout << "prioritiy NF2: " << std::get<1>(parsedPriorities[i]) << "\n";
-    }*/
-
     for (int i = 0; i < (int) functions.size(); i++) {
         //creating on stack
         //ServiceGraphNode n(functions[i]);
         ServiceGraphNode *s = new ServiceGraphNode(functions[i]);
-        std::cout << "Function " << functions[i] << " node created with address: " << s << std::endl;
+        //std::cout << "Function " << functions[i] << " node created with address: " << s << std::endl;
         func_to_nodes[functions[i]] = s;
     }
 
     std::set<ServiceGraphNode*> orderTreeNodes = {};
+    std::set<ServiceGraphNode*> priorityNodes = {};
 
+    // Create Forest describing order dependencies
     for (int i = 0; i < (int) parsedOrder.size(); i++) {
         std::string nf1 = std::get<0>(parsedOrder[i]);
         std::string nf2 = std::get<1>(parsedOrder[i]);
         ServiceGraphNode *node1 = func_to_nodes[nf1];
         ServiceGraphNode *node2 = func_to_nodes[nf2];
-        std::cout << node1 << std::endl;
-        std::cout << node2 << std::endl;
         (*node1).add_neighbor(node2);
-        (*node2).set_parent(node1);
+        (*node2).add_parent(node1);
         orderTreeNodes.insert(node1);
         orderTreeNodes.insert(node2);
     }
 
-    std::cout << "set size: " << orderTreeNodes.size() << std::endl;
-    ServiceGraphNode *node1 = func_to_nodes["iptables"];
+    for (int i = 0; i < (int) parsedPriorities.size(); i++) {
+        std::string nf1 = std::get<0>(parsedPriorities[i]);
+        std::string nf2 = std::get<1>(parsedPriorities[i]);
+        ServiceGraphNode *node1 = func_to_nodes[nf1];
+        ServiceGraphNode *node2 = func_to_nodes[nf2];
+        priorityNodes.insert(node1);
+        priorityNodes.insert(node2);
+    }
+
+    std::set<ServiceGraphNode*> rootNodes = {};
+    std::set<ServiceGraphNode*> leafNodes = {};
+
+    // loop finds all root nodes of each tree
+    for (auto node : orderTreeNodes) {
+        if (node->isRoot()) {
+            rootNodes.insert(node);
+        }
+    }
+
+    // loop proceeds through each tree and checks if leaves can be run in parallel
+    std::cout << "===================parsing tree nodes=======================" << std::endl;
+    for (auto node : rootNodes) {
+        std::set<ServiceGraphNode*> leavesForRoot = {};
+        std::cout << "root node: " << node->nf << std::endl;
+        std::cout << "num neighbors for root: " << node->neighbors.size() << std::endl;
+        std::set<ServiceGraphNode*> neighbors = node->neighbors;
+        for (auto neighbor : neighbors) {
+            std::cout << "neighbor: " << neighbor->nf << std::endl;
+            std::cout << "is neighbor leaf: " << neighbor->isLeaf() << std::endl;
+        }
+        findAllLeaves(node, leavesForRoot);
+        checkLevelParallelizability(leavesForRoot);
+        for (auto leaf : leavesForRoot) {
+            leafNodes.insert(leaf);
+        }
+    }
+    std::cout << "===================done parsing tree nodes=======================" << std::endl;
+
+    //check all pairwise parallelizability of priorityNF's
+    checkLevelParallelizability(priorityNodes);
+
+    ServiceGraphNode* first = NULL;
+    ServiceGraphNode* last = NULL;
+
+    for (int i = 0; i < (int) positionals.size(); i++) {
+        std::vector<std::string> pos = positionals[i];
+        if (pos[1].compare("first") == 0) {
+            first = func_to_nodes[pos[0]];
+        }
+        if (pos[1].compare("last") == 0) {
+            last = func_to_nodes[pos[0]];
+        }
+    }
+
+    // attaching root nodes to first node in chain
+    for (auto node : rootNodes) {
+        first->add_neighbor(node);
+        node->add_parent(first);
+    }
+
+    // attaching all free floating nodes to 
+    // both first and last nodes
+    for (auto node : priorityNodes) {
+        first->add_neighbor(node);
+        node->add_parent(first);
+        node->add_neighbor(last);
+        last->add_parent(node);
+    }
+
+    // attaching all leaf nodes to last node
+    for (auto node : leafNodes) {
+        node->add_neighbor(last);
+        last->add_parent(node);
+    }
+
+
+
+    // =======SERVICE GRAPH CONSTRUCTION DONE=========
+
+    //partitioning...uniformly partition to machines
+
+
+
+    //Testing Code for graph of order dependencies;
+    //std::cout << "priority set size: " << priorityNodes.size() << std::endl;
+    ServiceGraphNode *node1 = func_to_nodes["openvpn"];
     std::cout << (*node1).neighbors.size() << std::endl;
+    //std::cout << "Current Node: " << (*node1).nf << std::endl;
     //std::cout << ((func_to_nodes["iptables"])->neighbors).size() << std::endl;
+
+    for (auto it : (*node1).neighbors) {
+        std::cout << (*it).nf;
+    }
+
+
+
 
     std::string ip_one = ips[0];
     for (int i = 0; i < (int) dependencies.size(); i++) {
@@ -181,12 +269,16 @@ Field stringToField(std::string field) {
 /* function checks if nf1 before nf2 can be parallelized */
 bool Orchestrator::isParallelizable(std::vector<std::string> orderDep, json actionTable,
     std::vector<Field> &conflictingActions) {
+    //function gets actions for each function
     std::map<std::string, std::string> nf1 = actionTable[orderDep[0]];
     std::map<std::string, std::string> nf2 = actionTable[orderDep[1]];
+
+    //function iterates through all packet locations for nf1
     for (auto it = nf1.begin(); it != nf1.end(); ++it) {
         std::string packetLocation = it->first;
         std::string val = it->second;
         std::string val2 = nf2[packetLocation];
+        // if nf1 drops/adds/removes then it cannot be run in parallel with nf2
         if ((packetLocation.compare("Drop") == 0 || packetLocation.compare("Add/Rm") == 0) && val.compare("T") == 0) {
             return false;
         } else if (val.compare("null") != 0 && val2.compare("null") != 0) {
@@ -201,6 +293,47 @@ bool Orchestrator::isParallelizable(std::vector<std::string> orderDep, json acti
         }
     }
     return true;
+}
+
+
+/* Function takes in root of tree and performs a depth-first search to find all leaves in tree.
+   Leaves are added to set passed in */
+void Orchestrator::findAllLeaves(ServiceGraphNode* root, std::set<ServiceGraphNode*> &leaves) {
+    if (root->isLeaf()) {
+        leaves.insert(root);
+    } else {
+        std::set<ServiceGraphNode*> neighbors = root->neighbors;
+        for (auto neighbor : neighbors) {
+            findAllLeaves(neighbor, leaves);
+        }
+    }
+}
+
+/* Function takes in set of nodes and checks to see if all are mutually parallelizable */
+void Orchestrator::checkLevelParallelizability(std::set<ServiceGraphNode*> nodes) {
+    std::unordered_map<std::string, std::unordered_map<std::string, bool>> visited_pair = {};
+    for (auto node1 : nodes) {
+        for (auto node2 : nodes) {
+            if (node1 != node2) {
+                std::string nf1 = node1->nf;
+                std::string nf2 = node2->nf;
+                //std::cout << "node1: " << nf1 << std::endl;
+                //std::cout << "node2: " << nf1 << std::endl;
+                //std::cout << "===============" << std::endl;
+                std::vector<std::string> pair = {};
+                pair.push_back(nf1);
+                pair.push_back(nf2);
+                std::vector<Field> conflictingActions = {};
+                bool parallelizable = isParallelizable(pair, actionTable, conflictingActions);
+                visited_pair[nf1][nf2] = parallelizable;
+                if (!parallelizable) {
+                    if (visited_pair.find(nf2) != visited_pair.end() && !visited_pair[nf2][nf1]) {
+                        perror("nodes specified are not parallelizable");
+                    }
+                }
+            }
+        }
+    }
 }
 
 void Orchestrator::setup_containers() {
@@ -220,17 +353,12 @@ void Orchestrator::setup_containers() {
 }
 
 // Given a service graph node, determine if it is a root node
-bool Orchestrator::isLeaf(ServiceGraphNode *n){
-    if (!(*n).neighbors.empty()){
-        return false;
-    } 
-    else {
-        return true;
-    }
+bool Orchestrator::isLeaf(ServiceGraphNode *n) {
+    return !(*n).neighbors.empty();
 }
 
 // Given a service graph node, determine the root node pointing to it
-ServiceGraphNode* Orchestrator::findRootNode(ServiceGraphNode* n){
+/*ServiceGraphNode* Orchestrator::findRootNode(ServiceGraphNode* n) {
     ServiceGraphNode *parentOfN = (*n).parent;
     if (parentOfN == NULL){
         return n;
@@ -243,4 +371,4 @@ ServiceGraphNode* Orchestrator::findRootNode(ServiceGraphNode* n){
         }
         return currNode;
     }
-}
+}*/

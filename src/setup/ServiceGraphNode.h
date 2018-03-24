@@ -15,7 +15,8 @@ public:
     
     ServiceGraphNode(std::string f);
     void add_neighbor(ServiceGraphNode n);
-    void set_parent(ServiceGraphNode n);
+    void add_parent(ServiceGraphNode n);
+    bool isLeaf();
 };
 
 #endif

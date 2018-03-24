@@ -54,8 +54,9 @@ class Orchestrator {
 private:
     json userInput;
     json actionTable;
-    //std::vector<std::string> functions = {};
     std::unordered_map<std::string, ServiceGraphNode*> func_to_nodes = {};
+
+    // map if pair of functions (a, b) -> conflicts between a and b
     std::unordered_map<std::string, std::unordered_map<std::string, std::vector<Field>>> pair_to_conflicts = {};
     std::vector<std::tuple<std::string, std::string>> parsedOrder = {};
     std::vector<std::tuple<std::string, std::string>> parsedPriorities = {};
@@ -69,6 +70,8 @@ private:
     bool isParallelizable(std::vector<std::string> orderDep, json actionTable, std::vector<Field> &conflictingActions);
     void parsePriorityDependencies(std::vector<std::vector<std::string>> priorities);
     void parseOrderDependencies(std::vector<std::vector<std::string>> dependencies);
+    void checkLevelParallelizability(std::set<ServiceGraphNode*> nodes);
+    void findAllLeaves(ServiceGraphNode* root, std::set<ServiceGraphNode*> &leaves);
     std::string fieldToString(Field a);
 
     // Check if the given node is a leaf node

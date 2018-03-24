@@ -1,5 +1,6 @@
 build/*
 .idea/*
+google_protobuf-prefix/*
 
 .DS_Store
 */.DS_Store
