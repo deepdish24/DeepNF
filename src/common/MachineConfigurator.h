@@ -40,6 +40,10 @@ public:
 
 	std::vector<RuntimeNode*> get_nodes_for_machine(int mac_id);
 
+    std::map<int, Machine*> get_machine_map();
+
+    std::map<int, RuntimeNode*> get_node_map();
+
 	void add_machine(Machine* m);
 
 	void add_node(RuntimeNode* n);
