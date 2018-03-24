@@ -241,5 +241,3 @@ void forward_packet(const u_char* packet, int size)
         std::cerr << strerror(errno) << std::endl;
     }
 }
-
-

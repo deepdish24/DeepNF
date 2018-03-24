@@ -8,16 +8,16 @@ message MachineMsg {
 }
 
 message RuntimeNodeMsg {
-    enum NF {
+    enum NFMsg {
         SNORT = 0;
         HAPROXY = 1;
     }
 
     uint64 id = 1;
-    NF nf = 2;
+    NFMsg nf = 2;
     repeated uint64 neighbors = 3;
     uint64 inport = 4;
-    uint64 output = 5;
+    uint64 outport = 5;
     uint64 machine_id = 6;
     string ip = 7;
 }
