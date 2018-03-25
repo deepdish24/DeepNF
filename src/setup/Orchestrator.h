@@ -14,6 +14,7 @@
 #include <arpa/inet.h>
 #include <tuple>
 #include "ServiceGraphNode.cpp"
+#include "../common/NF.h"
 
 using json = nlohmann::json;
 
@@ -55,6 +56,8 @@ private:
     json userInput;
     json actionTable;
     std::unordered_map<std::string, ServiceGraphNode*> func_to_nodes = {};
+    std::unordered_map<std::string, std::string> ip_to_mc = {};
+    std::vector<std::string> ips;
 
     // map if pair of functions (a, b) -> conflicts between a and b
     std::unordered_map<std::string, std::unordered_map<std::string, std::vector<Field>>> pair_to_conflicts = {};
@@ -73,6 +76,7 @@ private:
     void checkLevelParallelizability(std::set<ServiceGraphNode*> nodes);
     void findAllLeaves(ServiceGraphNode* root, std::set<ServiceGraphNode*> &leaves);
     std::string fieldToString(Field a);
+    NF stringToNF(std::string function);
 
     // Check if the given node is a leaf node
     bool isLeaf(ServiceGraphNode* n);
@@ -84,7 +88,6 @@ private:
 public:
     Orchestrator(std::string filepath, std::string action_file_path);
     void setup_containers();
-    void start_packet_stream();
 };
 
 #endif
