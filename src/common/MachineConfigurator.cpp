@@ -6,7 +6,7 @@
 
 MachineConfigurator::MachineConfigurator(Machine* m) {
 	machine_id = m->get_id();
-	machine_map.insert(make_pair(machine_id, m));
+	machine_map.insert(std::make_pair(machine_id, m));
 }
 
 int MachineConfigurator::get_machine_id() { return machine_id; }
@@ -78,11 +78,11 @@ std::map<int, RuntimeNode*> MachineConfigurator::get_node_map() {
 
 
 void MachineConfigurator::add_machine(Machine* m) {
-	machine_map.insert(make_pair(m->get_id(), m));
+	machine_map.insert(std::make_pair(m->get_id(), m));
 }
 
 void MachineConfigurator::add_node(RuntimeNode* n) {
-	node_map.insert(make_pair(n->get_id(), n));
+	node_map.insert(std::make_pair(n->get_id(), n));
 }
 
 

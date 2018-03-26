@@ -48,13 +48,17 @@ Orchestrator::Orchestrator(std::string filepath, std::string action_file_path) {
     std::vector<std::vector<std::string>> dependencies = userInput["orderDependencies"];
     std::vector<std::vector<std::string>> priorities = userInput["priorities"];
 
+    bool hasPositionals = true;
+
     // Check size of the positional to make sure it is positive and at most 2
     if (positionals.size() < 1 || positionals.size() > 2) {
-        throw std::invalid_argument("Incorrect number of positional NFs detected");
+        hasPositionals = false;
+        //throw std::invalid_argument("Incorrect number of positional NFs detected");
     }
 
-    if (positionals.size() == 2 && positionals[0][1].compare(positionals[1][1]) == 0) {
-        throw std::invalid_argument("Two NFS assigned to same position");
+    if (hasPositionals && positionals.size() == 2 && positionals[0][1].compare(positionals[1][1]) == 0) {
+        hasPositionals = false;
+        //throw std::invalid_argument("Two NFS assigned to same position");
     }
 
     if ((int) dependencies.size() != 0) {
@@ -143,31 +147,33 @@ Orchestrator::Orchestrator(std::string filepath, std::string action_file_path) {
         }
     }
 
-    // attaching root nodes to first node in chain
-    for (auto node : rootNodes) {
-        first->add_neighbor(node);
-        node->add_parent(first);
-    }
+    if (hasPositionals) {
+        // attaching root nodes to first node in chain
+        for (auto node : rootNodes) {
+            first->add_neighbor(node);
+            node->add_parent(first);
+        }
 
-    // attaching all free floating nodes to 
-    // both first and last nodes
-    for (auto node : priorityNodes) {
-        first->add_neighbor(node);
-        node->add_parent(first);
-        node->add_neighbor(last);
-        last->add_parent(node);
-    }
+        // attaching all free floating nodes to 
+        // both first and last nodes
+        for (auto node : priorityNodes) {
+            first->add_neighbor(node);
+            node->add_parent(first);
+            node->add_neighbor(last);
+            last->add_parent(node);
+        }
 
-    // attaching all leaf nodes to last node
-    for (auto node : leafNodes) {
-        node->add_neighbor(last);
-        last->add_parent(node);
-    }
+        // attaching all leaf nodes to last node
+        for (auto node : leafNodes) {
+            node->add_neighbor(last);
+            last->add_parent(node);
+        }
 
-    // if no middle nodes exit, then we connect first directly to last
-    if (rootNodes.size() == 0 && priorityNodes.size() == 0) {
-        first->add_neighbor(last);
-        last->add_parent(first);
+        // if no middle nodes exit, then we connect first directly to last
+        if (rootNodes.size() == 0 && priorityNodes.size() == 0) {
+            first->add_neighbor(last);
+            last->add_parent(first);
+        }
     }
 
     /* NODE PARTITIONING */
@@ -190,8 +196,6 @@ Orchestrator::Orchestrator(std::string filepath, std::string action_file_path) {
         ip_to_machines[ips[i]] = m;
     }
 
-    //std::cout << "Code Here!\n";
-
     //configuring for each node
     for (int i = 0; i < (int) functions.size(); i++) {
         NF nf = stringToNF(functions[i]);
@@ -199,9 +203,7 @@ Orchestrator::Orchestrator(std::string filepath, std::string action_file_path) {
         idToRuntimeNode[i] = rnode;
         func_to_inx[functions[i]] = i;
         Machine *machine = ip_to_machines[func_to_ip[functions[i]]];
-        //std::cout << "Code here now" << std::endl;
         machine->add_node_id(rnode->get_id());
-        //std::cout << "no seg fault" << std::endl;
     }
 
     for (int i = 0; i < (int) functions.size(); i++) {
@@ -388,7 +390,9 @@ void Orchestrator::checkLevelParallelizability(std::set<ServiceGraphNode*> nodes
 }
 
 void Orchestrator::setup_containers() {
+    std::cout << "proceeding to setup containers" << std::endl;
     for (int i = 0; i < (int) ips.size(); i++) {
+        std::cout << "current ip: " << ips[i] << std::endl;
         struct sockaddr_in servaddr;
         int sockfd = socket(AF_INET, SOCK_STREAM, 0);
         bzero(&servaddr, sizeof(servaddr));
@@ -399,13 +403,23 @@ void Orchestrator::setup_containers() {
         inet_pton(AF_INET, ips[i].c_str(), &(servaddr.sin_addr));
         connect(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr));
 
-        const char* serializedConfig = ip_to_mc[ips[i]].c_str();
+        std::string serializedConfig = ip_to_mc[ips[i]];
+        char conf_str[serializedConfig.size()+1];
+        serializedConfig.copy(conf_str, serializedConfig.size(), 0);
+
+        /*std::string config(conf_str, sizeof(conf_str));
+        MachineConfigurator *mc = service_graph_util::string_to_machine_configurator(config);
+        MachineConfigurator conf = *(mc);
+        int machineId = conf.get_machine_id();
+        Machine* mac = conf.get_machine_with_id(machineId);
+        std::cout << "TEST SERIALIZATION: " << mac->get_bridge_ip() << std::endl;
+        std::cout << "=======================" << std::endl;*/
+
         char recvline[100];
         std::string ack = "ACK";
         bzero(recvline, 100);
-
         while (true) {
-            write(sockfd, serializedConfig, strlen(serializedConfig));
+            write(sockfd, conf_str, sizeof(conf_str));
             read(sockfd, recvline, 100);
             if (strcmp(recvline, ack.c_str()) == 0) {
                 break;

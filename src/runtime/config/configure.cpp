@@ -1,12 +1,64 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <iostream>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <unistd.h>
 
 #include "../../common/RuntimeNode.h"
 #include "../../common/MachineConfigurator.h"
+#include "../../common/ServiceGraphUtil.h"
 
-MachineConfigurator get_machine_configurator() {
-	
-	RuntimeNode n1 (1, snort);
+MachineConfigurator get_machine_configurator(int port) {
+	std::cout << "get machine config called with port: " << port << std::endl;
+	int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+	if (sockfd < 0) {
+		fprintf(stderr, "Cannot open socket\n");
+		exit(1);
+	}
+	struct sockaddr_in servaddr;
+	bzero(&servaddr, sizeof(servaddr));
+
+	servaddr.sin_family = AF_INET;
+	servaddr.sin_port = htons(port);
+	servaddr.sin_addr.s_addr = htons(INADDR_ANY);
+
+	if (bind(sockfd, (struct sockaddr*) &servaddr, sizeof(struct sockaddr)) < 0) {
+		std::cout << "cannot bind!" << std::endl;
+	}
+
+	listen(sockfd, 10);
+
+	const char* ack = "ACK";
+	char buffer[1000];
+
+	std::cout << "code here" << std::endl;
+
+	while (true) {
+		struct sockaddr_in clientaddr;
+		socklen_t clientaddrlen = sizeof(clientaddr);
+		int fd = accept(sockfd, (struct sockaddr*) &clientaddr, &clientaddrlen);
+
+		bzero(buffer, sizeof(buffer));
+		std::cout << "starting to read from socket" << std::endl;
+		int x = read(fd, buffer, sizeof(buffer));
+		if (x == 0) {
+			std::cout << "read failed" << std::endl;
+			break;
+		}
+		write(fd, ack, strlen(ack));
+		sleep(1);
+		close(fd);
+		break;
+	}
+
+	std::string config(buffer, sizeof(buffer));
+	//std::cout << "buffer: " << config << std::endl;
+	MachineConfigurator *mc = service_graph_util::string_to_machine_configurator(config);
+	return *(mc);
+
+	/*RuntimeNode n1 (1, snort);
 	RuntimeNode n2 (2, haproxy);
 	RuntimeNode n3 (3, snort);
 	n1.ip = "173.16.1.2";
@@ -27,7 +79,7 @@ MachineConfigurator get_machine_configurator() {
 	c.add_node(&n2);
 	c.add_node(&n3);
 
-	return c;
+	return c;*/
 }
 
 /**
@@ -37,7 +89,7 @@ std::vector<RuntimeNode*> get_internal_nodes(MachineConfigurator c) {
 	return c.get_nodes_for_machine(c.get_machine_id());
 }
 
-bool is_source_node(RuntimeNode* n, vector<RuntimeNode*> nodes) {
+bool is_source_node(RuntimeNode* n, std::vector<RuntimeNode*> nodes) {
 	std::set<int> nbrs;
 	for (RuntimeNode* n : nodes) {
 		std::vector<int> ns = n->get_neighbors();
@@ -166,7 +218,7 @@ void make_flow_rules(MachineConfigurator conf) {
 	std::string outport_ports = "";
 	int i = 0;
 	for (int p : source_node_inports) {
-		if (i == source_node_inports.size() - 1) {
+		if (i == (int) source_node_inports.size() - 1) {
 			outport_ports += std::to_string(p);
 		} else {
 			outport_ports += std::to_string(p) + ",";
@@ -223,16 +275,35 @@ void reset(MachineConfigurator c) {
  * Optional flag -r to remove all resources and undo the configuration.
  */
 int main(int argc, char *argv[]) {
-	
-	MachineConfigurator conf = get_machine_configurator();
-	if (argc > 1 && std::string(argv[1]).find("-r") == 0) {
+	int c;
+	int port = 10000;
+	opterr = 0;
+	bool needReset = false;
+
+	while ((c = getopt(argc, argv, "p:r")) != -1) {
+		switch(c) {
+			case 'p':
+				port = atoi(optarg);
+				break;
+			case 'r':
+				needReset = true;
+				break;
+		}
+	}
+
+	MachineConfigurator conf = get_machine_configurator(port);
+	/*int machineId = conf.get_machine_id();
+	Machine* mac = conf.get_machine_with_id(machineId);
+	std::cout << mac->get_bridge_ip() << std::endl;*/
+
+	if (needReset) {
 		reset(conf);
 	} else {
 		// making a dummy service graph
-		setup_nodes(conf);
+		/*setup_nodes(conf);
 		conf = setup_bridge_ports(conf);
 		make_flow_rules(conf);
-		start_network_functions(conf);
+		start_network_functions(conf);*/
 	}
 
 	return 0;
