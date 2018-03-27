@@ -15,7 +15,7 @@
 #include <vector>
 
 #include "pcap.h"
-#include "RuntimeNode.h"
+#include "../../common/RuntimeNode.h"
 
 
 void print_data(const u_char* data, int size);
@@ -28,16 +28,14 @@ void process_packet(u_char *arg, const struct pcap_pkthdr* pkthdr,
 //                                   std::string dev);
 void configure_device_read_handles(std::string packet_filter_expr);
 void configure_device_write_handle(std::string packet_filter_expr,
-                                   std::string dev);
-void merge_packets();
+                                  std::string dev);
 
 struct Packet {
 
 public:
     const pcap_pkthdr* header;
     const u_char* payload;
-    NF nf;
-};
+}
 
 std::mutex m;
 
@@ -48,8 +46,7 @@ pcap_t* dst_dev_handle;
 
 std::map<std::string, RuntimeNode> interface_leaf_map;
 std::map<std::string, pcap_t*> src_dev_handle_map;
-std::map<int, std::vector<Packet>*> packet_map;
-std::string cur_dev;
+std::map<int, std::vector<Packet *> > packet_map;
 
 int main(int argc,char **argv)
 {
@@ -79,23 +76,19 @@ int main(int argc,char **argv)
     
     /* loop for callback function */
     // pcap_loop(src_dev_handle, -1, process_packet, NULL);
-    for (std::map<std::string, RuntimeNode>::iterator it = interface_leaf_map.begin(); it != interface_leaf_map.end(); ++it) {
+    for (std::map<std::string, RuntimeNode>::iterator it = mymap.begin(); it != mymap.end(); ++it) {
         /* loop for callback function */
         std::cout << "looping\n";
-        cur_dev = it->first;
-        pcap_loop(src_dev_handle_map[it->first], 3, process_packet, NULL);
+        pcap_loop(src_dev_handle, 3, process_packet, NULL);
     }
-
-
     return 0;
 }
 
 void configure_device_read_handles(std::string packet_filter_expr)
 {
-    for (std::map<std::string, RuntimeNode>::iterator it = interface_leaf_map.begin(); it != interface_leaf_map.end(); ++it) {
+    for (std::map<std::string, RuntimeNode>::iterator it = mymap.begin(); it != mymap.end(); ++it) {
         
         std::string dev = it->first;
-        
         char errbuf[PCAP_ERRBUF_SIZE];
         const u_char *packet;
         struct bpf_program fp;        /* hold compiled program */
@@ -193,7 +186,7 @@ void process_packet(u_char *arg,
                     const struct pcap_pkthdr* pkthdr,
                     const u_char* packet)
 {
-    
+    std::cout << "received tcp packet\n";
     
     /* get the packet id */
     unsigned short iphdrlen;
@@ -213,21 +206,16 @@ void process_packet(u_char *arg,
     m.lock();
     std::vector<Packet> *pkts;
     if (packet_map.count(packet_id) > 0) {
-        pkts = packet_map[packet_id];
+        std::vector<Packet> *pkts = packet_map[packet_id];
     } else {
-        pkts = new std::vector<Packet>();
+        std::vector<Packet> *pkts = new std::vector<Packet>();
     }
-    std::cout << pkts << "\n";
     Packet p;
     p.header = pkthdr;
     p.payload = packet;
-    RuntimeNode n = interface_leaf_map.at(cur_dev);
-    p.nf = n.get_nf();
     pkts->push_back(p);
     packet_map[packet_id] = pkts;
     m.unlock();
-
-
 
     // print_tcp_packet(packet, pkthdr->len);
     // forward_packet(packet, pkthdr->len);
@@ -354,17 +342,3 @@ void forward_packet(const u_char* packet, int size)
         std::cerr << strerror(errno) << std::endl;
     }
 }
-
-void merge_packets()
-{
-    /* forward the haproxy packets and ignore the snort ones*/
-    for (std::map<int, std::vector<Packet>*>::iterator it = packet_map.begin(); it != packet_map.end(); ++it) {
-        std::vector<Packet> pkts = *(it->second);
-        for (Packet p : pkts) {
-            if (p.nf == haproxy) {
-                forward_packet(p.payload, p.header->len);
-            }
-        }
-    }
-}
-
