@@ -220,6 +220,7 @@ Orchestrator::Orchestrator(std::string filepath, std::string action_file_path) {
     for (int i = 0; i < (int) ips.size(); i++) {
         Machine* m = ip_to_machines[ips[i]];
         MachineConfigurator* mc = new MachineConfigurator(m);
+        //mc->get_nodes_for_machine(mc->get_machine_id());
         std::vector<int> node_ids = m->get_node_ids();
         for (int id : node_ids) {
             mc->add_node(idToRuntimeNode[id]);
