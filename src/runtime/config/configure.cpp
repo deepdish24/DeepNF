@@ -300,10 +300,10 @@ int main(int argc, char *argv[]) {
 		reset(conf);
 	} else {
 		// making a dummy service graph
-		/*setup_nodes(conf);
+		setup_nodes(conf);
 		conf = setup_bridge_ports(conf);
 		make_flow_rules(conf);
-		start_network_functions(conf);*/
+		start_network_functions(conf);
 	}
 
 	return 0;
