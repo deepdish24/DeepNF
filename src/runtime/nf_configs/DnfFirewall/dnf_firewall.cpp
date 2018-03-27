@@ -118,6 +118,7 @@ void process_packet(u_char *arg,
 {
     
     struct packet pkt_info(packet, pkthdr->len);
+
     print_ip_header(pkt_info.ip_header);
     print_tcp_packet(pkt_info.tcp_header);
     print_data(pkt_info.data, pkt_info.data_size);
@@ -207,7 +208,7 @@ void forward_packet(const u_char* packet, int size)
 void run_firewall(struct packet *pkt_info)
 {
     /* if dip = 80, send a null packet (drop packet) */
-    if (htons(pkt_info->tcp_header->dest) == 80) {
+    if (htons(pkt_info->tcp_header->dest) == 8000) {
         pkt_info->nullify();
     }
     forward_packet(pkt_info->pkt, pkt_info->size);

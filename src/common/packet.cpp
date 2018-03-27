@@ -25,7 +25,7 @@ bool packet::is_null()
 {
 	char sourceIp[INET_ADDRSTRLEN];
 	inet_ntop(AF_INET, &(ip_header->ip_src), sourceIp, INET_ADDRSTRLEN);
-	return tcp_header->source == 0 && std::string(sourceIp) == "0.0.0.0";
+	return ntohs(tcp_header->source) == 0 && std::string(sourceIp) == "0.0.0.0";
 }
 
 void packet::nullify()
