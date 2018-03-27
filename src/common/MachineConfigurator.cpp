@@ -61,7 +61,7 @@ Machine* MachineConfigurator::get_machine_with_id(int mac_id) {
 
 RuntimeNode* MachineConfigurator::get_node_with_id(int node_id) {
 	if (node_map.count(node_id) > 0) {
-		return node_map.at(node_id);
+		return node_map[node_id];
 	} else {
 		perror("no runtime node exists for given runtime node id");
 		return NULL;
@@ -107,7 +107,6 @@ void MachineConfigurator::add_machine(Machine* m) {
 }
 
 void MachineConfigurator::add_node(RuntimeNode* n) {
-	//node_map[n->get_id()] = n;
 	node_map.insert(std::make_pair(n->get_id(), n));
 }
 
