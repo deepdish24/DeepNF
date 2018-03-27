@@ -14,6 +14,7 @@
 #include <arpa/inet.h>
 #include <tuple>
 #include "ServiceGraphNode.cpp"
+#include "../common/NF.h"
 
 using json = nlohmann::json;
 
@@ -54,8 +55,11 @@ class Orchestrator {
 private:
     json userInput;
     json actionTable;
-    //std::vector<std::string> functions = {};
     std::unordered_map<std::string, ServiceGraphNode*> func_to_nodes = {};
+    std::unordered_map<std::string, std::string> ip_to_mc = {};
+    std::vector<std::string> ips;
+
+    // map if pair of functions (a, b) -> conflicts between a and b
     std::unordered_map<std::string, std::unordered_map<std::string, std::vector<Field>>> pair_to_conflicts = {};
     std::vector<std::tuple<std::string, std::string>> parsedOrder = {};
     std::vector<std::tuple<std::string, std::string>> parsedPriorities = {};
@@ -69,7 +73,10 @@ private:
     bool isParallelizable(std::vector<std::string> orderDep, json actionTable, std::vector<Field> &conflictingActions);
     void parsePriorityDependencies(std::vector<std::vector<std::string>> priorities);
     void parseOrderDependencies(std::vector<std::vector<std::string>> dependencies);
+    void checkLevelParallelizability(std::set<ServiceGraphNode*> nodes);
+    void findAllLeaves(ServiceGraphNode* root, std::set<ServiceGraphNode*> &leaves);
     std::string fieldToString(Field a);
+    NF stringToNF(std::string function);
 
     // Check if the given node is a leaf node
     bool isLeaf(ServiceGraphNode* n);
@@ -81,7 +88,6 @@ private:
 public:
     Orchestrator(std::string filepath, std::string action_file_path);
     void setup_containers();
-    void start_packet_stream();
 };
 
 #endif
