@@ -55,7 +55,8 @@ void MergerOperator::run() {
     printf("finished setting up bullshit\n");
 
     // listen for and process incoming packets
-    for (std::map<std::string, RuntimeNode>::iterator it = interface_leaf_map.begin(); it != interface_leaf_map.end(); ++it) {
+    for (std::map<std::string, RuntimeNode*>::iterator it = this->merger_info->get_interface_leaf_map().begin();
+         it != this->merger_info->get_interface_leaf_map().end(); ++it) {
         /* loop for callback function */
         cur_dev = it->first;
         pcap_loop(src_dev_handle_map[it->first], 3, process_packet, (u_char*) this);
