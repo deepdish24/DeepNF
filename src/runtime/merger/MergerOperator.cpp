@@ -100,11 +100,12 @@ void MergerOperator::process_packet(u_char *arg,
 void MergerOperator::configure_device_read_handles(std::string packet_filter_expr)
 {
 
-    printf("configure_device_read_handles\n");
-    std::map<std::string, RuntimeNode*> interface_leap_map = this->merger_info->get_interface_leaf_map();
 
-    for (std::map<std::string, RuntimeNode*>::iterator it = this->merger_info->get_interface_leaf_map().begin();
-         it != this->merger_info->get_interface_leaf_map().end(); ++it) {
+    printf("configure_device_read_handles\n");
+    std::map<std::string, RuntimeNode*> interface_leaf_map = this->merger_info->get_interface_leaf_map();
+
+    for (std::map<std::string, RuntimeNode*>::iterator it = interface_leaf_map.begin();
+        it != interface_leaf_map.end(); ++it) {
 
         std::string dev = it->first;
         printf("iterating on: std::string dev = it->first: %s;\n", dev.c_str());
