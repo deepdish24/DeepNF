@@ -10,8 +10,10 @@ COPY merge.cpp .
 COPY RuntimeNode.h .
 COPY RuntimeNode.cpp .
 COPY NF.h .
+COPY packet.h .
+COPY packet.cpp .
 
-RUN  g++ -std=c++11 -c RuntimeNode.h
 RUN  g++ -std=c++11 -c RuntimeNode.h RuntimeNode.cpp
-RUN g++ -std=c++11 RuntimeNode.h RuntimeNode.cpp merge.cpp \
+RUN  g++ -std=c++11 -c packet.h packet.cpp
+RUN g++ -std=c++11 packet.cpp RuntimeNode.cpp merge.cpp \
 	-o merge -I /usr/include/pcap -lpcap

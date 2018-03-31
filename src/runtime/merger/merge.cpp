@@ -37,6 +37,13 @@ public:
 FILE *logfile;
 pcap_t* dst_dev_handle;
 
+/**
+1. leaf -> interface mapping
+2.
+
+ **/
+
+// maps each network interface name to its corresponding RuntimeNode
 std::map<std::string, RuntimeNode> interface_leaf_map;
 std::map<std::string, pcap_t*> src_dev_handle_map;
 std::map<int, std::vector<nf_packet>*> packet_map;
@@ -307,7 +314,8 @@ void merge_packets()
             ctr++;
         }
         if (haproxy_idx >= 0 && !dropped_pkt) {
-            forward_packet(haproxy_pkt->pkt, haproxy_pkt->size);
+            std::cout << "forward packet\n";
+//            forward_packet(haproxy_pkt->pkt, haproxy_pkt->size);
         }
     }
 }

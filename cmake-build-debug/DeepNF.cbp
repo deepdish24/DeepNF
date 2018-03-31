@@ -5,7 +5,7 @@
 		<Option title="DeepNF"/>
 		<Option makefile_is_custom="1"/>
 		<Option compiler="clang"/>
-		<Option virtualFolders="CMake Files\;CMake Files\cmake-build-debug\;CMake Files\cmake-build-debug\google_protobuf-prefix\;CMake Files\cmake-build-debug\google_protobuf-prefix\tmp\;CMake Files\src\;CMake Files\src\common\;CMake Files\src\common\sgu_test\;CMake Files\src\listener\;CMake Files\src\runtime\;CMake Files\src\runtime\config\;CMake Files\src\runtime\merger\;CMake Files\src\setup\;"/>
+		<Option virtualFolders="CMake Files\;CMake Files\cmake-build-debug\;CMake Files\cmake-build-debug\google_protobuf-prefix\;CMake Files\cmake-build-debug\google_protobuf-prefix\tmp\;CMake Files\src\;CMake Files\src\common\;CMake Files\src\common\sgu_test\;CMake Files\src\listener\;CMake Files\src\runtime\;CMake Files\src\runtime\config\;CMake Files\src\setup\;"/>
 		<Build>
 			<Target title="all">
 				<Option working_dir="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug"/>
@@ -265,58 +265,6 @@
 					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/runtime/config/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
-			<Target title="merge">
-				<Option output="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/runtime/merger/merge" prefix_auto="0" extension_auto="0"/>
-				<Option working_dir="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/runtime/merger"/>
-				<Option object_output="./"/>
-				<Option type="1"/>
-				<Option compiler="clang"/>
-				<Compiler>
-					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/generated"/>
-					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/include"/>
-					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src"/>
-					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/usr/local/include/google/protobuf"/>
-					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1"/>
-					<Add directory="/usr/local/include"/>
-					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/9.0.0/include"/>
-					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
-					<Add directory="/usr/include"/>
-					<Add directory="/System/Library/Frameworks"/>
-					<Add directory="/Library/Frameworks"/>
-				</Compiler>
-				<MakeCommands>
-					<Build command="/usr/bin/make -j4 -f &quot;/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/runtime/merger/Makefile&quot;  VERBOSE=1 merge"/>
-					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/runtime/merger/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/make -j4 -f &quot;/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/runtime/merger/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/runtime/merger/Makefile&quot;  VERBOSE=1 clean"/>
-				</MakeCommands>
-			</Target>
-			<Target title="merge/fast">
-				<Option output="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/runtime/merger/merge" prefix_auto="0" extension_auto="0"/>
-				<Option working_dir="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/runtime/merger"/>
-				<Option object_output="./"/>
-				<Option type="1"/>
-				<Option compiler="clang"/>
-				<Compiler>
-					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/generated"/>
-					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/include"/>
-					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src"/>
-					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/usr/local/include/google/protobuf"/>
-					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1"/>
-					<Add directory="/usr/local/include"/>
-					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/9.0.0/include"/>
-					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
-					<Add directory="/usr/include"/>
-					<Add directory="/System/Library/Frameworks"/>
-					<Add directory="/Library/Frameworks"/>
-				</Compiler>
-				<MakeCommands>
-					<Build command="/usr/bin/make -j4 -f &quot;/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/runtime/merger/Makefile&quot;  VERBOSE=1 merge/fast"/>
-					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/runtime/merger/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/make -j4 -f &quot;/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/runtime/merger/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/runtime/merger/Makefile&quot;  VERBOSE=1 clean"/>
-				</MakeCommands>
-			</Target>
 			<Target title="setup">
 				<Option output="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/setup/setup" prefix_auto="0" extension_auto="0"/>
 				<Option working_dir="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/setup"/>
@@ -376,6 +324,12 @@
 		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/generated/src/proto/Machine.pb.h">
 			<Option target="common"/>
 		</Unit>
+		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/common/ConflictItem.cpp">
+			<Option target="common"/>
+		</Unit>
+		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/common/ConflictItem.h">
+			<Option target="common"/>
+		</Unit>
 		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/common/Machine.cpp">
 			<Option target="common"/>
 		</Unit>
@@ -386,6 +340,12 @@
 			<Option target="common"/>
 		</Unit>
 		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/common/MachineConfigurator.h">
+			<Option target="common"/>
+		</Unit>
+		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/common/MergerInfo.cpp">
+			<Option target="common"/>
+		</Unit>
+		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/common/MergerInfo.h">
 			<Option target="common"/>
 		</Unit>
 		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/common/NF.h">
@@ -414,9 +374,6 @@
 		</Unit>
 		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/runtime/config/configure.cpp">
 			<Option target="configure"/>
-		</Unit>
-		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/runtime/merger/merge.cpp">
-			<Option target="merge"/>
 		</Unit>
 		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/setup/Orchestrator.cpp">
 			<Option target="setup"/>
@@ -447,9 +404,6 @@
 		</Unit>
 		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/runtime/config/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\src\runtime\config\"/>
-		</Unit>
-		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/runtime/merger/CMakeLists.txt">
-			<Option virtualFolder="CMake Files\src\runtime\merger\"/>
 		</Unit>
 		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/setup/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\src\setup\"/>
