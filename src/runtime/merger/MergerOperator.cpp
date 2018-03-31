@@ -90,9 +90,10 @@ void MergerOperator::process_packet(u_char *arg,
 
     nf_packet p;
     p.pkt = pkt_info;
-    RuntimeNode n = *this->merger_info->get_interface_leaf_map().at(cur_dev);
+    printf("p.pkt = pkt_info;\n");
+    RuntimeNode* n = this->merger_info->get_interface_leaf_map().at(cur_dev);
     printf("RuntimeNode n = *this->merger_info->get_interface_leaf_map().at(cur_dev);\n");
-    p.nf = n.get_nf();
+    p.nf = n->get_nf();
     pkts->push_back(p);
     packet_map[packet_id] = pkts;
 
