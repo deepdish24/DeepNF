@@ -49,7 +49,10 @@ void MergerOperator::run() {
     // create pcap handles
     std::string dst_dev = "eth3"; // destination to send packets after merge
 
+    printf("configure_device_read_handles(packet_filter_expr)\n");
     configure_device_read_handles(packet_filter_expr);
+
+    printf("configure_device_write_handle(packet_filter_expr, dst_dev);\n");
     configure_device_write_handle(packet_filter_expr, dst_dev);
 
     printf("finished setting up bullshit\n");
@@ -96,12 +99,15 @@ void MergerOperator::process_packet(u_char *arg,
 /* HELPER FUNCTIONS FOR OPERATING ON PACKETS */
 void MergerOperator::configure_device_read_handles(std::string packet_filter_expr)
 {
+
+    printf("configure_device_read_handles\n");
     std::map<std::string, RuntimeNode*> interface_leap_map = this->merger_info->get_interface_leaf_map();
 
     for (std::map<std::string, RuntimeNode*>::iterator it = this->merger_info->get_interface_leaf_map().begin();
          it != this->merger_info->get_interface_leaf_map().end(); ++it) {
 
         std::string dev = it->first;
+        printf("iterating on: std::string dev = it->first;\n");
 
         char errbuf[PCAP_ERRBUF_SIZE];
         struct bpf_program fp;        /* hold compiled program */
@@ -114,6 +120,7 @@ void MergerOperator::configure_device_read_handles(std::string packet_filter_exp
         }
 
         /* open device for reading in promiscuous mode */
+        printf("src_dev_handle_map[dev] = pcap_open_live(dev.c_str(), BUFSIZ, 1,-1, errbuf);\n");
         src_dev_handle_map[dev] = pcap_open_live(dev.c_str(), BUFSIZ, 1,-1, errbuf);
 
         if(src_dev_handle_map[dev] == NULL) {
@@ -122,12 +129,14 @@ void MergerOperator::configure_device_read_handles(std::string packet_filter_exp
         }
 
         /* Now we'll compile the filter expression*/
+        printf("if(pcap_compile(src_dev_handle_map[dev], &fp, packet_filter_expr.c_str(), 0, netp) == -1)\n");
         if(pcap_compile(src_dev_handle_map[dev], &fp, packet_filter_expr.c_str(), 0, netp) == -1) {
             fprintf(stderr, "Error calling pcap_compile\n");
             exit(-1);
         }
 
         /* set the filter */
+        printf("if(pcap_setfilter(src_dev_handle_map[dev], &fp) == -1) \n");
         if(pcap_setfilter(src_dev_handle_map[dev], &fp) == -1) {
             fprintf(stderr, "Error setting filter\n");
             exit(-1);
