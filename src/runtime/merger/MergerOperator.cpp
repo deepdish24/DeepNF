@@ -70,12 +70,14 @@ void MergerOperator::process_packet(u_char *arg,
     printf("Received new packet\n");
 
     struct packet *pkt_info = new struct packet(packet, pkthdr->len);
+    printf("struct packet *pkt_info = new struct packet(packet, pkthdr->len);\n");
 
     this->print_ip_header(pkt_info->ip_header);
     this->print_tcp_packet(pkt_info->tcp_header);
     this->print_data(pkt_info->data, pkt_info->data_size);
 
     int packet_id = ntohs(pkt_info->ip_header->ip_id);
+    printf("int packet_id = ntohs(pkt_info->ip_header->ip_id);\n");
 
     /* add packet to the map */
     std::vector<nf_packet> *pkts;
@@ -84,9 +86,12 @@ void MergerOperator::process_packet(u_char *arg,
     } else {
         pkts = new std::vector<nf_packet>();
     }
+    printf("Added packet to map\n");
+
     nf_packet p;
     p.pkt = pkt_info;
     RuntimeNode n = *this->merger_info->get_interface_leaf_map().at(cur_dev);
+    printf("RuntimeNode n = *this->merger_info->get_interface_leaf_map().at(cur_dev);\n");
     p.nf = n.get_nf();
     pkts->push_back(p);
     packet_map[packet_id] = pkts;
