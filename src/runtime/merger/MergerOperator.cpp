@@ -59,7 +59,7 @@ void MergerOperator::run() {
          it != this->merger_info->get_interface_leaf_map().end(); ++it) {
         /* loop for callback function */
         cur_dev = it->first;
-        pcap_loop(src_dev_handle_map[it->first], 3, process_packet, (u_char*) this);
+        pcap_loop(src_dev_handle_map[it->first], 3, process_packet_handler, (u_char*) this);
     }
 }
 
@@ -98,7 +98,8 @@ void MergerOperator::configure_device_read_handles(std::string packet_filter_exp
 {
     std::map<std::string, RuntimeNode*> interface_leap_map = this->merger_info->get_interface_leaf_map();
 
-    for (std::map<std::string, RuntimeNode>::iterator it = interface_leaf_map.begin(); it != interface_leaf_map.end(); ++it) {
+    for (std::map<std::string, RuntimeNode*>::iterator it = this->merger_info->get_interface_leaf_map().begin();
+         it != this->merger_info->get_interface_leaf_map().end(); ++it) {
 
         std::string dev = it->first;
 
