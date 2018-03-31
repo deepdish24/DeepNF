@@ -56,15 +56,17 @@ class MergerOperator {
         /* FUNCTIONS FOR PERFORMING MERGER OPERATIONS */
         // sets up hardcoded MergerInfo object to do testing on
         MergerInfo* setup_dummy_info();
+        void process_packet(u_char *arg, const struct pcap_pkthdr* pkthdr, const u_char* packet);
 
 
         /* HELPER FUNCTIONS FOR OPERATING ON PACKETS */
         void configure_device_read_handles(std::string packet_filter_expr);
-        void configure_device_write_handle(std::string packet_filter_expr,
-                                       std::string dev);
+        void configure_device_write_handle(std::string packet_filter_expr, std::string dev);
 
-
-
+        /* HELPER FUNCTIONS THAT PRINT STUFF */
+        void print_tcp_packet(struct tcphdr *tcph);
+        void print_ip_header(struct ip *iph);
+        void print_data(u_char* data, int size);
 };
 
 
