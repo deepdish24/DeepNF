@@ -5,14 +5,14 @@
 #ifndef DEEPNF_MERGERINFO_H
 #define DEEPNF_MERGERINFO_H
 
-#import "RuntimeNode.h"
-#import "ConflictItem.h"
+#include "RuntimeNode.h"
+#include "ConflictItem.h"
 
-#import <map>
-#import <vector>
+#include <map>
+#include <vector>
 
-#import "RuntimeNode.h"
-#import "ConflictItem.h"
+#include "RuntimeNode.h"
+#include "ConflictItem.h"
 
 class MergerInfo {
 
@@ -30,9 +30,9 @@ class MergerInfo {
     public:
        std::map<std::string, RuntimeNode*> get_eth_to_runtime_map();
 
-       std::vector<ConflictItem*> get_conflicts_list;
+       std::vector<ConflictItem*> get_conflicts_list();
 
-       std::vector<RuntimeNode*> get_service_graph;
+       std::vector<RuntimeNode*> get_service_graph();
 
 };
 

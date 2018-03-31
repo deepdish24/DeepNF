@@ -5,8 +5,8 @@
 #ifndef DEEPNF_CONFLICTITEM_H
 #define DEEPNF_CONFLICTITEM_H
 
-#import <map>
-#import <vector>
+#include <map>
+#include <vector>
 
 class ConflictItem {
     enum Field {
