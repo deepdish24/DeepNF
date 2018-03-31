@@ -1,5 +1,7 @@
 build/*
 .idea/*
+google_protobuf-prefix/*
+deepnf.pem
 
 .DS_Store
 */.DS_Store

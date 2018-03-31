@@ -5,7 +5,7 @@
 		<Option title="DeepNF"/>
 		<Option makefile_is_custom="1"/>
 		<Option compiler="clang"/>
-		<Option virtualFolders="CMake Files\;CMake Files\cmake-build-debug\;CMake Files\cmake-build-debug\google_protobuf-prefix\;CMake Files\cmake-build-debug\google_protobuf-prefix\tmp\;CMake Files\src\;CMake Files\src\common\;CMake Files\src\listener\;CMake Files\src\runtime\;CMake Files\src\runtime\config\;CMake Files\src\runtime\merger\;CMake Files\src\setup\;"/>
+		<Option virtualFolders="CMake Files\;CMake Files\cmake-build-debug\;CMake Files\cmake-build-debug\google_protobuf-prefix\;CMake Files\cmake-build-debug\google_protobuf-prefix\tmp\;CMake Files\src\;CMake Files\src\common\;CMake Files\src\common\sgu_test\;CMake Files\src\listener\;CMake Files\src\runtime\;CMake Files\src\runtime\config\;CMake Files\src\runtime\merger\;CMake Files\src\setup\;"/>
 		<Build>
 			<Target title="all">
 				<Option working_dir="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug"/>
@@ -107,6 +107,58 @@
 					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/common/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
 					<Clean command="/usr/bin/make -j4 -f &quot;/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/common/Makefile&quot;  VERBOSE=1 clean"/>
 					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/common/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="sgu_test">
+				<Option output="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/common/sgu_test/sgu_test" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/common/sgu_test"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="clang"/>
+				<Compiler>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/generated"/>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/include"/>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src"/>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/usr/local/include/google/protobuf"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/9.0.0/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/common/sgu_test/Makefile&quot;  VERBOSE=1 sgu_test"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/common/sgu_test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/common/sgu_test/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/common/sgu_test/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="sgu_test/fast">
+				<Option output="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/common/sgu_test/sgu_test" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/common/sgu_test"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="clang"/>
+				<Compiler>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/generated"/>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/include"/>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src"/>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/usr/local/include/google/protobuf"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/9.0.0/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/common/sgu_test/Makefile&quot;  VERBOSE=1 sgu_test/fast"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/common/sgu_test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/common/sgu_test/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/common/sgu_test/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="listener">
@@ -318,6 +370,12 @@
 				</MakeCommands>
 			</Target>
 		</Build>
+		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/generated/src/proto/Machine.pb.cc">
+			<Option target="common"/>
+		</Unit>
+		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/generated/src/proto/Machine.pb.h">
+			<Option target="common"/>
+		</Unit>
 		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/common/Machine.cpp">
 			<Option target="common"/>
 		</Unit>
@@ -344,6 +402,9 @@
 		</Unit>
 		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/common/ServiceGraphUtil.h">
 			<Option target="common"/>
+		</Unit>
+		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/common/sgu_test/main.cpp">
+			<Option target="sgu_test"/>
 		</Unit>
 		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/listener/listener.cpp">
 			<Option target="listener"/>
@@ -374,6 +435,9 @@
 		</Unit>
 		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/common/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\src\common\"/>
+		</Unit>
+		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/common/sgu_test/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\src\common\sgu_test\"/>
 		</Unit>
 		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/listener/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\src\listener\"/>

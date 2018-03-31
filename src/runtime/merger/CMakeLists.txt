@@ -11,3 +11,8 @@ set(HEADERS
 )
 
 add_executable(merge ${SOURCE_FILES} ${HEADERS})
+<<<<<<< HEAD
+=======
+
+ 
+>>>>>>> ad0d10463408e0aa6293e40489dbe267fd3b8494

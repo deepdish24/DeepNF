@@ -11,14 +11,11 @@ public:
 	// set of pointers to node neighbors
 	std::set<ServiceGraphNode*> neighbors;
 	// parent of node
-	ServiceGraphNode *parent;
+	std::set<ServiceGraphNode*> parents;
+	//ServiceGraphNode *parent;
 	
 	ServiceGraphNode(std::string f) {
 		nf = f;
-	}
-
-	ServiceGraphNode() {
-		nf = "default";
 	}
 
 	void set_name(std::string f) {
@@ -29,8 +26,16 @@ public:
 		neighbors.insert(n);
 	}
 
-	void set_parent(ServiceGraphNode* n) {
-		parent = n;
+	void add_parent(ServiceGraphNode* n) {
+		parents.insert(n);
+	}
+
+	bool isLeaf() {
+		return neighbors.empty();
+	}
+
+	bool isRoot() {
+		return parents.empty();
 	}
 };
 

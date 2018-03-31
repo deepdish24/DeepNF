@@ -12,6 +12,10 @@
 #include <sys/socket.h>
 #include <ios>
 #include <tuple>
+#include <typeinfo>
+#include "../common/RuntimeNode.h"
+#include "../common/MachineConfigurator.h"
+#include "../common/ServiceGraphUtil.h"
 
 Orchestrator::Orchestrator(std::string filepath, std::string action_file_path) {
     std::ifstream fileInput(filepath);
@@ -21,12 +25,13 @@ Orchestrator::Orchestrator(std::string filepath, std::string action_file_path) {
     actionTableInput >> actionTable;
 
     std::vector<std::string> functions = userInput["functions"];
-    std::vector<std::string> ips = userInput["ips"];
+    std::vector<std::string> ips_tmp = userInput["ips"];
+    ips = ips_tmp;
     std::vector<int> ports = userInput["ports"];
 
     /* setting up sockaddr data structures to connect 
      to ip + port of all available machines */
-    for (int i = 0; i < (int) ips.size(); i++) {
+   /* for (int i = 0; i < (int) ips.size(); i++) {
         std::string ip = ips[i];
         int port_num = ports[i];
         int sockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -37,65 +42,191 @@ Orchestrator::Orchestrator(std::string filepath, std::string action_file_path) {
         inet_pton(AF_INET, ip.c_str(), &(servaddr.sin_addr));
         connect(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr));
         sockets[ip] = sockfd;
-    }
+    }*/
 
     std::vector<std::vector<std::string>> positionals = userInput["positional"];
     std::vector<std::vector<std::string>> dependencies = userInput["orderDependencies"];
     std::vector<std::vector<std::string>> priorities = userInput["priorities"];
 
+    bool hasPositionals = true;
+
     // Check size of the positional to make sure it is positive and at most 2
-    if (positionals.size() > 2 || positionals.size() < 0){
-        throw std::invalid_argument("Incorrect number of positional NFs detected");
+    if (positionals.size() < 1 || positionals.size() > 2) {
+        hasPositionals = false;
+        //throw std::invalid_argument("Incorrect number of positional NFs detected");
     }
 
-    parseOrderDependencies(dependencies);
-    parsePriorityDependencies(priorities);
-
-    /*for (int i = 0; i < (int) parsedOrder.size(); i++) {
-        std::cout << "Order NF1: " << std::get<0>(parsedOrder[i]) << "\n";
-        std::cout << "Order NF2: " << std::get<1>(parsedOrder[i]) << "\n";
+    if (hasPositionals && positionals.size() == 2 && positionals[0][1].compare(positionals[1][1]) == 0) {
+        hasPositionals = false;
+        //throw std::invalid_argument("Two NFS assigned to same position");
     }
 
-    for (int i = 0; i < (int) parsedPriorities.size(); i++) {
-        std::cout << "prioritiy NF1: " << std::get<0>(parsedPriorities[i]) << "\n";
-        std::cout << "prioritiy NF2: " << std::get<1>(parsedPriorities[i]) << "\n";
-    }*/
+    if ((int) dependencies.size() != 0) {
+        parseOrderDependencies(dependencies);
+    }
 
+    if ((int) priorities.size() != 0) {
+        parsePriorityDependencies(priorities);
+    }
+
+     /* SERVICE GRAPH CONSTRUCTION */
     for (int i = 0; i < (int) functions.size(); i++) {
         //creating on stack
         //ServiceGraphNode n(functions[i]);
         ServiceGraphNode *s = new ServiceGraphNode(functions[i]);
-        std::cout << "Function " << functions[i] << " node created with address: " << s << std::endl;
+        //std::cout << "Function " << functions[i] << " node created with address: " << s << std::endl;
         func_to_nodes[functions[i]] = s;
     }
 
     std::set<ServiceGraphNode*> orderTreeNodes = {};
+    std::set<ServiceGraphNode*> priorityNodes = {};
 
+    // Create Forest describing order dependencies
     for (int i = 0; i < (int) parsedOrder.size(); i++) {
         std::string nf1 = std::get<0>(parsedOrder[i]);
         std::string nf2 = std::get<1>(parsedOrder[i]);
         ServiceGraphNode *node1 = func_to_nodes[nf1];
         ServiceGraphNode *node2 = func_to_nodes[nf2];
-        std::cout << node1 << std::endl;
-        std::cout << node2 << std::endl;
         (*node1).add_neighbor(node2);
-        (*node2).set_parent(node1);
+        (*node2).add_parent(node1);
         orderTreeNodes.insert(node1);
         orderTreeNodes.insert(node2);
     }
 
-    std::cout << "set size: " << orderTreeNodes.size() << std::endl;
-    ServiceGraphNode *node1 = func_to_nodes["iptables"];
-    std::cout << (*node1).neighbors.size() << std::endl;
-    //std::cout << ((func_to_nodes["iptables"])->neighbors).size() << std::endl;
+    for (int i = 0; i < (int) parsedPriorities.size(); i++) {
+        std::string nf1 = std::get<0>(parsedPriorities[i]);
+        std::string nf2 = std::get<1>(parsedPriorities[i]);
+        ServiceGraphNode *node1 = func_to_nodes[nf1];
+        ServiceGraphNode *node2 = func_to_nodes[nf2];
+        priorityNodes.insert(node1);
+        priorityNodes.insert(node2);
+    }
 
+    std::set<ServiceGraphNode*> rootNodes = {};
+    std::set<ServiceGraphNode*> leafNodes = {};
+
+    // loop finds all root nodes of each tree
+    for (auto node : orderTreeNodes) {
+        if (node->isRoot()) {
+            rootNodes.insert(node);
+        }
+    }
+
+    // loop proceeds through each tree and checks if leaves can be run in parallel
+    std::cout << "===================parsing tree nodes=======================" << std::endl;
+    for (auto node : rootNodes) {
+        std::set<ServiceGraphNode*> leavesForRoot = {};
+        std::cout << "root node: " << node->nf << std::endl;
+        std::cout << "num neighbors for root: " << node->neighbors.size() << std::endl;
+        std::set<ServiceGraphNode*> neighbors = node->neighbors;
+        for (auto neighbor : neighbors) {
+            std::cout << "neighbor: " << neighbor->nf << std::endl;
+            std::cout << "is neighbor leaf: " << neighbor->isLeaf() << std::endl;
+        }
+        findAllLeaves(node, leavesForRoot);
+        checkLevelParallelizability(leavesForRoot);
+        for (auto leaf : leavesForRoot) {
+            leafNodes.insert(leaf);
+        }
+    }
+    std::cout << "===================done parsing tree nodes=======================" << std::endl;
+
+    //check all pairwise parallelizability of priorityNF's
+    checkLevelParallelizability(priorityNodes);
+
+    ServiceGraphNode* first = NULL;
+    ServiceGraphNode* last = NULL;
+
+    for (int i = 0; i < (int) positionals.size(); i++) {
+        std::vector<std::string> pos = positionals[i];
+        if (pos[1].compare("first") == 0) {
+            first = func_to_nodes[pos[0]];
+        }
+        if (pos[1].compare("last") == 0) {
+            last = func_to_nodes[pos[0]];
+        }
+    }
+
+    if (hasPositionals) {
+        // attaching root nodes to first node in chain
+        for (auto node : rootNodes) {
+            first->add_neighbor(node);
+            node->add_parent(first);
+        }
+
+        // attaching all free floating nodes to 
+        // both first and last nodes
+        for (auto node : priorityNodes) {
+            first->add_neighbor(node);
+            node->add_parent(first);
+            node->add_neighbor(last);
+            last->add_parent(node);
+        }
+
+        // attaching all leaf nodes to last node
+        for (auto node : leafNodes) {
+            node->add_neighbor(last);
+            last->add_parent(node);
+        }
+
+        // if no middle nodes exit, then we connect first directly to last
+        if (rootNodes.size() == 0 && priorityNodes.size() == 0) {
+            first->add_neighbor(last);
+            last->add_parent(first);
+        }
+    }
+
+    /* NODE PARTITIONING */
     std::string ip_one = ips[0];
-    for (int i = 0; i < (int) dependencies.size(); i++) {
-        struct DependencyPair dp;
-        dp.function1 = dependencies[i][0];
-        dp.function2 = dependencies[i][1];
-        func_to_ip[dp.function1] = ip_one;
-        func_to_ip[dp.function2] = ip_one;
+    for (int i = 0; i < (int) functions.size(); i++) {
+        func_to_ip[functions[i]] = ip_one;
+    }
+
+
+    /* MACHINE CONFIGURATION */
+    std::unordered_map<std::string, Machine*> ip_to_machines;
+    std::unordered_map<int, RuntimeNode*> idToRuntimeNode = {};
+    std::unordered_map<std::string, int> func_to_inx = {};
+
+    //configure each machine
+    for (int i = 0; i < (int) ips.size(); i++) {
+        Machine *m = new Machine(i);
+        m->set_ip(ips[i]);
+        m->set_bridge_ip("173.16.1.1");
+        ip_to_machines[ips[i]] = m;
+    }
+
+    //configuring for each node
+    for (int i = 0; i < (int) functions.size(); i++) {
+        NF nf = stringToNF(functions[i]);
+        RuntimeNode *rnode = new RuntimeNode(i, nf);
+        idToRuntimeNode[i] = rnode;
+        func_to_inx[functions[i]] = i;
+        Machine *machine = ip_to_machines[func_to_ip[functions[i]]];
+        machine->add_node_id(rnode->get_id());
+    }
+
+    for (int i = 0; i < (int) functions.size(); i++) {
+        ServiceGraphNode *node = func_to_nodes[functions[i]];
+        RuntimeNode *rnode = idToRuntimeNode[i];
+        std::set<ServiceGraphNode*> neighbors = node->neighbors;
+        for (auto neighbor : neighbors) {
+            int neighborInx = func_to_inx[neighbor->nf];
+            rnode->add_neighbor(neighborInx);
+        }
+    }
+
+    // creating machine configurator objects and serializing them to send somewhere?
+    for (int i = 0; i < (int) ips.size(); i++) {
+        Machine* m = ip_to_machines[ips[i]];
+        MachineConfigurator* mc = new MachineConfigurator(m);
+        //mc->get_nodes_for_machine(mc->get_machine_id());
+        std::vector<int> node_ids = m->get_node_ids();
+        for (int id : node_ids) {
+            mc->add_node(idToRuntimeNode[id]);
+        }
+        std::string serializedConfig = service_graph_util::machine_configurator_to_string(mc);
+        ip_to_mc[ips[i]] = serializedConfig;
     }
 }
 
@@ -135,6 +266,18 @@ void Orchestrator::parseOrderDependencies(std::vector<std::vector<std::string>> 
             parsedOrder.push_back(std::make_tuple(f1, f2));
         }
     }
+}
+
+NF Orchestrator::stringToNF(std::string function) {
+    NF nf = snort;
+    if (function.compare("snort") == 0) {
+        nf = snort;
+    } else if (function.compare("haproxy") == 0) {
+        nf = haproxy;
+    } else {
+        perror("stringToNf called on unknown function");
+    }
+    return nf;
 }
 
 Action stringToAction(std::string action) {
@@ -181,12 +324,16 @@ Field stringToField(std::string field) {
 /* function checks if nf1 before nf2 can be parallelized */
 bool Orchestrator::isParallelizable(std::vector<std::string> orderDep, json actionTable,
     std::vector<Field> &conflictingActions) {
+    //function gets actions for each function
     std::map<std::string, std::string> nf1 = actionTable[orderDep[0]];
     std::map<std::string, std::string> nf2 = actionTable[orderDep[1]];
+
+    //function iterates through all packet locations for nf1
     for (auto it = nf1.begin(); it != nf1.end(); ++it) {
         std::string packetLocation = it->first;
         std::string val = it->second;
         std::string val2 = nf2[packetLocation];
+        // if nf1 drops/adds/removes then it cannot be run in parallel with nf2
         if ((packetLocation.compare("Drop") == 0 || packetLocation.compare("Add/Rm") == 0) && val.compare("T") == 0) {
             return false;
         } else if (val.compare("null") != 0 && val2.compare("null") != 0) {
@@ -203,44 +350,86 @@ bool Orchestrator::isParallelizable(std::vector<std::string> orderDep, json acti
     return true;
 }
 
+
+/* Function takes in root of tree and performs a depth-first search to find all leaves in tree.
+   Leaves are added to set passed in */
+void Orchestrator::findAllLeaves(ServiceGraphNode* root, std::set<ServiceGraphNode*> &leaves) {
+    if (root->isLeaf()) {
+        leaves.insert(root);
+    } else {
+        std::set<ServiceGraphNode*> neighbors = root->neighbors;
+        for (auto neighbor : neighbors) {
+            findAllLeaves(neighbor, leaves);
+        }
+    }
+}
+
+/* Function takes in set of nodes and checks to see if all are mutually parallelizable */
+void Orchestrator::checkLevelParallelizability(std::set<ServiceGraphNode*> nodes) {
+    std::unordered_map<std::string, std::unordered_map<std::string, bool>> visited_pair = {};
+    for (auto node1 : nodes) {
+        for (auto node2 : nodes) {
+            if (node1 != node2) {
+                std::string nf1 = node1->nf;
+                std::string nf2 = node2->nf;
+                std::vector<std::string> pair = {};
+                pair.push_back(nf1);
+                pair.push_back(nf2);
+                std::vector<Field> conflictingActions = {};
+                bool parallelizable = isParallelizable(pair, actionTable, conflictingActions);
+                visited_pair[nf1][nf2] = parallelizable;
+                if (!parallelizable) {
+                    if (visited_pair.find(nf2) != visited_pair.end() && !visited_pair[nf2][nf1]) {
+                        perror("nodes specified are not parallelizable");
+                    }
+                } else {
+                    pair_to_conflicts[nf1][nf2] = conflictingActions;
+                }
+            }
+        }
+    }
+}
+
 void Orchestrator::setup_containers() {
-    for (auto it = func_to_ip.begin(); it != func_to_ip.end(); ++it) {
-        std::string function = it->first;
-        std::string ip_addr = it->second;
-        int sockfd = sockets[ip_addr];
-        std::string x = function + "\r\n";
-        const char* buf = x.c_str();
-        char buffer[100];
+    std::cout << "proceeding to setup containers" << std::endl;
+    for (int i = 0; i < (int) ips.size(); i++) {
+        std::cout << "current ip: " << ips[i] << std::endl;
+        struct sockaddr_in servaddr;
+        int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+        bzero(&servaddr, sizeof(servaddr));
+
+        servaddr.sin_family = AF_INET;
+        servaddr.sin_port = htons(10000);
+
+        inet_pton(AF_INET, ips[i].c_str(), &(servaddr.sin_addr));
+        connect(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr));
+
+        std::string serializedConfig = ip_to_mc[ips[i]];
+        char conf_str[serializedConfig.size()+1];
+        serializedConfig.copy(conf_str, serializedConfig.size(), 0);
+
+        /*std::string config(conf_str, sizeof(conf_str));
+        MachineConfigurator *mc = service_graph_util::string_to_machine_configurator(config);
+        MachineConfigurator conf = *(mc);
+        int machineId = conf.get_machine_id();
+        Machine* mac = conf.get_machine_with_id(machineId);
+        std::cout << "TEST SERIALIZATION: " << mac->get_bridge_ip() << std::endl;
+        std::cout << "=======================" << std::endl;*/
+
+        char recvline[100];
+        std::string ack = "ACK";
+        bzero(recvline, 100);
         while (true) {
-            write(sockfd, buf, strlen(buf));
-            read(sockfd, buffer, sizeof(buffer) - 1);
-            break;
+            write(sockfd, conf_str, sizeof(conf_str));
+            read(sockfd, recvline, 100);
+            if (strcmp(recvline, ack.c_str()) == 0) {
+                break;
+            }
         }
     }
 }
 
 // Given a service graph node, determine if it is a root node
-bool Orchestrator::isLeaf(ServiceGraphNode *n){
-    if (!(*n).neighbors.empty()){
-        return false;
-    } 
-    else {
-        return true;
-    }
-}
-
-// Given a service graph node, determine the root node pointing to it
-ServiceGraphNode* Orchestrator::findRootNode(ServiceGraphNode* n){
-    ServiceGraphNode *parentOfN = (*n).parent;
-    if (parentOfN == NULL){
-        return n;
-    }
-    else {
-        ServiceGraphNode *currNode;
-        while (parentOfN != NULL){
-            currNode = parentOfN;
-            parentOfN = (*currNode).parent;
-        }
-        return currNode;
-    }
+bool Orchestrator::isLeaf(ServiceGraphNode *n) {
+    return !(*n).neighbors.empty();
 }
