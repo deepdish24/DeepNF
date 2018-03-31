@@ -13,6 +13,7 @@
 #include "pcap.h"
 #include "RuntimeNode.h"
 
+using namespace std;
 
 void print_data(u_char* data, int size);
 void print_ip_header(struct ip *iph);
@@ -74,6 +75,8 @@ int main(int argc,char **argv)
     // configure_device_read_handle(packet_filter_expr, src_dev);
     configure_device_read_handles(packet_filter_expr);
     configure_device_write_handle(packet_filter_expr, dst_dev);
+
+    printf("setup successfully\n");
 
     /* loop for callback function */
     // pcap_loop(src_dev_handle, -1, process_packet, NULL);

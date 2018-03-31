@@ -107,7 +107,7 @@ void MergerOperator::configure_device_read_handles(std::string packet_filter_exp
          it != this->merger_info->get_interface_leaf_map().end(); ++it) {
 
         std::string dev = it->first;
-        printf("iterating on: std::string dev = it->first;\n");
+        printf("iterating on: std::string dev = it->first: %s;\n", dev.c_str());
 
         char errbuf[PCAP_ERRBUF_SIZE];
         struct bpf_program fp;        /* hold compiled program */
