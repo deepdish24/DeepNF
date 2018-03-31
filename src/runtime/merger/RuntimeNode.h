@@ -1,4 +1,5 @@
-#pragma once
+#ifndef DEEPNF_RUNTIME_NODE_H
+#define DEEPNF_RUNTIME_NODE_H
 
 #include <string>
 #include <stdlib.h>
@@ -44,3 +45,5 @@ public:
     NF get_nf();
 
 };
+
+#endif

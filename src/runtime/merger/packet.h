@@ -1,4 +1,5 @@
-#pragma once
+#ifndef DEEPNF_PACKET_H
+#define DEEPNF_PACKET_H
 
 #include <net/ethernet.h>
 #include <netinet/tcp.h>   //Provides declarations for tcp header
@@ -24,3 +25,5 @@ public:
     bool is_null();
     void nullify();
 };
+
+#endif

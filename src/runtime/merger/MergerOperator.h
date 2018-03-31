@@ -56,7 +56,7 @@ class MergerOperator {
         /* FUNCTIONS FOR PERFORMING MERGER OPERATIONS */
         // sets up hardcoded MergerInfo object to do testing on
         MergerInfo* setup_dummy_info();
-        void process_packet(u_char *arg, const struct pcap_pkthdr* pkthdr, const u_char* packet);
+        static void process_packet(u_char *arg, const struct pcap_pkthdr* pkthdr, const u_char* packet);
 
 
         /* HELPER FUNCTIONS FOR OPERATING ON PACKETS */
