@@ -8,7 +8,15 @@
 std::string packet_filter_expr = "tcp";
 
 
+void process_packet_handler(unsigned char * user,
+                            const struct pcap_pkthdr *pkthdr,
+                            const unsigned char * packet) {
+    ((MergerOperator*) user)->process_packet(user, pkthdr, packet);
+}
+
+
 MergerOperator::MergerOperator() { }
+
 
 /* FUNCTIONS FOR PERFORMING MERGER OPERATIONS */
 
@@ -50,7 +58,7 @@ void MergerOperator::run() {
     for (std::map<std::string, RuntimeNode>::iterator it = interface_leaf_map.begin(); it != interface_leaf_map.end(); ++it) {
         /* loop for callback function */
         cur_dev = it->first;
-        pcap_loop(src_dev_handle_map[it->first], 3, this->process_packet, NULL);
+        pcap_loop(src_dev_handle_map[it->first], 3, process_packet, (u_char*) this);
     }
 }
 
@@ -75,7 +83,7 @@ void MergerOperator::process_packet(u_char *arg,
     }
     nf_packet p;
     p.pkt = pkt_info;
-    RuntimeNode n = interface_leaf_map.at(cur_dev);
+    RuntimeNode n = *this->merger_info->get_interface_leaf_map().at(cur_dev);
     p.nf = n.get_nf();
     pkts->push_back(p);
     packet_map[packet_id] = pkts;
