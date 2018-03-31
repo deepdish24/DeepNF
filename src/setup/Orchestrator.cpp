@@ -390,6 +390,24 @@ void Orchestrator::checkLevelParallelizability(std::set<ServiceGraphNode*> nodes
     }
 }
 
+/*void Orchestrator::write_json_dictionary(std::unordered_map<std::string, int> func_to_inx, 
+    std::unordered_map<int, RuntimeNode*> idToRuntimeNode = {}) {
+    std::vector<ConflictPairInfo> conflictPairs = {};
+    for (auto it = pair_to_conflicts.begin(); it != pair_to_conflicts.end(); ++it) {
+        std::string major = it->first;
+        std::unordered_map<std::string, std::vector<Field>> map = it->second;
+        RuntimeNode *node = idToRuntimeNode[func_to_inx[major]];
+        RuntimeNode *parentNode
+        for (auto nextIt = map.begin(); nextIt != map.end(); ++nextIt) {
+            struct ConflictPairInfo *cpInfo = malloc(sizeof(ConflictPairInfo));
+            std::string minor = nextIt->first;
+            std::vector<Field> fields = nextIt->second;
+            cpInfo->major = major;
+            cpInfo->minor = minor;
+        }
+    }
+}*/
+
 void Orchestrator::setup_containers() {
     std::cout << "proceeding to setup containers" << std::endl;
     for (int i = 0; i < (int) ips.size(); i++) {

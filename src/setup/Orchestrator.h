@@ -51,6 +51,13 @@ struct Intermediary {
     std::vector<ActionPair> actions = {};
 };
 
+/*struct ConflictPairInfo {
+    int major;
+    int minor;
+    int parent;
+    std::vector<std::string> confActions = {};
+}*/
+
 class Orchestrator {
 private:
     json userInput;
