@@ -9,7 +9,7 @@ RUN apt-get update -y && \
     apt-get install python3 --fix-missing -y && \
     apt-get install python-pip python-dev build-essential -y && \
     pip install -U pip && pip install cget && \
-    cget install nlohmann/json
+    cget install nlohmann/json -DJSON_MultipleHeaders=ON
 
 
 
