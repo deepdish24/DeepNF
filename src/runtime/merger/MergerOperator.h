@@ -31,10 +31,10 @@
 class MergerOperator {
 
     public:
-        MergerOperator();
+        MergerOperator(std::string action_file_path);
 
         // runs the merger
-        void run(std::string action_file_path);
+        void run();
         void process_packet(u_char *arg, const struct pcap_pkthdr* pkthdr, const u_char* packet);
 
 

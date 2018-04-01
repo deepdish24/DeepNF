@@ -15,7 +15,13 @@ void process_packet_handler(unsigned char * user,
 }
 
 
-MergerOperator::MergerOperator() { }
+MergerOperator::MergerOperator(std::string action_file_path) {
+    // set up action table
+    nlohmann::json action_table;
+    std::ifstream action_table_input(action_file_path);
+    action_table_input >> action_table;
+    this->action_table_helper = new ActionTableHelper(action_table);
+}
 
 
 /* FUNCTIONS FOR PERFORMING MERGER OPERATIONS */
@@ -39,12 +45,6 @@ MergerInfo* MergerOperator::setup_dummy_info() {
 
 void MergerOperator::run(std::string action_file_path) {
     printf("wtf is this bullshit\n");
-
-    // set up action table
-    nlohmann::json action_table;
-    std::ifstream action_table_input(action_file_path);
-    action_table_input >> action_table;
-    this->action_table_helper = new ActionTableHelper(action_table);
 
     // create dummy MergerInfo object
     this->merger_info = setup_dummy_info();
@@ -216,7 +216,7 @@ void MergerOperator::configure_device_write_handle(std::string packet_filter_exp
 }
 
 
-static MergerOperator::NFPacket* MergerOperator::copy_nfpacket(NFPacket* nfpacket) {
+MergerOperator::NFPacket* MergerOperator::copy_nfpacket(NFPacket* nfpacket) {
     NFPacket copy;
     copy.pkt = nfpacket->pkt->copy();
     copy.runtime_id = nfpacket->runtime_id;
