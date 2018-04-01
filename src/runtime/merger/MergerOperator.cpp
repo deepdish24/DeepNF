@@ -16,11 +16,16 @@ void process_packet_handler(unsigned char * user,
 
 
 MergerOperator::MergerOperator(std::string action_file_path) {
+    printf("MergerOperator::MergerOperator \n");
+
     // set up action table
     nlohmann::json action_table;
     std::ifstream action_table_input(action_file_path);
     action_table_input >> action_table;
-    this->action_table_helper = new ActionTableHelper(action_table);
+
+    printf("finished reading in json \n");
+
+//    this->action_table_helper = new ActionTableHelper(action_table);
 }
 
 
@@ -44,6 +49,8 @@ MergerInfo* MergerOperator::setup_dummy_info() {
 
 
 void MergerOperator::run() {
+    printf("MergerOperator::run() \n");
+
     printf("wtf is this bullshit\n");
 
     // create dummy MergerInfo object
