@@ -8,7 +8,7 @@
 
 packet::packet(const u_char *pkt, int pkt_size)
 {
-	this->pkt = pkt;
+	this->pkt_char = pkt;
 	size = pkt_size;
 	ethernet_header = (struct ether_header*)pkt;
 	if (ntohs(ethernet_header->ether_type) == ETHERTYPE_IP) {
@@ -35,6 +35,6 @@ void packet::nullify()
 }
 
 packet* packet::copy() {
-	struct packet *pkt_info = new struct packet(this->pkt, this->size);
+	struct packet *pkt_info = new struct packet(this->pkt_char, this->size);
 	return pkt_info;
 }
