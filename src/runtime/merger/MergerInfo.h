@@ -30,7 +30,7 @@ class MergerInfo {
     public:
         MergerInfo(std::map<std::string, RuntimeNode*> interface_leaf_map,
                    std::vector<ConflictItem*> conflicts_list,
-                   std::vector<RuntimeNode*> service_graph);
+                   std::map<int, RuntimeNode*> node_map);
 
         std::map<std::string, RuntimeNode*> get_interface_leaf_map();
 

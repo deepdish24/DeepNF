@@ -8,7 +8,7 @@
 
 MergerInfo::MergerInfo(std::map<std::string, RuntimeNode*> interface_leaf_map,
                        std::vector<ConflictItem*> conflicts_list,
-                       std::map<int, RuntimeNode*> service_graph) {
+                       std::map<int, RuntimeNode*> node_map) {
     this->interface_leaf_map = interface_leaf_map;
     this->conflicts_list = conflicts_list;
     this->node_map = node_map;

@@ -36,9 +36,9 @@ MergerInfo* MergerOperator::setup_dummy_info() {
     interface_leaf_map.insert(std::make_pair("eth2", &n1));
 
     std::vector<ConflictItem*> conflicts_list;
-    std::vector<RuntimeNode*> service_graph;
+    std::map<int, RuntimeNode*> node_map;
 
-    MergerInfo* mi = new MergerInfo(interface_leaf_map, conflicts_list, service_graph);
+    MergerInfo* mi = new MergerInfo(interface_leaf_map, conflicts_list, node_map);
     return mi;
 }
 
