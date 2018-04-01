@@ -2,16 +2,16 @@ FROM ubuntu:latest
 
 MAINTAINER Akash Subramanian <skythelimit.96@gmail.com>
 
-RUN apt-get update -y && \
+RUN groupadd -g 999 appuser && \
+    useradd -r -u 999 -g appuser appuser && \
+    apt-get update -y && \
     apt-get upgrade -y && \
     apt-get install -y g++ libpcap-dev && \
-    apt-get install cmake -y && \
-    apt-get install python3 --fix-missing -y && \
-    apt-get install python-pip python-dev build-essential -y && \
-    pip install -U pip && pip install cget && \
-    cget install nlohmann/json -DJSON_MultipleHeaders=ON
-
+    apt install linuxbrew-wrapper -y && \
+    chmod 777 /home/ && \
+    chmod 777 /
 
 COPY * ./
 
-RUN bash build.sh
+
+USER appuser
