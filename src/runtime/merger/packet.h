@@ -14,7 +14,7 @@ public:
 
 	/* reference:
      * http://tonylukasavage.com/blog/2010/12/19/offline-packet-capture-analysis-with-c-c----amp--libpcap/ */
-    const u_char *pkt; 
+    const u_char *pkt_char;
     int size;
     struct ether_header* ethernet_header;
     struct ip* ip_header;

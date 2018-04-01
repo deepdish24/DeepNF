@@ -106,12 +106,13 @@ void MergerOperator::process_packet(u_char *arg,
 
         // send packet to destination virtual interface
         if (!merged_packet->pkt->is_null()) {
-            if (pcap_sendpacket(this->dst_dev_handle, merged_packet->pkt->pkt, merged_packet->pkt->size) < 0) {
+            if (pcap_sendpacket(this->dst_dev_handle, merged_packet->pkt->pkt_char, merged_packet->pkt->size) < 0) {
                 std::cerr << strerror(errno) << std::endl;
             }
         }
 
         // cleanup
+        delete merged_packet;
         packet_map.erase(packet_id);
     }
 
@@ -129,7 +130,7 @@ MergerOperator::NFPacket* MergerOperator::resolve_packet_conflict(
     }
 
     // otherwise, merge packet based on conflicting items
-    struct packet *new_pkt = new struct packet(major_p->pkt, major_p->pkt->size);
+    struct packet *new_pkt = new struct packet(major_p->pkt->pkt_char, major_p->pkt->size);
     std::map<NF, std::set<Field>> fields_map = action_table_helper->get_write_fields_map();
 
     // write changes made in minor packet
@@ -176,23 +177,23 @@ MergerOperator::NFPacket* MergerOperator::resolve_packet_conflict(
         }
     }
 
-    NFPacket ret_p;
-    ret_p.pkt = new_pkt;
-    ret_p.runtime_id = conflict->get_parent();
-    ret_p.nf = merger_info->get_node_map()[ret_p.runtime_id]->get_nf();
+    NFPacket* ret_p = new NFPacket();
+    ret_p->pkt = new_pkt;
+    ret_p->runtime_id = conflict->get_parent();
+    ret_p->nf = merger_info->get_node_map()[ret_p->runtime_id]->get_nf();
 
     // construct written_fields set for merged packet
     std::set<Field> written_fields;
     for (std::set<Field>::iterator it = minor_fields.begin();
          it != minor_fields.end(); ++it) {
-        ret_p.written_fields.insert(*it);
+        ret_p->written_fields.insert(*it);
     }
     for (std::set<Field>::iterator it = major_fields.begin();
          it != major_fields.end(); ++it) {
-        ret_p.written_fields.insert(*it);
+        ret_p->written_fields.insert(*it);
     }
 
-    return &ret_p;
+    return ret_p;
 }
 
 
@@ -230,6 +231,8 @@ MergerOperator::NFPacket* MergerOperator::merge_all(int pkt_id) {
                 }
 
                 // remove major and minor from packet_map and add merged pkt
+                delete (*rt_to_pkt_map)[ci->get_major()];
+                delete (*rt_to_pkt_map)[ci->get_minor()];
                 rt_to_pkt_map->erase(ci->get_major());
                 rt_to_pkt_map->erase(ci->get_minor());
                 rt_to_pkt_map->insert(std::make_pair(merged_pkt->runtime_id, merged_pkt));
@@ -318,10 +321,10 @@ void MergerOperator::configure_device_write_handle(std::string packet_filter_exp
 
 
 MergerOperator::NFPacket* MergerOperator::copy_nfpacket(NFPacket* nfpacket) {
-    NFPacket copy;
-    copy.pkt = nfpacket->pkt->copy();
-    copy.runtime_id = nfpacket->runtime_id;
-    return &copy;
+    NFPacket* copy = new NFPacket();
+    copy->pkt = nfpacket->pkt->copy();
+    copy->runtime_id = nfpacket->runtime_id;
+    return copy;
 }
 
 
