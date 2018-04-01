@@ -13,6 +13,6 @@ RUN apt-get update -y && \
 
 
 
-COPY * .
+COPY * ./
 
 RUN bash build.sh
