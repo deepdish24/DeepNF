@@ -6,11 +6,13 @@
 #define DEEPNF_ACTIONTABLEHELPER_H
 
 #include <set>
+#include <map>
 #include "string.h"
 
-#include "nlohmann/json.hpp"
+#include <json.hpp>
 #include "NF.h"
 #include "Field.h"
+
 
 using json = nlohmann::json;
 
