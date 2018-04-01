@@ -324,12 +324,6 @@
 		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/generated/src/proto/Machine.pb.h">
 			<Option target="common"/>
 		</Unit>
-		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/common/ConflictItem.cpp">
-			<Option target="common"/>
-		</Unit>
-		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/common/ConflictItem.h">
-			<Option target="common"/>
-		</Unit>
 		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/common/Machine.cpp">
 			<Option target="common"/>
 		</Unit>
@@ -340,12 +334,6 @@
 			<Option target="common"/>
 		</Unit>
 		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/common/MachineConfigurator.h">
-			<Option target="common"/>
-		</Unit>
-		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/common/MergerInfo.cpp">
-			<Option target="common"/>
-		</Unit>
-		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/common/MergerInfo.h">
 			<Option target="common"/>
 		</Unit>
 		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/common/NF.h">
@@ -373,6 +361,18 @@
 			<Option target="protocol_buffers"/>
 		</Unit>
 		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/runtime/config/configure.cpp">
+			<Option target="configure"/>
+		</Unit>
+		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/runtime/merger/ActionTableHelper.cpp">
+			<Option target="configure"/>
+		</Unit>
+		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/runtime/merger/ActionTableHelper.h">
+			<Option target="configure"/>
+		</Unit>
+		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/runtime/merger/MergerOperator.cpp">
+			<Option target="configure"/>
+		</Unit>
+		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/runtime/merger/MergerOperator.h">
 			<Option target="configure"/>
 		</Unit>
 		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/setup/Orchestrator.cpp">

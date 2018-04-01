@@ -6,9 +6,7 @@ set(SOURCE_FILES
     Machine.cpp
     ServiceGraphUtil.cpp
     MachineConfigurator.cpp
-    MergerInfo.cpp
-    ConflictItem.cpp
-)
+        )
 
 set(HEADERS
     # add headers files here eventually
@@ -17,9 +15,7 @@ set(HEADERS
     MachineConfigurator.h
     NF.h
     ServiceGraphUtil.h
-    MergerInfo.h
-    ConflictItem.h
-)
+        )
 
 set(PROTOCOL_BUFFERS
         ${PROTO_DIR}/Machine.pb.cc
