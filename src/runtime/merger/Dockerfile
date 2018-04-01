@@ -11,4 +11,6 @@ RUN groupadd -g 999 appuser && \
     chmod 777 /home/ && \
     chmod 777 .
 
+USER appuser
+
 COPY * ./
