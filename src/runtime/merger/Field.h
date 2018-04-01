@@ -1,13 +1,15 @@
 #ifndef DEEPNF_FIELD_H
 #define DEEPNF_FIELD_H
 
+#include <string>
+
 enum Field {
     SIP = 0,
     DIP,
     SPORT,
     DPORT,
     PAYLOAD,
-    end // used only for iterating over the FIELD enums; not an actual FIELD
+    field_end // used only for iterating over the FIELD enums; not an actual FIELD
 };
 
 namespace field

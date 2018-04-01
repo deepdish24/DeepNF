@@ -1,10 +1,12 @@
 #ifndef DEEPNF_NF_H
 #define DEEPNF_NF_H
 
+#include <string>
+
 enum NF {
     snort,
     haproxy,
-    end // used only for iterating over the NF enums; not an actual NF
+    nf_end // used only for iterating over the NF enums; not an actual NF
 };
 
 namespace nf

@@ -15,7 +15,7 @@ ActionTableHelper::ActionTableHelper(json action_table) {
 */
 std::map<NF, std::set<Field>> ActionTableHelper::get_write_fields_map() {
     if (!this->fields_map_initialized) {
-        for (int nf_it = 0; nf_it != NF::end; nf_it++) {
+        for (int nf_it = 0; nf_it != NF::nf_end; nf_it++) {
             NF nf = (NF) nf_it;
             this->fields_map[nf] = this->get_write_fields(nf);
         }
@@ -39,7 +39,7 @@ std::set<Field> ActionTableHelper::get_write_fields(NF nf) {
     std::string nf_str = nf::nf_to_string(nf);
 
     // check all possible fields
-    for ( int field_it = 0; field_it != Field::end; field_it++ )
+    for ( int field_it = 0; field_it != Field::field_end; field_it++ )
     {
         Field field = (Field) field_it;
         std::string field_str = field::field_to_string(field);
