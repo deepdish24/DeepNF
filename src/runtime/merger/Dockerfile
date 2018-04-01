@@ -12,5 +12,3 @@ RUN groupadd -g 999 appuser && \
     chmod 777 .
 
 COPY * ./
-
-RUN bash build.sh
