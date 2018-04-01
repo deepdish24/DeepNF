@@ -16,6 +16,7 @@ SETTING UP AND RUNNING MERGER
     => docker exec -t -i --user $(id -u) merger /bin/bash
     => brew tap nlohmann/json; brew install nlohmann_json
 
-4. Copy merger files into container and build
+4. Copy merger files into container, build and run
     => docker cp . merger:/
-    => bash build.sh
+    => docker exec -t -i --user root merger /bin/bash
+    => bash build.sh; ./merge [path to action table]
