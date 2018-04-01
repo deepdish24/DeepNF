@@ -57,7 +57,7 @@ std::set<Field> ActionTableHelper::get_write_fields(NF nf) {
  * @param   The contents of the action field in the action table format, ie. "R/W", "null", "W", etc.
  * @return  Whether or not the contents indicate that a field is writable
  */
-static bool ActionTableHelper::is_writable(std::string rw_field) {
+bool ActionTableHelper::is_writable(std::string rw_field) {
     // return true is rw_field is either "W" or "R/W";
     return (rw_field.compare("R/W") == 0 || rw_field.compare("W") == 0);
 }
