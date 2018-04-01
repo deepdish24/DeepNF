@@ -24,8 +24,8 @@ class MergerInfo {
         // list of conflicting NFs
         std::vector<ConflictItem*> conflicts_list;
 
-        // list of all nodes in the service graph
-        std::vector<RuntimeNode*> service_graph;
+        // maps node id to node
+        std::map<int, RuntimeNode*> node_map;
 
     public:
         MergerInfo(std::map<std::string, RuntimeNode*> interface_leaf_map,
@@ -36,7 +36,7 @@ class MergerInfo {
 
         std::vector<ConflictItem*> get_conflicts_list();
 
-        std::vector<RuntimeNode*> get_service_graph();
+        std::map<int, RuntimeNode*> get_node_map();
 
 };
 

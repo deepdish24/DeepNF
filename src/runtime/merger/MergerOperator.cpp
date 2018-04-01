@@ -100,6 +100,7 @@ void MergerOperator::process_packet(u_char *arg,
     RuntimeNode* n = this->merger_info->get_interface_leaf_map().at(cur_dev);
     printf("RuntimeNode n = *this->merger_info->get_interface_leaf_map().at(cur_dev);\n");
     p.runtime_id = n->get_id();
+    p.nf = n->get_nf();
     pkts->push_back(&p);
     packet_map[packet_id] = pkts;
 
@@ -111,39 +112,54 @@ MergerOperator::NFPacket* MergerOperator::resolve_packet_conflict(
         NFPacket* minor_p,
         ConflictItem* conflict)
 {
-    struct packet* major = major_p->pkt;
-    struct packet* minor = minor_p->pkt;
-
     // if either packet is null (was dropped), return null packet
-    if (major->is_null() || minor->is_null()) {
+    if (major_p->pkt->is_null() || minor_p->pkt->is_null()) {
         return copy_nfpacket(major_p);
     }
 
     // otherwise, merge packet based on conflicting items
-    struct packet *pkt_info = new struct packet(major->pkt, major->size);
-    std::vector<Field> conflict_list = conflict->get_conflicts();
+    struct packet *new_pkt = new struct packet(major_p->pkt, major_p->pkt->size);
+    std::map<NF, std::set<Field>> fields_map = action_table_helper->get_write_fields_map();
 
-//
-//    for (std::vector<Field>::iterator it = conflict_list.begin(); it != conflict_list.end(); ++it) {
-//        Field field = *it;
-//
-//        switch(field) {
-//            case Field::SIP:
-//                break;
-//
-//            case Field::DIP:
-//                break;
-//
-//            case Field::SPORT:
-//                break;
-//
-//            case Field::DPORT:
-//                break;
-//
-//            case Field::PAYLOAD:
-//                break;
-//        }
-//    }
+    // write changes made in minor packet
+    std::set<Field> major_fields = fields_map[major_p->nf];
+    std::set<Field> minor_fields = fields_map[minor_p->nf];
+    for (std::set<Field>::iterator it = minor_fields.begin(); it != minor_fields.end(); ++it) {
+        Field field = *it;
+
+        // write the minor's field changes as long as the change does NOT conflict with major
+        if (major_fields.find(field) == major_fields.end()) {
+            switch (field) {
+                case Field::SIP:
+                    new_pkt->ip_header->ip_src = minor_p->pkt->ip_header->ip_src;
+                    break;
+
+                case Field::DIP:
+                    new_pkt->ip_header->ip_dst = minor_p->pkt->ip_header->ip_dst;
+                    break;
+
+                case Field::SPORT:
+                    new_pkt->tcp_header->th_sport = minor_p->pkt->tcp_header->th_sport;
+                    break;
+
+                case Field::DPORT:
+                    new_pkt->tcp_header->th_dport = minor_p->pkt->tcp_header->th_dport;
+                    break;
+
+                case Field::PAYLOAD:
+                    new_pkt->data = minor_p->pkt->data;
+                    new_pkt->data_size = minor_p->pkt->data_size;
+                    break;
+            }
+        }
+    }
+
+    NFPacket ret_p;
+    ret_p.pkt = new_pkt;
+    ret_p.runtime_id = conflict->get_parent();
+
+
+    return
 
 }
 

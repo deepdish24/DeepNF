@@ -40,7 +40,7 @@ class ActionTableHelper {
         // json action table object that this ActionTableHelper instance will parse
         json action_table;
 
-        std::map<NF, std::set<Field>> fields_map; // cache results of get_write_fields_map to speed runtime
+        std::map<NF, std::set<Field>> fields_map; // cache results of get_write_fields_map to increase efficiency
         bool fields_map_initialized;
 
 };

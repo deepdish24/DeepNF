@@ -43,6 +43,7 @@ class MergerOperator {
             public:
                 struct packet *pkt;
                 int runtime_id;
+                NF nf;
         };
 
         FILE *logfile;
