@@ -7,4 +7,4 @@ g++ -std=c++11 -c ConflictItem.h ConflictItem.cpp
 g++ -std=c++11 -c MergerInfo.h MergerInfo.cpp
 g++ -std=c++11 MergerOperator.h MergerOperator.h
 
-g++ -std=c++11 NF.cpp packet.cpp RuntimeNode.cpp ActionTableHelper.cpp ConflictItem.cpp MergerInfo.cpp MergerOperator.cpp merge.cpp -o merge -I /usr/include/pcap -lpcap
+g++ -std=c++11 NF.cpp packet.cpp RuntimeNode.cpp ActionTableHelper.cpp ConflictItem.cpp MergerInfo.cpp MergerOperator.cpp merge.cpp -o merge -I//.linuxbrew/Cellar/nlohmann_json/3.1.2/include -I /usr/include/pcap -lpcap

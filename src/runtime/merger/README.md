@@ -13,3 +13,7 @@ SETTING UP AND RUNNING MERGER
 
 3. Install nlohmann/json
     => brew tap nlohmann/json; brew install nlohmann_json
+
+4. Copy merger files into container and build
+    => docker cp . merger:/
+    => bash build.sh
