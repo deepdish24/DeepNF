@@ -8,16 +8,12 @@
 #include <map>
 #include <vector>
 
+#include "Field.h"
+
 class ConflictItem {
-    enum Field {
-        SIP,
-        DIP,
-        SPORT,
-        DPORT,
-        PAYLOAD
-    };
 
     public:
+
         ConflictItem(int major, int minor, int parent);
         ConflictItem(int major, int minor, int parent, std::vector<Field> conflicts);
 

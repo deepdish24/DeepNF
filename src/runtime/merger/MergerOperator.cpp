@@ -37,8 +37,14 @@ MergerInfo* MergerOperator::setup_dummy_info() {
 }
 
 
-void MergerOperator::run() {
+void MergerOperator::run(std::string action_file_path) {
     printf("wtf is this bullshit\n");
+
+    // set up action table
+    nlohmann::json action_table;
+    std::ifstream action_table_input(action_file_path);
+    action_table_input >> action_table;
+    this->action_table_helper = new ActionTableHelper(action_table);
 
     // create dummy MergerInfo object
     this->merger_info = setup_dummy_info();
@@ -80,25 +86,66 @@ void MergerOperator::process_packet(u_char *arg,
     printf("int packet_id = ntohs(pkt_info->ip_header->ip_id);\n");
 
     /* add packet to the map */
-    std::vector<nf_packet> *pkts;
+    std::vector<NFPacket*> *pkts;
     if (packet_map.count(packet_id) > 0) {
         pkts = packet_map[packet_id];
     } else {
-        pkts = new std::vector<nf_packet>();
+        pkts = new std::vector<NFPacket*>();
     }
     printf("Added packet to map\n");
 
-    nf_packet p;
+    NFPacket p;
     p.pkt = pkt_info;
     printf("p.pkt = pkt_info;\n");
     RuntimeNode* n = this->merger_info->get_interface_leaf_map().at(cur_dev);
     printf("RuntimeNode n = *this->merger_info->get_interface_leaf_map().at(cur_dev);\n");
-    p.nf = n->get_nf();
-    pkts->push_back(p);
+    p.runtime_id = n->get_id();
+    pkts->push_back(&p);
     packet_map[packet_id] = pkts;
 
 }
 
+
+MergerOperator::NFPacket* MergerOperator::resolve_packet_conflict(
+        NFPacket* major_p,
+        NFPacket* minor_p,
+        ConflictItem* conflict)
+{
+    struct packet* major = major_p->pkt;
+    struct packet* minor = minor_p->pkt;
+
+    // if either packet is null (was dropped), return null packet
+    if (major->is_null() || minor->is_null()) {
+        return copy_nfpacket(major_p);
+    }
+
+    // otherwise, merge packet based on conflicting items
+    struct packet *pkt_info = new struct packet(major->pkt, major->size);
+    std::vector<Field> conflict_list = conflict->get_conflicts();
+
+//
+//    for (std::vector<Field>::iterator it = conflict_list.begin(); it != conflict_list.end(); ++it) {
+//        Field field = *it;
+//
+//        switch(field) {
+//            case Field::SIP:
+//                break;
+//
+//            case Field::DIP:
+//                break;
+//
+//            case Field::SPORT:
+//                break;
+//
+//            case Field::DPORT:
+//                break;
+//
+//            case Field::PAYLOAD:
+//                break;
+//        }
+//    }
+
+}
 
 
 /* HELPER FUNCTIONS FOR OPERATING ON PACKETS */
@@ -166,6 +213,14 @@ void MergerOperator::configure_device_write_handle(std::string packet_filter_exp
         printf("pcap_open_live(): %s\n", errbuf);
         exit(-1);
     }
+}
+
+
+static MergerOperator::NFPacket* MergerOperator::copy_nfpacket(NFPacket* nfpacket) {
+    NFPacket copy;
+    copy.pkt = nfpacket->pkt->copy();
+    copy.runtime_id = nfpacket->runtime_id;
+    return &copy;
 }
 
 

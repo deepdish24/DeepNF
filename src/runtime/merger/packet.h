@@ -24,6 +24,7 @@ public:
     
     bool is_null();
     void nullify();
+    packet* copy(); // returns an exact copy of the current packet instance
 };
 
 #endif

@@ -33,3 +33,8 @@ void packet::nullify()
 	tcp_header->source = 0;
     memset(&(ip_header->ip_src), 0, sizeof(ip_header->ip_src));
 }
+
+packet* packet::copy() {
+	struct packet *pkt_info = new struct packet(this->pkt, this->size);
+	return pkt_info;
+}

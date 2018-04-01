@@ -16,7 +16,10 @@
 
 int main(int argc,char **argv)
 {
-    MergerOperator* mo = new MergerOperator();
+
+    std::string action_table_filepath = argv[0];
+
+    MergerOperator* mo = new MergerOperator(action_table_filepath);
     mo->run();
 
     return 0;

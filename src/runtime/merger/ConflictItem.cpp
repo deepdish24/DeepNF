@@ -24,4 +24,4 @@ int ConflictItem::get_minor() { return this->minor; }
 
 int ConflictItem::get_parent() { return this->parent; }
 
-std::vector<ConflictItem::Field> ConflictItem::get_conflicts() { return this->conflicts; }
+std::vector<Field> ConflictItem::get_conflicts() { return this->conflicts; }
