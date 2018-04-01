@@ -6,9 +6,9 @@
 #define DEEPNF_ACTIONTABLEHELPER_H
 
 #include <set>
-#include "string.h"
+#include <string>
 
-#include "nlohmann/json.hpp"
+#include <nlohmann/json.hpp>
 #include "NF.h"
 #include "Field.h"
 
