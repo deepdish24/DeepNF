@@ -123,7 +123,18 @@ MergerOperator::NFPacket* MergerOperator::resolve_packet_conflict(
 
     // write changes made in minor packet
     std::set<Field> major_fields = fields_map[major_p->nf];
+    for (std::set<Field>::iterator it = major_p->written_fields.begin();
+         it != major_p->written_fields.end(); ++it) {
+        major_fields.insert(*it);
+    }
+
     std::set<Field> minor_fields = fields_map[minor_p->nf];
+    for (std::set<Field>::iterator it = minor_p->written_fields.begin();
+         it != minor_p->written_fields.end(); ++it) {
+        minor_fields.insert(*it);
+    }
+
+
     for (std::set<Field>::iterator it = minor_fields.begin(); it != minor_fields.end(); ++it) {
         Field field = *it;
 
@@ -157,10 +168,20 @@ MergerOperator::NFPacket* MergerOperator::resolve_packet_conflict(
     NFPacket ret_p;
     ret_p.pkt = new_pkt;
     ret_p.runtime_id = conflict->get_parent();
+    ret_p.nf = merger_info->get_node_map()[ret_p.runtime_id]->get_nf();
 
+    // construct written_fields set for merged packet
+    std::set<Field> written_fields;
+    for (std::set<Field>::iterator it = minor_fields.begin();
+         it != minor_fields.end(); ++it) {
+        written_fields.insert(*it);
+    }
+    for (std::set<Field>::iterator it = major_fields.begin();
+         it != major_fields.end(); ++it) {
+        written_fields.insert(*it);
+    }
 
-    return
-
+    return &ret_p;
 }
 
 
