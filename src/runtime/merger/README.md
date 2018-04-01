@@ -10,7 +10,7 @@ SETTING UP AND RUNNING MERGER
 
 2. Run bash as root
     => docker exec -t -i --user root merger /bin/bash
-    => apt install linuxbrew-wrapper -y; chmod 777 /home/; chmod 777 /
+    => chmod 777 /home/; chmod 777 /
 
 2. Run bash as "appuser" and install nlohmann/json
     => docker exec -t -i --user $(id -u) merger /bin/bash

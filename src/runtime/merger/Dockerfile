@@ -9,5 +9,21 @@ RUN apt-get update -y && \
     chmod 777 /home/ && \
     chmod 777 /
 
-COPY * ./
+COPY ActionTablerHelper.cpp .
+COPY ActionTablerHelper.h .
+COPY ConflictItem.cpp .
+COPY ConflictItem.h .
+COPY Field.h .
+COPY Field.cpp .
+COPY merge.cpp .
+COPY Field.h .
+COPY Field.cpp .
+COPY MergerInfo.h .
+COPY MergerInfo.cpp .
+COPY NF.h .
+COPY NF.cpp .
+COPY packet.h .
+COPY packet.cpp .
+COPY RuntimeNode.h .
+COPY RuntimeNode.cpp .
 

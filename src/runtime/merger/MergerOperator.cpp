@@ -43,7 +43,7 @@ MergerInfo* MergerOperator::setup_dummy_info() {
 }
 
 
-void MergerOperator::run(std::string action_file_path) {
+void MergerOperator::run() {
     printf("wtf is this bullshit\n");
 
     // create dummy MergerInfo object
