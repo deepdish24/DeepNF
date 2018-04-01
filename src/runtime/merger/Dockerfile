@@ -11,5 +11,3 @@ RUN apt-get update -y && \
 
 COPY * ./
 
-
-USER appuser

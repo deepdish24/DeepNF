@@ -8,10 +8,12 @@ SETTING UP AND RUNNING MERGER
     => docker build -t=merger .
     => docker run -d -t -i --user $(id -u) --name merger merge:latest /bin/bash
 
-2. Run bash as "appuser"
-    => docker exec -t -i --user $(id -u) merger /bin/bash
+2. Run bash as root
+    => docker exec -t -i --user root merger /bin/bash
+    => apt install linuxbrew-wrapper -y; chmod 777 /home/; chmod 777 /
 
-3. Install nlohmann/json
+2. Run bash as "appuser" and install nlohmann/json
+    => docker exec -t -i --user $(id -u) merger /bin/bash
     => brew tap nlohmann/json; brew install nlohmann_json
 
 4. Copy merger files into container and build
