@@ -9,8 +9,9 @@ RUN groupadd -g 999 appuser && \
     apt-get install -y g++ libpcap-dev && \
     apt install linuxbrew-wrapper -y && \
     chmod 777 /home/ && \
-    chmod 777 .
-
-USER appuser
+    chmod 777 /
 
 COPY * ./
+
+
+USER appuser
