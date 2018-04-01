@@ -9,8 +9,8 @@ RUN apt-get update -y && \
     chmod 777 /home/ && \
     chmod 777 /
 
-COPY ActionTablerHelper.cpp .
-COPY ActionTablerHelper.h .
+COPY ActionTableHelper.cpp .
+COPY ActionTableHelper.h .
 COPY ConflictItem.cpp .
 COPY ConflictItem.h .
 COPY Field.h .
