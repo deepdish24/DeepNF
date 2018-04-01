@@ -177,11 +177,9 @@ Orchestrator::Orchestrator(std::string filepath, std::string action_file_path) {
     }
 
     /* NODE PARTITIONING */
-    std::string ip_one = ips[0];
-    for (int i = 0; i < (int) functions.size(); i++) {
-        func_to_ip[functions[i]] = ip_one;
-    }
-
+    round_robin_partitioning(ips, functions);
+    //single_node_partitioning(ips, functions);
+    
 
     /* MACHINE CONFIGURATION */
     std::unordered_map<std::string, Machine*> ip_to_machines;
@@ -221,12 +219,37 @@ Orchestrator::Orchestrator(std::string filepath, std::string action_file_path) {
         Machine* m = ip_to_machines[ips[i]];
         MachineConfigurator* mc = new MachineConfigurator(m);
         //mc->get_nodes_for_machine(mc->get_machine_id());
-        std::vector<int> node_ids = m->get_node_ids();
+        for (int j = 0; j  < (int) ips.size(); j++) {
+            if (i != j) {
+                mc->add_machine(ip_to_machines[ips[j]]);
+            }
+        }
+        for (auto it = idToRuntimeNode.begin(); it != idToRuntimeNode.end(); it++) {
+            mc->add_node(it->second);
+        }
+        /*std::vector<int> node_ids = m->get_node_ids();
         for (int id : node_ids) {
             mc->add_node(idToRuntimeNode[id]);
-        }
+        }*/
         std::string serializedConfig = service_graph_util::machine_configurator_to_string(mc);
         ip_to_mc[ips[i]] = serializedConfig;
+    }
+    write_json_dictionary(func_to_inx);
+}
+
+void Orchestrator::round_robin_partitioning(std::vector<std::string> &ips, std::vector<std::string> &functions) {
+    int currInx = 0;
+    for (int i = 0; i < (int) functions.size(); i++) {
+        func_to_ip[functions[i]] = ips[currInx];
+        currInx = (currInx + 1) % (int) ips.size();
+    }
+}
+
+void Orchestrator::single_node_partitioning(std::vector<std::string> &ips, 
+    std::vector<std::string> &functions) {
+    std::string ip_one = ips[0];
+    for (int i = 0; i < (int) functions.size(); i++) {
+        func_to_ip[functions[i]] = ip_one;
     }
 }
 
@@ -258,11 +281,13 @@ void Orchestrator::parseOrderDependencies(std::vector<std::vector<std::string>> 
         std::string f1 = dependencies[i][0];
         std::string f2 = dependencies[i][1];
         if (parallel) {
+            std::cout << "CAN BE RUN IN PARALLEL\n";
             parsedPriorities.push_back(std::make_tuple(f1, f2));
             if ((int) conflictingActions.size() > 0) {
                 pair_to_conflicts[f1][f2] = conflictingActions;
             }
         } else {
+            std::cout << "CANNOT BE RUN IN PARALLEL\n";
             parsedOrder.push_back(std::make_tuple(f1, f2));
         }
     }
@@ -333,6 +358,10 @@ bool Orchestrator::isParallelizable(std::vector<std::string> orderDep, json acti
         std::string packetLocation = it->first;
         std::string val = it->second;
         std::string val2 = nf2[packetLocation];
+        /*std::cout << "nf1 packet location: " << packetLocation << std::endl;
+        std::cout << "nf1 val: " << val << std::endl;
+        std::cout << "nf2 val: " << val2 << std::endl;*/
+
         // if nf1 drops/adds/removes then it cannot be run in parallel with nf2
         if ((packetLocation.compare("Drop") == 0 || packetLocation.compare("Add/Rm") == 0) && val.compare("T") == 0) {
             return false;
@@ -340,6 +369,7 @@ bool Orchestrator::isParallelizable(std::vector<std::string> orderDep, json acti
             Action a1 = stringToAction(it->second);
             Action a2 = stringToAction(nf2[packetLocation]);
             if ((a1 == READ || a1 == WRITE) && a2 == WRITE) {
+                //std::cout << "adding to conflicting actions" << std::endl;
                 std::string loc(packetLocation);
                 conflictingActions.push_back(stringToField(packetLocation));
             } else if (a1 == WRITE) {
@@ -390,23 +420,37 @@ void Orchestrator::checkLevelParallelizability(std::set<ServiceGraphNode*> nodes
     }
 }
 
-/*void Orchestrator::write_json_dictionary(std::unordered_map<std::string, int> func_to_inx, 
-    std::unordered_map<int, RuntimeNode*> idToRuntimeNode = {}) {
-    std::vector<ConflictPairInfo> conflictPairs = {};
+void Orchestrator::write_json_dictionary(std::unordered_map<std::string, int> func_to_inx) {
+    //std::vector<ConflictPairInfo> conflictPairs = {};
+    auto arr = json::array();
     for (auto it = pair_to_conflicts.begin(); it != pair_to_conflicts.end(); ++it) {
         std::string major = it->first;
         std::unordered_map<std::string, std::vector<Field>> map = it->second;
-        RuntimeNode *node = idToRuntimeNode[func_to_inx[major]];
-        RuntimeNode *parentNode
+        ServiceGraphNode* node = func_to_nodes[major];
+        ServiceGraphNode* parentNode = node->get_parent();
+        int parentId = -1;
+        if (parentNode != NULL) {
+            std::string parent = parentNode->nf;
+            parentId = func_to_inx[parent];
+        }
         for (auto nextIt = map.begin(); nextIt != map.end(); ++nextIt) {
-            struct ConflictPairInfo *cpInfo = malloc(sizeof(ConflictPairInfo));
+            auto object = json::object();
+            //auto fieldArr = json::array();
             std::string minor = nextIt->first;
-            std::vector<Field> fields = nextIt->second;
-            cpInfo->major = major;
-            cpInfo->minor = minor;
+            //std::vector<Field> fields = nextIt->second;
+            object["major"] = func_to_inx[major];
+            object["minor"] = func_to_inx[minor];
+            object["parent"] = parentId;
+            /*for (Field f : fields) {
+                fieldArr.push_back(fieldToString(f));
+            }*/
+            //object["conflicts"] = fieldArr;
+            arr.push_back(object);
         }
     }
-}*/
+    std::ofstream out("../../../src/common/conflict_pairs.json");
+    out << arr;
+}
 
 void Orchestrator::setup_containers() {
     std::cout << "proceeding to setup containers" << std::endl;
