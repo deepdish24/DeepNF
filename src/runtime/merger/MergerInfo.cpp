@@ -26,3 +26,23 @@ std::map<int, RuntimeNode*> MergerInfo::get_node_map() {
     return node_map;
 }
 
+/**
+ * @return A deep copy of conflicts_list
+ */
+std::vector<ConflictItem*> MergerInfo::copy_conflicts_list() {
+    std::vector<ConflictItem*> copy_list;
+
+    for (std::vector<ConflictItem*>::iterator it = conflicts_list.begin(); it != conflicts_list.end(); ++it) {
+        ConflictItem* ci = *it;
+
+        // create a copy of ci
+        ConflictItem* copy_ci = new ConflictItem(ci->get_major(),
+                                                 ci->get_minor(),
+                                                 ci->get_parent(),
+                                                 ci->get_conflicts());
+        copy_list.push_back(copy_ci);
+    }
+
+    return copy_list;
+
+}

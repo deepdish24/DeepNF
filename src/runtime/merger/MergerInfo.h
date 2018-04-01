@@ -38,6 +38,11 @@ class MergerInfo {
 
         std::map<int, RuntimeNode*> get_node_map();
 
+        /**
+         * @return A deep copy of conflicts_list
+         */
+        std::vector<ConflictItem*> copy_conflicts_list();
+
 };
 
 

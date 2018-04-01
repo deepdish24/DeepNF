@@ -62,8 +62,8 @@ class MergerOperator {
         // maps name of virtual interface to its corresponding RuntimeNode
         std::map<std::string, pcap_t*> src_dev_handle_map;
 
-        // maps packet IDs with list of received packets with that ID
-        std::map<int, std::vector<NFPacket*>*> packet_map;
+        // maps packet IDs to a map of runtime_ids -> NFPacket
+        std::map<int, std::map<int, NFPacket*>*> packet_map;
         std::string cur_dev;
 
         /* FUNCTIONS FOR PERFORMING MERGER OPERATIONS */
@@ -72,6 +72,9 @@ class MergerOperator {
 
         // given the two packets and the corresponding ConflictItem, return a merged packet
         NFPacket* resolve_packet_conflict(NFPacket* major_p, NFPacket* minor_p, ConflictItem* conflict);
+
+        // returns merged packet for the given packet ID. Assumes that all packets for the packet ID have been received
+        NFPacket* merge_all(int pkt_id);
 
 
 

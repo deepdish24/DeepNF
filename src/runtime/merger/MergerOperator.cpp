@@ -76,33 +76,44 @@ void MergerOperator::process_packet(u_char *arg,
     printf("Received new packet\n");
 
     struct packet *pkt_info = new struct packet(packet, pkthdr->len);
-    printf("struct packet *pkt_info = new struct packet(packet, pkthdr->len);\n");
 
     this->print_ip_header(pkt_info->ip_header);
     this->print_tcp_packet(pkt_info->tcp_header);
     this->print_data(pkt_info->data, pkt_info->data_size);
 
     int packet_id = ntohs(pkt_info->ip_header->ip_id);
-    printf("int packet_id = ntohs(pkt_info->ip_header->ip_id);\n");
 
     /* add packet to the map */
-    std::vector<NFPacket*> *pkts;
+    std::map<int, NFPacket*>* runtime_pkt_map;
     if (packet_map.count(packet_id) > 0) {
-        pkts = packet_map[packet_id];
+        runtime_pkt_map = packet_map[packet_id];
     } else {
-        pkts = new std::vector<NFPacket*>();
+        runtime_pkt_map = new std::map<int, NFPacket*>();
     }
-    printf("Added packet to map\n");
 
     NFPacket p;
     p.pkt = pkt_info;
-    printf("p.pkt = pkt_info;\n");
     RuntimeNode* n = this->merger_info->get_interface_leaf_map().at(cur_dev);
-    printf("RuntimeNode n = *this->merger_info->get_interface_leaf_map().at(cur_dev);\n");
     p.runtime_id = n->get_id();
     p.nf = n->get_nf();
-    pkts->push_back(&p);
-    packet_map[packet_id] = pkts;
+
+    runtime_pkt_map->insert(std::make_pair(p.runtime_id, &p));
+    packet_map[packet_id] = runtime_pkt_map;
+
+    // if all packets have been received for the given id, begin merging
+    if (packet_map[packet_id]->size() == merger_info->get_interface_leaf_map().size()) {
+        NFPacket* merged_packet = merge_all(packet_id);
+
+        // send packet to destination virtual interface
+        if (!merged_packet->pkt->is_null()) {
+            if (pcap_sendpacket(this->dst_dev_handle, merged_packet->pkt->pkt, merged_packet->pkt->size) < 0) {
+                std::cerr << strerror(errno) << std::endl;
+            }
+        }
+
+        // cleanup
+        packet_map.erase(packet_id);
+    }
 
 }
 
@@ -174,14 +185,67 @@ MergerOperator::NFPacket* MergerOperator::resolve_packet_conflict(
     std::set<Field> written_fields;
     for (std::set<Field>::iterator it = minor_fields.begin();
          it != minor_fields.end(); ++it) {
-        written_fields.insert(*it);
+        ret_p.written_fields.insert(*it);
     }
     for (std::set<Field>::iterator it = major_fields.begin();
          it != major_fields.end(); ++it) {
-        written_fields.insert(*it);
+        ret_p.written_fields.insert(*it);
     }
 
     return &ret_p;
+}
+
+
+// returns merged packet for the given packet ID. Assumes that all packets for the packet ID have been received
+MergerOperator::NFPacket* MergerOperator::merge_all(int pkt_id) {
+    // maps each runtime leaf id with its associated packet
+    std::map<int, NFPacket*>* rt_to_pkt_map = packet_map[pkt_id];
+
+    // list of conflict runtime ids
+    std::vector<ConflictItem*> conflicts_list = merger_info->get_conflicts_list();
+
+    bool was_changed = true; // has at least one merge conflict been resolved in this iteration?
+    bool major_exists;
+    bool minor_exists;
+
+    // iterate through conflicts list and resolve conflicts
+    while (was_changed) {
+        was_changed = false;
+        for (std::vector<ConflictItem*>::iterator it = conflicts_list.begin(); it != conflicts_list.end(); ++it) {
+            ConflictItem* ci = *it;
+            major_exists = rt_to_pkt_map->find(ci->get_major()) != rt_to_pkt_map->end();
+            minor_exists = rt_to_pkt_map->find(ci->get_minor()) != rt_to_pkt_map->end();
+
+            // if both major and minor of the conflict item exist in the map, merge them
+            if (major_exists && minor_exists) {
+                was_changed = true;
+
+                NFPacket* merged_pkt = this->resolve_packet_conflict((*rt_to_pkt_map)[ci->get_major()],
+                                                                     (*rt_to_pkt_map)[ci->get_minor()],
+                                                                     ci);
+
+                // if merged_pkt is null, drop and end merging process
+                if (merged_pkt->pkt->is_null()) {
+                    return merged_pkt;
+                }
+
+                // remove major and minor from packet_map and add merged pkt
+                rt_to_pkt_map->erase(ci->get_major());
+                rt_to_pkt_map->erase(ci->get_minor());
+                rt_to_pkt_map->insert(std::make_pair(merged_pkt->runtime_id, merged_pkt));
+            }
+        }
+    }
+
+    // merging process should be finished by now
+    if (rt_to_pkt_map->size() != 1) {
+        throw std::runtime_error("More than one packet exists in pkt map even thought merging is finished");
+    }
+
+    for (std::map<int, NFPacket*>::iterator it = rt_to_pkt_map->begin(); it != rt_to_pkt_map->end(); ++it) {
+        NFPacket* final_pkt = it->second;
+        return final_pkt;
+    }
 }
 
 
@@ -266,22 +330,10 @@ void MergerOperator::print_tcp_packet(struct tcphdr *tcph)
 {
     fprintf(this->logfile,"\n");
     fprintf(this->logfile,"TCP Header\n");
-    fprintf(this->logfile,"   |-Source Port      : %u\n",ntohs(tcph->source));
-    fprintf(this->logfile,"   |-Destination Port : %u\n",htons(tcph->dest));
-    fprintf(this->logfile,"   |-Sequence Number    : %u\n",ntohl(tcph->seq));
-    fprintf(this->logfile,"   |-Acknowledge Number : %u\n",ntohl(tcph->ack_seq));
-    fprintf(this->logfile,"   |-Header Length      : %d DWORDS or %d BYTES\n" ,(unsigned int)tcph->doff,(unsigned int)tcph->doff*4);
-    //fprintf(this->logfile,"   |-CWR Flag : %d\n",(unsigned int)tcph->cwr);
-    //fprintf(this->logfile,"   |-ECN Flag : %d\n",(unsigned int)tcph->ece);
-    fprintf(this->logfile,"   |-Urgent Flag          : %d\n",(unsigned int)tcph->urg);
-    fprintf(this->logfile,"   |-Acknowledgement Flag : %d\n",(unsigned int)tcph->ack);
-    fprintf(this->logfile,"   |-Push Flag            : %d\n",(unsigned int)tcph->psh);
-    fprintf(this->logfile,"   |-Reset Flag           : %d\n",(unsigned int)tcph->rst);
-    fprintf(this->logfile,"   |-Synchronise Flag     : %d\n",(unsigned int)tcph->syn);
-    fprintf(this->logfile,"   |-Finish Flag          : %d\n",(unsigned int)tcph->fin);
-    fprintf(this->logfile,"   |-Window         : %d\n",ntohs(tcph->window));
-    fprintf(this->logfile,"   |-Checksum       : %d\n",ntohs(tcph->check));
-    fprintf(this->logfile,"   |-Urgent Pointer : %d\n",tcph->urg_ptr);
+    fprintf(this->logfile,"   |-Source Port      : %u\n",ntohs(tcph->th_sport));
+    fprintf(this->logfile,"   |-Destination Port : %u\n",htons(tcph->th_dport));
+    fprintf(this->logfile,"   |-Sequence Number    : %u\n",ntohl(tcph->th_seq));
+    fprintf(this->logfile,"   |-Acknowledge Number : %u\n",ntohl(tcph->th_ack));
     fprintf(this->logfile,"\n");
     fprintf(this->logfile,"                        DATA Dump                         ");
     fprintf(this->logfile,"\n");
