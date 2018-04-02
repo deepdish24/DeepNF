@@ -27,12 +27,12 @@ MergerOperator::MergerOperator() {
 
 /* sets up hardcoded MergerInfo object to do testing on */
 MergerInfo* MergerOperator::setup_dummy_info() {
-    RuntimeNode n1 (1, snort); // node that drops packets
-    RuntimeNode n2 (2, snort); // node that sends packets
+    RuntimeNode* n1 = new RuntimeNode(1, snort); // node that drops packets
+    RuntimeNode* n2 = new RuntimeNode(2, snort); // node that sends packets
 
     std::map<std::string, RuntimeNode*> interface_leaf_map;
-    interface_leaf_map.insert(std::make_pair("eth1", &n1));
-    interface_leaf_map.insert(std::make_pair("eth2", &n1));
+    interface_leaf_map.insert(std::make_pair("eth1", n1));
+    interface_leaf_map.insert(std::make_pair("eth2", n2));
 
     std::vector<ConflictItem*> conflicts_list;
     std::map<int, RuntimeNode*> node_map;
@@ -63,7 +63,7 @@ void MergerOperator::run() {
     for (std::map<std::string, RuntimeNode*>::iterator it = this->merger_info->get_interface_leaf_map().begin();
          it != this->merger_info->get_interface_leaf_map().end(); ++it) {
         /* loop for callback function */
-        cur_dev = it->first;
+        this->cur_dev = it->first;
         pcap_loop(src_dev_handle_map[it->first], 1, process_packet_handler, (u_char*) this);
     }
 }
@@ -90,7 +90,11 @@ void MergerOperator::process_packet(u_char *arg,
 
     NFPacket* p = new NFPacket();
     p->pkt = pkt_info;
-//    RuntimeNode* n = this->merger_info->get_interface_leaf_map().at(cur_dev);
+
+    printf("cur_dev: %s", this->cur_dev);
+    RuntimeNode* n = this->merger_info->get_interface_leaf_map().at(cur_dev);
+    printf("this runtimeNode: %d\n", n->get_id());
+
 //    p->runtime_id = n->get_id();
 //    p->nf = n->get_nf();
 //
