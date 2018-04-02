@@ -183,23 +183,27 @@ MergerOperator::NFPacket* MergerOperator::resolve_packet_conflict(
         }
     }
 
+    printf("Creating new NFPacket\n");
     NFPacket* ret_p = new NFPacket();
-    ret_p->pkt = new_pkt;
-    ret_p->runtime_id = conflict->get_parent();
-    ret_p->nf = merger_info->get_node_map()[ret_p->runtime_id]->get_nf();
 
-    // construct written_fields set for merged packet
-    std::set<Field> written_fields;
-    for (std::set<Field>::iterator it = minor_fields.begin();
-         it != minor_fields.end(); ++it) {
-        ret_p->written_fields.insert(*it);
-    }
-    for (std::set<Field>::iterator it = major_fields.begin();
-         it != major_fields.end(); ++it) {
-        ret_p->written_fields.insert(*it);
-    }
-
-    return ret_p;
+    delete ret_p;
+    printf("Deleted NFPacket\n");
+//    ret_p->pkt = new_pkt;
+//    ret_p->runtime_id = conflict->get_parent();
+//    ret_p->nf = merger_info->get_node_map()[ret_p->runtime_id]->get_nf();
+//
+//    // construct written_fields set for merged packet
+//    std::set<Field> written_fields;
+//    for (std::set<Field>::iterator it = minor_fields.begin();
+//         it != minor_fields.end(); ++it) {
+//        ret_p->written_fields.insert(*it);
+//    }
+//    for (std::set<Field>::iterator it = major_fields.begin();
+//         it != major_fields.end(); ++it) {
+//        ret_p->written_fields.insert(*it);
+//    }
+//
+//    return ret_p;
 }
 
 
