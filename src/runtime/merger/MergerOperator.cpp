@@ -106,14 +106,18 @@ void MergerOperator::process_packet(u_char *arg,
         printf("All packets received for %d, beginning merging \n\n", packet_id);
         NFPacket* merged_packet = merge_all(packet_id);
 
+        printf("Got merged packet\n");
+
         // send packet to destination virtual interface
         if (!merged_packet->pkt->is_null()) {
+            printf("Packet is not null, sending it to eth...\n");
             if (pcap_sendpacket(this->dst_dev_handle, merged_packet->pkt->pkt_char, merged_packet->pkt->size) < 0) {
                 std::cerr << strerror(errno) << std::endl;
             }
         }
 
         // cleanup
+        printf("cleanup packet\n");
         delete merged_packet;
         packet_map.erase(packet_id);
     }
@@ -220,7 +224,8 @@ MergerOperator::NFPacket* MergerOperator::merge_all(int pkt_id) {
         was_changed = false;
         for (std::vector<ConflictItem*>::iterator it = conflicts_list.begin(); it != conflicts_list.end(); ++it) {
             ConflictItem* ci = *it;
-            printf("next conflict item: %s", ci->to_string().c_str());
+            printf("next conflict item:");
+            printf("%s", ci->to_string().c_str());
             major_exists = rt_to_pkt_map->find(ci->get_major()) != rt_to_pkt_map->end();
             minor_exists = rt_to_pkt_map->find(ci->get_minor()) != rt_to_pkt_map->end();
 
@@ -245,14 +250,18 @@ MergerOperator::NFPacket* MergerOperator::merge_all(int pkt_id) {
                 rt_to_pkt_map->insert(std::make_pair(merged_pkt->runtime_id, merged_pkt));
             }
         }
+        printf("Finished iterating through conflicts list\n");
     }
 
+    printf("Finished merging\n");
     // merging process should be finished by now
     if (rt_to_pkt_map->size() != 1) {
         throw std::runtime_error("More than one packet exists in pkt map even thought merging is finished");
     }
 
     for (std::map<int, NFPacket*>::iterator it = rt_to_pkt_map->begin(); it != rt_to_pkt_map->end(); ++it) {
+        printf("Found final merged NFPacket, returning it now...\n");
+
         NFPacket* final_pkt = it->second;
         return final_pkt;
     }
