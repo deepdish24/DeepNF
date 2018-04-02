@@ -1,2 +1,2 @@
 add_subdirectory(./config)
-add_subdirectory(./merger)
+#add_subdirectory(./merger)

@@ -8,8 +8,6 @@
 #include "NF.h"
 
 
-using namespace std;
-
 class RuntimeNode {
 
 private:
