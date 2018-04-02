@@ -9,3 +9,6 @@ SETTING UP AND RUNNING MERGER
     => docker run -d -t -i --name merger merger:latest /bin/bash
     => docker exec -t -i merger /bin/bash
     => bash build.sh; ./merge
+
+2. To copy files from AWS instance to container
+    => docker cp . merger:/

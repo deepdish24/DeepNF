@@ -18,7 +18,7 @@ int main(int argc,char **argv)
 {
 
     MergerOperator* mo = new MergerOperator();
-//    mo->run();
+    mo->run();
 
     return 0;
 }

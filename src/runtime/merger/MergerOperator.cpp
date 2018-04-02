@@ -45,7 +45,6 @@ MergerInfo* MergerOperator::setup_dummy_info() {
 void MergerOperator::run() {
     printf("MergerOperator::run() \n");
 
-    printf("wtf is this bullshit\n");
 
     // create dummy MergerInfo object
     this->merger_info = setup_dummy_info();
@@ -59,7 +58,7 @@ void MergerOperator::run() {
     configure_device_read_handles(packet_filter_expr);
     configure_device_write_handle(packet_filter_expr, dst_dev);
 
-    printf("finished setting up bullshit\n");
+    printf("finished setting up bullshit, listening for packets...\n");
 
     // listen for and process incoming packets
     for (std::map<std::string, RuntimeNode*>::iterator it = this->merger_info->get_interface_leaf_map().begin();
@@ -101,8 +100,11 @@ void MergerOperator::process_packet(u_char *arg,
     runtime_pkt_map->insert(std::make_pair(p.runtime_id, &p));
     packet_map[packet_id] = runtime_pkt_map;
 
+    printf("Added packet %d to packet_map \n", packet_id);
+
     // if all packets have been received for the given id, begin merging
     if (packet_map[packet_id]->size() == merger_info->get_interface_leaf_map().size()) {
+        printf("All packets received for %d, beginning merging \n", packet_id);
         NFPacket* merged_packet = merge_all(packet_id);
 
         // send packet to destination virtual interface
