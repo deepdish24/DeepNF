@@ -39,15 +39,6 @@ class MergerOperator {
 
 
     private:
-        struct NFPacket {
-            public:
-                struct packet *pkt;
-                int runtime_id;
-                NF nf;
-                // list of additional fields that have been written to, NOT INCLUDING fields written to by the
-                // packet's NF
-                std::set<Field> written_fields;
-        };
 
         FILE *logfile;
         pcap_t* dst_dev_handle;
