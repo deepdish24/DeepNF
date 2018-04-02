@@ -1,10 +1,9 @@
-import java.net.DatagramSocket;
-import java.net.DatagramPacket;
 import java.util.HashSet;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
-import java.net.InetAddress;
+import java.io.*;
+import java.net.*;
 
 class Sender {
 
@@ -16,8 +15,9 @@ class Sender {
         String ip = args[0]; // IP address to send packet to
         int portNo = Integer.parseInt(args[1]); // port to send packet to
         int maxPacket = Integer.parseInt(args[2]); // number of packets to send
-        InetAddress host = InetAddress.getByName(ip);
-        DatagramSocket s = new DatagramSocket();
+
+        Socket socket = new Socket (ip, portNo);
+        PrintWriter out = new PrintWriter (socket.getOutputStream(), true);
 
         /* The first two commands need to be run only once */
         int count = 0;
@@ -26,9 +26,9 @@ class Sender {
                 System.out.println("Sent " + count + " packets");
             }
             count++;
-            byte[] data = "sample data".getBytes();
-            DatagramPacket packet = new DatagramPacket(data, data.length, host, portNo);
-            s.send(packet);
+
+            out.println ("\n");
+            out.flush();
         }
 
         System.out.println("Finished sender at: " + System.currentTimeMillis());

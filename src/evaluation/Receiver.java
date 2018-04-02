@@ -1,10 +1,9 @@
-import java.net.DatagramSocket;
-import java.net.DatagramPacket;
 import java.util.HashSet;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
-import java.net.InetAddress;
+import java.io.*;
+import java.net.*;
 
 class Receiver {
 
@@ -17,10 +16,10 @@ class Receiver {
         int portNo = Integer.parseInt(args[0]); // port number to listen to packets on
         int maxPacket = Integer.parseInt(args[1]); // number of packets to listen for
 
-        serverSocket = new DatagramSocket(portNo);
-        receiveData = new byte[1024];
+        ServerSocket serverSocket = new ServerSocket (portNo);
+        Socket clientSocket = serverSocket.accept ();
 
-        String packet;
+        BufferedReader in = new BufferedReader (new InputStreamReader (clientSocket.getInputStream ()));
 
         int count = 0;
         while (count != maxPacket ) {
@@ -30,17 +29,17 @@ class Receiver {
             }
 
             // receive a packet
-            Arrays.fill(receiveData, (byte) 0);
-
-            DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-            serverSocket.receive(receivePacket);
-            packet = new String( receivePacket.getData());
+            String fromClient = in.readLine ();
 
         }
 
         long endTime = System.nanoTime();
 
         System.out.println("Receiver ending at: " + System.currentTimeMillis());
+
+        in.close ();
+        clientSocket.close ();
+        serverSocket.close ();
 
 
     }
