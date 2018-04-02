@@ -2,6 +2,7 @@ build/*
 .idea/*
 google_protobuf-prefix/*
 deepnf.pem
+src/webserver/node_modules/*
 
 .DS_Store
 */.DS_Store
