@@ -64,7 +64,7 @@ void MergerOperator::run() {
          it != this->merger_info->get_interface_leaf_map().end(); ++it) {
         /* loop for callback function */
         cur_dev = it->first;
-        pcap_loop(src_dev_handle_map[it->first], -1, process_packet_handler, (u_char*) this);
+        pcap_loop(src_dev_handle_map[it->first], 10000, process_packet_handler, (u_char*) this);
     }
 }
 
