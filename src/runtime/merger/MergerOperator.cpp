@@ -63,7 +63,7 @@ void MergerOperator::run() {
     for (std::map<std::string, RuntimeNode*>::iterator it = this->merger_info->get_interface_leaf_map().begin();
          it != this->merger_info->get_interface_leaf_map().end(); ++it) {
         /* loop for callback function */
-//        this->cur_dev = it->first;
+        this->cur_dev = it->first;
         pcap_loop(src_dev_handle_map[it->first], 1, process_packet_handler, (u_char*) this);
     }
 }
@@ -91,7 +91,7 @@ void MergerOperator::process_packet(u_char *arg,
 //    NFPacket* p = new NFPacket();
 //    p->pkt = pkt_info;
 
-    RuntimeNode* n = this->merger_info->get_interface_leaf_map().at("eth1");
+    RuntimeNode* n = this->merger_info->get_interface_leaf_map().at(this->cur_dev);
 //    printf("this runtimeNode: %d\n", n->get_id());
 
 //    p->runtime_id = n->get_id();
@@ -133,7 +133,7 @@ void MergerOperator::process_packet(u_char *arg,
 }
 
 
-MergerOperator::NFPacket* MergerOperator::resolve_packet_conflict(
+NFPacket* MergerOperator::resolve_packet_conflict(
         NFPacket* major_p,
         NFPacket* minor_p,
         ConflictItem* conflict)
