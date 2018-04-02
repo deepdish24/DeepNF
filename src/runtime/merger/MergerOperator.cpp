@@ -216,7 +216,7 @@ NFPacket* MergerOperator::resolve_packet_conflict(
 
 
 // returns merged packet for the given packet ID. Assumes that all packets for the packet ID have been received
-MergerOperator::NFPacket* MergerOperator::merge_all(int pkt_id) {
+NFPacket* MergerOperator::merge_all(int pkt_id) {
     printf("MergerOperator::merge_all: pkt_id = %d\n", pkt_id);
 
     // maps each runtime leaf id with its associated packet
@@ -348,7 +348,7 @@ void MergerOperator::configure_device_write_handle(std::string packet_filter_exp
 }
 
 
-MergerOperator::NFPacket* MergerOperator::copy_nfpacket(NFPacket* nfpacket) {
+NFPacket* MergerOperator::copy_nfpacket(NFPacket* nfpacket) {
     NFPacket* copy = new NFPacket();
     copy->pkt = nfpacket->pkt->copy();
     copy->runtime_id = nfpacket->runtime_id;
