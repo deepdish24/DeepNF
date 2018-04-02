@@ -28,11 +28,11 @@ MergerOperator::MergerOperator() {
 /* sets up hardcoded MergerInfo object to do testing on */
 MergerInfo* MergerOperator::setup_dummy_info() {
     RuntimeNode n1 (1, snort); // node that drops packets
-//    RuntimeNode n2 (2, snort); // node that sends packets
+    RuntimeNode n2 (2, snort); // node that sends packets
 
     std::map<std::string, RuntimeNode*> interface_leaf_map;
     interface_leaf_map.insert(std::make_pair("eth1", &n1));
-//    interface_leaf_map.insert(std::make_pair("eth2", &n1));
+    interface_leaf_map.insert(std::make_pair("eth2", &n1));
 
     std::vector<ConflictItem*> conflicts_list;
     std::map<int, RuntimeNode*> node_map;
@@ -64,7 +64,7 @@ void MergerOperator::run() {
          it != this->merger_info->get_interface_leaf_map().end(); ++it) {
         /* loop for callback function */
         cur_dev = it->first;
-        pcap_loop(src_dev_handle_map[it->first], 10000, process_packet_handler, (u_char*) this);
+        pcap_loop(src_dev_handle_map[it->first], 1, process_packet_handler, (u_char*) this);
     }
 }
 
