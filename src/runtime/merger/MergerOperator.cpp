@@ -107,7 +107,7 @@ void MergerOperator::process_packet(u_char *arg,
 
     unsigned long received_packet_num = packet_map[packet_id]->size();
     unsigned long total_packet_num = merger_info->get_interface_leaf_map().size();
-    if (received_packet_num == total_packet_num) {
+//    if (received_packet_num == total_packet_num) {
         printf("All packets received for %d, beginning merging \n\n", packet_id);
 //        NFPacket* merged_packet = merge_all(packet_id);
 //
@@ -125,7 +125,7 @@ void MergerOperator::process_packet(u_char *arg,
 //        printf("cleanup packet\n");
 //        delete merged_packet;
 //        packet_map.erase(packet_id);
-    }
+//    }
 
 }
 
