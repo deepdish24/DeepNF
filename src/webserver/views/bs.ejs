@@ -39,6 +39,8 @@ width: 992px) {
 
   <body>
 
+
+
     
 <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
@@ -83,7 +85,7 @@ id="navbarResponsive">
       </div>
     </nav>
 
-    <!-- Page Content -->
+ <!-- Page Content -->
     <div class="container">
       <div 
 class="row">
@@ -102,142 +104,65 @@ scope="col">Function</th>
               </tr>
             
 </thead>
-            <tbody>
-              <tr>
-                <td>1522643595</td>
+<tbody>
+  
+</tbody>
                 
-<td>32767</td>
-                <td>Firewall</td>
-                <td>Forwarded to IDS</td>
-              
-</tr>
-              <tr>
-                <td>1522643595</td>
-                <td>32767</td>
-                
-<td>Firewall</td>
-                <td>Received by Firewall</td>
-              </tr>
-              <tr>
-        
-        <td>1522643590</td>
-                <td>32763</td>
-                <td>IDS</td>
-                
-<td>Forwarded to Merger</td>
-              </tr>
-              <tr>
-                <td>1522643590</td>
-       
-         <td>32759</td>
-                <td>Firewall</td>
-                <td>Dropped Packet</td>
-            
-  </tr>
-              <tr>
-                <td>1522643590</td>
-                <td>32763</td>
-                
-<td>IDS</td>
-                <td>Forwarded to Merger</td>
-              </tr>
-              <tr>
-              
-  <td>1522643595</td>
-                <td>32767</td>
-                <td>Firewall</td>
-                
-<td>Forwarded to IDS</td>
-              </tr>
-              <tr>
-                <td>1522643590</td>
-          
-      <td>32745</td>
-                <td>Firewall</td>
-                <td>Received By Firewall</td>
-         
-     </tr>
-              <tr>
-                <td>1522643590</td>
-                <td>32763</td>
-              
-  <td>IDS</td>
-                <td>Forwarded to Merger</td>
-              </tr>
-              <tr>
-            
-    <td>1522643595</td>
-                <td>32767</td>
-                <td>Firewall</td>
-                
-<td>Forwarded to IDS</td>
-              </tr>
-              <tr>
-                <td>1522643590</td>
-          
-      <td>32750</td>
-                <td>Firewall</td>
-                <td>Received By Firewall</td>
-         
-     </tr>
-              <tr>
-                <td>1522643590</td>
-                <td>32764</td>
-              
-  <td>Firewall</td>
-                <td>Received By Firewall</td>
-              </tr>
-               <tr>
-     
-           <td>1522643590</td>
-                <td>32759</td>
-                <td>Firewall</td>
-              
-  <td>Dropped Packet</td>
-              </tr>
-               <tr>
-                <td>1522643590</td>
-         
-       <td>32759</td>
-                <td>Firewall</td>
-                <td>Dropped Packet</td>
-              
-</tr>
-               <tr>
-                <td>1522643590</td>
-                <td>32759</td>
-                
-<td>Firewall</td>
-                <td>Dropped Packet</td>
-              </tr>
-              <tr>
-              
-  <td>1522643590</td>
-                <td>32772</td>
-                <td>Firewall</td>
-                
-<td>Received By Firewall</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      
-</div>
-    </div>
 
     <!-- Bootstrap core JavaScript -->
     <script 
 src="vendor/jquery/jquery.min.js"></script>
+
     <script 
 src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script 
 src="http://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
-    <script 
-type="text/javascript">
-      $(document).ready( function () {
+    <script type="text/javascript">
+      
+
+      var table = document.getElementById("myTable");
+
+
+      var data = <%- JSON.stringify(content_data);%>
+      var data_as_array = data.split('\n');
+      console.log(typeof data);
+      //var data_as_array = data.split('\n');
+
+      if(data) {
+              //console.log(data_as_array.length);
+        for (i = 0; i < data_as_array.length; i++) {
+        var data_element = data_as_array[i].split(',');
+
+                  //Add post info
+          $('#myTable tbody').append('<tr>');
+          $('#myTable tbody').append('<td>' + data_element[0] + '</td>');
+          $('#myTable tbody').append('<td>' + data_element[1] + '</td>');
+          $('#myTable tbody').append('<td>' + data_element[2] + '</td>');
+           $('#myTable tbody').append('<td>' + data_element[3] + '</td>');
+           $('#myTable tbody').append('</tr>');
+      }
+      }
+
+
+setTimeout(function(){
+
+
+    //$.get('/getData', function(data) {
+   //     $('#content_div_id').html(data);    
+  //  });
+   window.location.reload(1);
+}, 10000);
+
+
+
+
+  
+  </script>
+
+  <script type="text/javascript">
+     $(document).ready( function () {
         $('#myTable').DataTable();
       } );
-  
   </script>
   </body>
 
