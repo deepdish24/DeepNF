@@ -92,10 +92,12 @@ void MergerOperator::process_packet(u_char *arg,
     p->runtime_id = n->get_id();
     p->nf = n->get_nf();
 
-    runtime_pkt_map->insert(std::make_pair(p->runtime_id, p));
-    packet_map[packet_id] = runtime_pkt_map;
+    printf("Created new packet \n");
 
-    printf("Added packet %d to packet_map \n", packet_id);
+//    runtime_pkt_map->insert(std::make_pair(p->runtime_id, p));
+//    packet_map[packet_id] = runtime_pkt_map;
+//
+//    printf("Added packet %d to packet_map \n", packet_id);
 
 //    // if all packets have been received for the given id, begin merging
 //    printf("packet_map[packet_id]->size(): %lu\n", packet_map[packet_id]->size());
