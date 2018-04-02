@@ -103,7 +103,7 @@ void MergerOperator::process_packet(u_char *arg,
 
     // if all packets have been received for the given id, begin merging
     if (packet_map[packet_id]->size() == merger_info->get_interface_leaf_map().size()) {
-        printf("All packets received for %d, beginning merging \n", packet_id);
+        printf("All packets received for %d, beginning merging \n\n", packet_id);
         NFPacket* merged_packet = merge_all(packet_id);
 
         // send packet to destination virtual interface
@@ -201,11 +201,14 @@ MergerOperator::NFPacket* MergerOperator::resolve_packet_conflict(
 
 // returns merged packet for the given packet ID. Assumes that all packets for the packet ID have been received
 MergerOperator::NFPacket* MergerOperator::merge_all(int pkt_id) {
+    printf("MergerOperator::merge_all: pkt_id = %d\n", pkt_id);
+
     // maps each runtime leaf id with its associated packet
     std::map<int, NFPacket*>* rt_to_pkt_map = packet_map[pkt_id];
 
     // list of conflict runtime ids
     std::vector<ConflictItem*> conflicts_list = merger_info->get_conflicts_list();
+    printf("Got rt_to_pkt_map and conflicts_list\n");
 
     bool was_changed = true; // has at least one merge conflict been resolved in this iteration?
     bool major_exists;
@@ -213,9 +216,11 @@ MergerOperator::NFPacket* MergerOperator::merge_all(int pkt_id) {
 
     // iterate through conflicts list and resolve conflicts
     while (was_changed) {
+        printf("Iterating through conflicts list\n");
         was_changed = false;
         for (std::vector<ConflictItem*>::iterator it = conflicts_list.begin(); it != conflicts_list.end(); ++it) {
             ConflictItem* ci = *it;
+            printf("next conflict item: %s", ci->to_string());
             major_exists = rt_to_pkt_map->find(ci->get_major()) != rt_to_pkt_map->end();
             minor_exists = rt_to_pkt_map->find(ci->get_minor()) != rt_to_pkt_map->end();
 
