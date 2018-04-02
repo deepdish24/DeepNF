@@ -220,7 +220,7 @@ MergerOperator::NFPacket* MergerOperator::merge_all(int pkt_id) {
         was_changed = false;
         for (std::vector<ConflictItem*>::iterator it = conflicts_list.begin(); it != conflicts_list.end(); ++it) {
             ConflictItem* ci = *it;
-            printf("next conflict item: %s", ci->to_string());
+            printf("next conflict item: %s", ci->to_string().c_str());
             major_exists = rt_to_pkt_map->find(ci->get_major()) != rt_to_pkt_map->end();
             minor_exists = rt_to_pkt_map->find(ci->get_minor()) != rt_to_pkt_map->end();
 
