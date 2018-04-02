@@ -111,25 +111,25 @@ void MergerOperator::process_packet(u_char *arg,
 
     unsigned long received_packet_num = packet_map[packet_id]->size();
     unsigned long total_packet_num = merger_info->get_interface_leaf_map().size();
-//    if (received_packet_num == total_packet_num) {
-//        printf("All packets received for %d, beginning merging \n\n", packet_id);
-//        NFPacket* merged_packet = merge_all(packet_id);
-//
-//        printf("Got merged packet\n");
-//
-//        // send packet to destination virtual interface
-//        if (!merged_packet->pkt->is_null()) {
-//            printf("Packet is not null, sending it to eth...\n");
-//            if (pcap_sendpacket(this->dst_dev_handle, merged_packet->pkt->pkt_char, merged_packet->pkt->size) < 0) {
-//                std::cerr << strerror(errno) << std::endl;
-//            }
-//        }
-//
-//        // cleanup
-//        printf("cleanup packet\n");
-//        delete merged_packet;
-//        packet_map.erase(packet_id);
-//    }
+    if (received_packet_num == total_packet_num) {
+        printf("All packets received for %d, beginning merging \n\n", packet_id);
+        NFPacket* merged_packet = merge_all(packet_id);
+
+        printf("Got merged packet\n");
+
+        // send packet to destination virtual interface
+        if (!merged_packet->pkt->is_null()) {
+            printf("Packet is not null, sending it to eth...\n");
+            if (pcap_sendpacket(this->dst_dev_handle, merged_packet->pkt->pkt_char, merged_packet->pkt->size) < 0) {
+                std::cerr << strerror(errno) << std::endl;
+            }
+        }
+
+        // cleanup
+        printf("cleanup packet\n");
+        delete merged_packet;
+        packet_map.erase(packet_id);
+    }
 
 }
 
