@@ -3,6 +3,8 @@ build/*
 google_protobuf-prefix/*
 deepnf.pem
 src/webserver/node_modules/*
+src/runtime/config/CMakeLists.txt
+src/setup/CMakeLists.txt
 
 .DS_Store
 */.DS_Store
