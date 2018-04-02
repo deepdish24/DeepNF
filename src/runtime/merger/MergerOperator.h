@@ -26,6 +26,7 @@
 #include "NF.h"
 #include "Field.h"
 #include "ActionTableHelper.h"
+#include "NFPacket.h"
 
 class MergerOperator {
 
