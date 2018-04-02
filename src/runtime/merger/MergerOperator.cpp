@@ -102,8 +102,8 @@ void MergerOperator::process_packet(u_char *arg,
     printf("Added packet %d to packet_map \n", packet_id);
 
     // if all packets have been received for the given id, begin merging
-    printf("packet_map[packet_id]->size(): %d\n", packet_map[packet_id]->size());
-    printf("merger_info->get_interface_leaf_map().size(): %d\n", merger_info->get_interface_leaf_map().size());
+    printf("packet_map[packet_id]->size(): %lu\n", packet_map[packet_id]->size());
+    printf("merger_info->get_interface_leaf_map().size(): %lu\n", merger_info->get_interface_leaf_map().size());
 
     if (packet_map[packet_id]->size() == merger_info->get_interface_leaf_map().size()) {
         printf("All packets received for %d, beginning merging \n\n", packet_id);
