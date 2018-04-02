@@ -18,8 +18,6 @@
 #include <vector>
 #include <fstream>
 
-#include "nlohmann/json.hpp"
-
 #include "packet.h"
 #include "pcap.h"
 #include "RuntimeNode.h"

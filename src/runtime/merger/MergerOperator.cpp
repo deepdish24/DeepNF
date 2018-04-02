@@ -19,13 +19,7 @@ MergerOperator::MergerOperator(std::string action_file_path) {
     printf("MergerOperator::MergerOperator \n");
 
     // set up action table
-    nlohmann::json action_table;
-    std::ifstream action_table_input(action_file_path);
-    action_table_input >> action_table;
-
-    printf("finished reading in json \n");
-
-//    this->action_table_helper = new ActionTableHelper(action_table);
+    this->action_table_helper = new ActionTableHelper();
 }
 
 
