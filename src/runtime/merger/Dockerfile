@@ -24,5 +24,6 @@ COPY packet.h .
 COPY packet.cpp .
 COPY RuntimeNode.h .
 COPY RuntimeNode.cpp .
+COPY build.sh .
 
 RUN bash build.sh
