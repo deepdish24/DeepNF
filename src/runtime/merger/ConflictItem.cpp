@@ -34,7 +34,7 @@ std::string ConflictItem::to_string() {
 
     buffer = (char*) malloc(size + 1);
     buffer[size] = '\0';
-    size_t size = snprintf(buffer, bufsize, "(maj=%d, min=%d, par=%d)", this->major, this->minor, this->parent);
+    size = snprintf(buffer, bufsize, "(maj=%d, min=%d, par=%d)", this->major, this->minor, this->parent);
 
     std::string ret_str = std::string(buffer);
     free(buffer);
