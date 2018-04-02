@@ -90,8 +90,7 @@ void MergerOperator::process_packet(u_char *arg,
 
     NFPacket* p = new NFPacket();
     p->pkt = pkt_info;
-
-    printf("cur_dev: %s", this->cur_dev.c_str());
+    
     RuntimeNode* n = this->merger_info->get_interface_leaf_map().at("eth1");
     printf("this runtimeNode: %d\n", n->get_id());
 
