@@ -15,7 +15,7 @@ void process_packet_handler(unsigned char * user,
 }
 
 
-MergerOperator::MergerOperator(std::string action_file_path) {
+MergerOperator::MergerOperator() {
     printf("MergerOperator::MergerOperator \n");
 
     // set up action table

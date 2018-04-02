@@ -30,7 +30,7 @@
 class MergerOperator {
 
     public:
-        MergerOperator(std::string action_file_path);
+        MergerOperator();
 
         // runs the merger
         void run();
