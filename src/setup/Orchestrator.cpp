@@ -179,7 +179,7 @@ Orchestrator::Orchestrator(std::string filepath, std::string action_file_path) {
     /* NODE PARTITIONING */
     round_robin_partitioning(ips, functions);
     //single_node_partitioning(ips, functions);
-    
+
 
     /* MACHINE CONFIGURATION */
     std::unordered_map<std::string, Machine*> ip_to_machines;
@@ -448,7 +448,7 @@ void Orchestrator::write_json_dictionary(std::unordered_map<std::string, int> fu
             arr.push_back(object);
         }
     }
-    std::ofstream out("../../../src/common/conflict_pairs.json");
+    std::ofstream out("../../../src/common/eth_to_leaf.json");
     out << arr;
 }
 
