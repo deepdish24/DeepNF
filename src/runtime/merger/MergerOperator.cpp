@@ -76,9 +76,9 @@ void MergerOperator::process_packet(u_char *arg,
 
     struct packet *pkt_info = new struct packet(packet, pkthdr->len);
 
-    this->print_ip_header(pkt_info->ip_header);
-    this->print_tcp_packet(pkt_info->tcp_header);
-    this->print_data(pkt_info->data, pkt_info->data_size);
+//    this->print_ip_header(pkt_info->ip_header);
+//    this->print_tcp_packet(pkt_info->tcp_header);
+//    this->print_data(pkt_info->data, pkt_info->data_size);
 
     int packet_id = ntohs(pkt_info->ip_header->ip_id);
 
