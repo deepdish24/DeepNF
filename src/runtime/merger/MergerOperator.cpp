@@ -88,8 +88,8 @@ void MergerOperator::process_packet(u_char *arg,
 
     printf("Created packet map\n");
 
-//    NFPacket* p = new NFPacket();
-//    p->pkt = pkt_info;
+    NFPacket p;
+    p.pkt = pkt_info;
 
     printf("this->cur_dev: %s\n", this->cur_dev.c_str());
     RuntimeNode* n = this->merger_info->get_interface_leaf_map().at(this->cur_dev);
