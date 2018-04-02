@@ -90,16 +90,16 @@ void MergerOperator::process_packet(u_char *arg,
         runtime_pkt_map = new std::map<int, NFPacket*>();
     }
 
-    NFPacket* p = new NFPacket();
-    p->pkt = pkt_info;
-    RuntimeNode* n = this->merger_info->get_interface_leaf_map().at(cur_dev);
-    p->runtime_id = n->get_id();
-    p->nf = n->get_nf();
-
-    runtime_pkt_map->insert(std::make_pair(p->runtime_id, p));
-    packet_map[packet_id] = runtime_pkt_map;
-
-    printf("Added packet %d to packet_map \n", packet_id);
+//    NFPacket* p = new NFPacket();
+//    p->pkt = pkt_info;
+//    RuntimeNode* n = this->merger_info->get_interface_leaf_map().at(cur_dev);
+//    p->runtime_id = n->get_id();
+//    p->nf = n->get_nf();
+//
+//    runtime_pkt_map->insert(std::make_pair(p->runtime_id, p));
+//    packet_map[packet_id] = runtime_pkt_map;
+//
+//    printf("Added packet %d to packet_map \n", packet_id);
 //
 //    // if all packets have been received for the given id, begin merging
 //    printf("packet_map[packet_id]->size(): %lu\n", packet_map[packet_id]->size());
