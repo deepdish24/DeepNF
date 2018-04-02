@@ -18,6 +18,8 @@ COPY Field.h .
 COPY Field.cpp .
 COPY MergerInfo.h .
 COPY MergerInfo.cpp .
+COPY MergerOperator.h .
+COPY MergerOperator.cpp .
 COPY NF.h .
 COPY NF.cpp .
 COPY packet.h .
