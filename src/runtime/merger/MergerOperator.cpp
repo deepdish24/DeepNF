@@ -100,17 +100,17 @@ void MergerOperator::process_packet(u_char *arg,
 
     printf("Created new packet \n");
 
-//    runtime_pkt_map->insert(std::make_pair(p->runtime_id, p));
-//    packet_map[packet_id] = runtime_pkt_map;
-//
-//    printf("Added packet %d to packet_map \n", packet_id);
+    runtime_pkt_map->insert(std::make_pair(p->runtime_id, p));
+    packet_map[packet_id] = runtime_pkt_map;
 
-//    // if all packets have been received for the given id, begin merging
-//    printf("packet_map[packet_id]->size(): %lu\n", packet_map[packet_id]->size());
-//    printf("merger_info->get_interface_leaf_map().size(): %lu\n", merger_info->get_interface_leaf_map().size());
-//
-//    unsigned long received_packet_num = packet_map[packet_id]->size();
-//    unsigned long total_packet_num = merger_info->get_interface_leaf_map().size();
+    printf("Added packet %d to packet_map \n", packet_id);
+
+    // if all packets have been received for the given id, begin merging
+    printf("packet_map[packet_id]->size(): %lu\n", packet_map[packet_id]->size());
+    printf("merger_info->get_interface_leaf_map().size(): %lu\n", merger_info->get_interface_leaf_map().size());
+
+    unsigned long received_packet_num = packet_map[packet_id]->size();
+    unsigned long total_packet_num = merger_info->get_interface_leaf_map().size();
 //    if (received_packet_num == total_packet_num) {
 //        printf("All packets received for %d, beginning merging \n\n", packet_id);
 //        NFPacket* merged_packet = merge_all(packet_id);
