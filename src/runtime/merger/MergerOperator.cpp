@@ -88,16 +88,16 @@ void MergerOperator::process_packet(u_char *arg,
 
     printf("Created packet map\n");
 
-    NFPacket* p = new NFPacket();
-    p->pkt = pkt_info;
+//    NFPacket* p = new NFPacket();
+//    p->pkt = pkt_info;
 
-//    RuntimeNode* n = this->merger_info->get_interface_leaf_map().at("eth1");
+    RuntimeNode* n = this->merger_info->get_interface_leaf_map().at("eth1");
 //    printf("this runtimeNode: %d\n", n->get_id());
 
 //    p->runtime_id = n->get_id();
 //    p->nf = n->get_nf();
 //
-    printf("Created new packet \n");
+//    printf("Created new packet \n");
 
 //    runtime_pkt_map->insert(std::make_pair(p->runtime_id, p));
 //    packet_map[packet_id] = runtime_pkt_map;
