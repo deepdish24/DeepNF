@@ -15,17 +15,11 @@ void process_packet_handler(unsigned char * user,
 }
 
 
-MergerOperator::MergerOperator(std::string action_file_path) {
+MergerOperator::MergerOperator() {
     printf("MergerOperator::MergerOperator \n");
 
     // set up action table
-    nlohmann::json action_table;
-    std::ifstream action_table_input(action_file_path);
-    action_table_input >> action_table;
-
-    printf("finished reading in json \n");
-
-//    this->action_table_helper = new ActionTableHelper(action_table);
+    this->action_table_helper = new ActionTableHelper();
 }
 
 
@@ -33,12 +27,12 @@ MergerOperator::MergerOperator(std::string action_file_path) {
 
 /* sets up hardcoded MergerInfo object to do testing on */
 MergerInfo* MergerOperator::setup_dummy_info() {
-    RuntimeNode n1 (1, snort); // node that drops packets
-    RuntimeNode n2 (2, snort); // node that sends packets
+    RuntimeNode* n1 = new RuntimeNode(1, snort); // node that drops packets
+    RuntimeNode* n2 = new RuntimeNode(2, snort); // node that sends packets
 
     std::map<std::string, RuntimeNode*> interface_leaf_map;
-    interface_leaf_map.insert(std::make_pair("eth1", &n1));
-    interface_leaf_map.insert(std::make_pair("eth2", &n1));
+    interface_leaf_map.insert(std::make_pair("eth1", n1));
+    interface_leaf_map.insert(std::make_pair("eth2", n2));
 
     std::vector<ConflictItem*> conflicts_list;
     std::map<int, RuntimeNode*> node_map;
@@ -50,8 +44,6 @@ MergerInfo* MergerOperator::setup_dummy_info() {
 
 void MergerOperator::run() {
     printf("MergerOperator::run() \n");
-
-    printf("wtf is this bullshit\n");
 
     // create dummy MergerInfo object
     this->merger_info = setup_dummy_info();
@@ -65,14 +57,14 @@ void MergerOperator::run() {
     configure_device_read_handles(packet_filter_expr);
     configure_device_write_handle(packet_filter_expr, dst_dev);
 
-    printf("finished setting up bullshit\n");
+    printf("finished setting up bullshit, listening for packets...\n");
 
     // listen for and process incoming packets
     for (std::map<std::string, RuntimeNode*>::iterator it = this->merger_info->get_interface_leaf_map().begin();
          it != this->merger_info->get_interface_leaf_map().end(); ++it) {
         /* loop for callback function */
-        cur_dev = it->first;
-        pcap_loop(src_dev_handle_map[it->first], 3, process_packet_handler, (u_char*) this);
+        this->cur_dev = it->first;
+        pcap_loop(src_dev_handle_map[it->first], 1, process_packet_handler, (u_char*) this);
     }
 }
 
@@ -84,10 +76,6 @@ void MergerOperator::process_packet(u_char *arg,
 
     struct packet *pkt_info = new struct packet(packet, pkthdr->len);
 
-    this->print_ip_header(pkt_info->ip_header);
-    this->print_tcp_packet(pkt_info->tcp_header);
-    this->print_data(pkt_info->data, pkt_info->data_size);
-
     int packet_id = ntohs(pkt_info->ip_header->ip_id);
 
     /* add packet to the map */
@@ -98,27 +86,47 @@ void MergerOperator::process_packet(u_char *arg,
         runtime_pkt_map = new std::map<int, NFPacket*>();
     }
 
-    NFPacket p;
-    p.pkt = pkt_info;
-    RuntimeNode* n = this->merger_info->get_interface_leaf_map().at(cur_dev);
-    p.runtime_id = n->get_id();
-    p.nf = n->get_nf();
+    printf("Created packet map\n");
 
-    runtime_pkt_map->insert(std::make_pair(p.runtime_id, &p));
+    struct NFPacket* p = (struct NFPacket *) malloc(sizeof(struct NFPacket));
+    p->pkt = pkt_info;
+
+    printf("this->cur_dev: %s\n", this->cur_dev.c_str());
+    RuntimeNode* n = this->merger_info->get_interface_leaf_map().at(this->cur_dev);
+    printf("this runtimeNode: %d\n", n->get_id());
+
+    p->runtime_id = n->get_id();
+    p->nf = n->get_nf();
+
+    printf("Created new packet \n");
+
+    runtime_pkt_map->insert(std::make_pair(p->runtime_id, p));
     packet_map[packet_id] = runtime_pkt_map;
 
+    printf("Added packet %d to packet_map \n", packet_id);
+
     // if all packets have been received for the given id, begin merging
-    if (packet_map[packet_id]->size() == merger_info->get_interface_leaf_map().size()) {
+    printf("packet_map[packet_id]->size(): %lu\n", packet_map[packet_id]->size());
+    printf("merger_info->get_interface_leaf_map().size(): %lu\n", merger_info->get_interface_leaf_map().size());
+
+    unsigned long received_packet_num = packet_map[packet_id]->size();
+    unsigned long total_packet_num = merger_info->get_interface_leaf_map().size();
+    if (received_packet_num == total_packet_num) {
+        printf("All packets received for %d, beginning merging \n\n", packet_id);
         NFPacket* merged_packet = merge_all(packet_id);
+
+        printf("Got merged packet\n");
 
         // send packet to destination virtual interface
         if (!merged_packet->pkt->is_null()) {
+            printf("Packet is not null, sending it to eth...\n");
             if (pcap_sendpacket(this->dst_dev_handle, merged_packet->pkt->pkt_char, merged_packet->pkt->size) < 0) {
                 std::cerr << strerror(errno) << std::endl;
             }
         }
 
         // cleanup
+        printf("cleanup packet\n");
         delete merged_packet;
         packet_map.erase(packet_id);
     }
@@ -184,7 +192,11 @@ MergerOperator::NFPacket* MergerOperator::resolve_packet_conflict(
         }
     }
 
+    printf("Creating new NFPacket\n");
     NFPacket* ret_p = new NFPacket();
+
+    delete ret_p;
+    printf("Deleted NFPacket\n");
     ret_p->pkt = new_pkt;
     ret_p->runtime_id = conflict->get_parent();
     ret_p->nf = merger_info->get_node_map()[ret_p->runtime_id]->get_nf();
@@ -206,11 +218,14 @@ MergerOperator::NFPacket* MergerOperator::resolve_packet_conflict(
 
 // returns merged packet for the given packet ID. Assumes that all packets for the packet ID have been received
 MergerOperator::NFPacket* MergerOperator::merge_all(int pkt_id) {
+    printf("MergerOperator::merge_all: pkt_id = %d\n", pkt_id);
+
     // maps each runtime leaf id with its associated packet
     std::map<int, NFPacket*>* rt_to_pkt_map = packet_map[pkt_id];
 
     // list of conflict runtime ids
     std::vector<ConflictItem*> conflicts_list = merger_info->get_conflicts_list();
+    printf("Got rt_to_pkt_map and conflicts_list\n");
 
     bool was_changed = true; // has at least one merge conflict been resolved in this iteration?
     bool major_exists;
@@ -218,9 +233,12 @@ MergerOperator::NFPacket* MergerOperator::merge_all(int pkt_id) {
 
     // iterate through conflicts list and resolve conflicts
     while (was_changed) {
+        printf("Iterating through conflicts list\n");
         was_changed = false;
         for (std::vector<ConflictItem*>::iterator it = conflicts_list.begin(); it != conflicts_list.end(); ++it) {
             ConflictItem* ci = *it;
+            printf("next conflict item:");
+            printf("%s", ci->to_string().c_str());
             major_exists = rt_to_pkt_map->find(ci->get_major()) != rt_to_pkt_map->end();
             minor_exists = rt_to_pkt_map->find(ci->get_minor()) != rt_to_pkt_map->end();
 
@@ -245,14 +263,18 @@ MergerOperator::NFPacket* MergerOperator::merge_all(int pkt_id) {
                 rt_to_pkt_map->insert(std::make_pair(merged_pkt->runtime_id, merged_pkt));
             }
         }
+        printf("Finished iterating through conflicts list\n");
     }
 
+    printf("Finished merging\n");
     // merging process should be finished by now
     if (rt_to_pkt_map->size() != 1) {
         throw std::runtime_error("More than one packet exists in pkt map even thought merging is finished");
     }
 
     for (std::map<int, NFPacket*>::iterator it = rt_to_pkt_map->begin(); it != rt_to_pkt_map->end(); ++it) {
+        printf("Found final merged NFPacket, returning it now...\n");
+
         NFPacket* final_pkt = it->second;
         return final_pkt;
     }

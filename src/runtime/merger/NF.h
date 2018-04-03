@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #ifndef DEEPNF_NF_H
 #define DEEPNF_NF_H
 
@@ -18,3 +19,8 @@ namespace nf
     std::string nf_to_string(NF nf);
 }
 #endif
+=======
+#pragma once
+
+enum NF { snort, haproxy };
+>>>>>>> master

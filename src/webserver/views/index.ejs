@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" 
+content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+   
+ <meta name="author" content="">
+
+    <title>DeepNF</title>
+
+    <!-- Bootstrap core CSS -->
+    <link 
+href="/bootstrap/css/bootstrap.min.css" type="text/css" rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <link 
+href="http://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" rel="stylesheet">
+
+    <!-- Custom 
+styles for this template -->
+    <style>
+      body {
+        padding-top: 54px;
+      }
+      @media (min-
+width: 992px) {
+        body {
+          padding-top: 56px;
+        }
+      }
+
+    </style>
+
+  </head>
+
+  <body>
+
+    
+<!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div 
+class="container">
+        <a class="navbar-brand" href="#">DeepNF</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" 
+id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+           
+   <a class="nav-link" href="/">Home
+                <span class="sr-only">(current)</span>
+              
+</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">About</a>
+ 
+           </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="#">Machine 
+1</a>
+            </li>
+            <li>
+              <a class="nav-link" href="#">Machine 2</a>
+            
+</li>
+            <li>
+              <a class="nav-link" href="#">Machine 3</a>
+            </li>
+            
+            <li>
+              <a class="nav-link" href="/printData">Test Machine</a>
+            </li>
+          
+</ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+      <div 
+class="row">
+        <div class="col-lg-12 text-center">
+          <h1 class="mt-5">DeepNF Machine 1 
+Logs</h1>
+          <table class="table" id="myTable">
+            <thead>
+              <tr>
+                
+<th scope="col">Time</th>
+                <th scope="col">PacketId</th>
+                <th 
+scope="col">Function</th>
+                <th scope="col">Action</th>
+              </tr>
+            
+</thead>
+            <tbody>
+              <tr>
+                <td>1522643595</td>
+                
+<td>32767</td>
+                <td>Firewall</td>
+                <td>Forwarded to IDS</td>
+              
+</tr>
+              <tr>
+                <td>1522643595</td>
+                <td>32767</td>
+                
+<td>Firewall</td>
+                <td>Received by Firewall</td>
+              </tr>
+              <tr>
+        
+        <td>1522643590</td>
+                <td>32763</td>
+                <td>IDS</td>
+                
+<td>Forwarded to Merger</td>
+              </tr>
+              <tr>
+                <td>1522643590</td>
+       
+         <td>32759</td>
+                <td>Firewall</td>
+                <td>Dropped Packet</td>
+            
+  </tr>
+              <tr>
+                <td>1522643590</td>
+                <td>32763</td>
+                
+<td>IDS</td>
+                <td>Forwarded to Merger</td>
+              </tr>
+              <tr>
+              
+  <td>1522643595</td>
+                <td>32767</td>
+                <td>Firewall</td>
+                
+<td>Forwarded to IDS</td>
+              </tr>
+              <tr>
+                <td>1522643590</td>
+          
+      <td>32745</td>
+                <td>Firewall</td>
+                <td>Received By Firewall</td>
+         
+     </tr>
+              <tr>
+                <td>1522643590</td>
+                <td>32763</td>
+              
+  <td>IDS</td>
+                <td>Forwarded to Merger</td>
+              </tr>
+              <tr>
+            
+    <td>1522643595</td>
+                <td>32767</td>
+                <td>Firewall</td>
+                
+<td>Forwarded to IDS</td>
+              </tr>
+              <tr>
+                <td>1522643590</td>
+          
+      <td>32750</td>
+                <td>Firewall</td>
+                <td>Received By Firewall</td>
+         
+     </tr>
+              <tr>
+                <td>1522643590</td>
+                <td>32764</td>
+              
+  <td>Firewall</td>
+                <td>Received By Firewall</td>
+              </tr>
+               <tr>
+     
+           <td>1522643590</td>
+                <td>32759</td>
+                <td>Firewall</td>
+              
+  <td>Dropped Packet</td>
+              </tr>
+               <tr>
+                <td>1522643590</td>
+         
+       <td>32759</td>
+                <td>Firewall</td>
+                <td>Dropped Packet</td>
+              
+</tr>
+               <tr>
+                <td>1522643590</td>
+                <td>32759</td>
+                
+<td>Firewall</td>
+                <td>Dropped Packet</td>
+              </tr>
+              <tr>
+              
+  <td>1522643590</td>
+                <td>32772</td>
+                <td>Firewall</td>
+                
+<td>Received By Firewall</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      
+</div>
+    </div>
+
+    <!-- Bootstrap core JavaScript -->
+    <script 
+src="vendor/jquery/jquery.min.js"></script>
+    <script 
+src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script 
+src="http://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+    <script 
+type="text/javascript">
+      $(document).ready( function () {
+        $('#myTable').DataTable();
+      } );
+  
+  </script>
+  </body>
+
+</html>

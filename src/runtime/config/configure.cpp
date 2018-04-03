@@ -1,14 +1,19 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
+#include <fstream>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <unordered_map>
+#include "nlohmann/json.hpp"
 
 #include "../../common/RuntimeNode.h"
 #include "../../common/MachineConfigurator.h"
 #include "../../common/ServiceGraphUtil.h"
+
+using json = nlohmann::json;
 
 MachineConfigurator get_machine_configurator(int port) {
 	std::cout << "get machine config called with port: " << port << std::endl;
@@ -137,7 +142,7 @@ void setup_nodes(MachineConfigurator conf) {
 	}
 }
 
-MachineConfigurator setup_bridge_ports(MachineConfigurator conf) {
+std::unordered_map<int, int> setup_bridge_ports(MachineConfigurator &conf) {
 
 	// create a bridge
 	system("sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-vsctl add-br ovs-br");
@@ -147,46 +152,82 @@ MachineConfigurator setup_bridge_ports(MachineConfigurator conf) {
 	std::string bridge_ip = cur_machine->get_bridge_ip();
 	
 	system(("sudo ifconfig ovs-br " + bridge_ip + " netmask 255.255.255.0 up").c_str());
-	
+
+	// getting ip info from bridges
+	int dotinx = bridge_ip.rfind(".");
+	std::string ip_assign = bridge_ip.substr(0, dotinx+1);
+	int ofport_inx = atoi(bridge_ip.substr(dotinx+1).c_str());
+	int ip_inx = ofport_inx + 1;
+
 	// connect containers to the bridge
-	std::string add_port_classifier = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br eth1 classifier";
-	std::string add_port_merger = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br eth1 merger";
-	system(add_port_classifier.c_str());
-	system(add_port_merger.c_str());
+	// std::string add_port_classifier = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br eth1 classifier";
+	//std::string add_port_merger = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br eth1 merger";
+	//system(add_port_classifier.c_str());
+	//system(add_port_merger.c_str());
 
 	std::vector<RuntimeNode*> nodes = get_internal_nodes(conf);
 
-	int ofport = 3;
+	/* MERGER PORT SETUP */
+	// node id to eth setup map
+	std::unordered_map<int, int> nodeid_to_eth;
+	std::string add_port_merger = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br eth";
+	int eth_inx = 1;
+	auto j = json::object();
 	for (RuntimeNode* n : nodes) {
-		
-		std::string add_port_command = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br";
-		// std::string node_id = std::to_string(n.get_id());
-		switch(n->get_nf()) {
-			case snort:
-			system((add_port_command + " eth1 " + n->get_name()).c_str());
-			n->inport = ofport ++;
-			system((add_port_command + " eth2 " + n->get_name()).c_str());
-			n->outport = ofport ++;
-			break;
-			
-			case haproxy:
-			system((add_port_command + " eth1 " + n->get_name() + " --ipaddress=" + n->ip).c_str());
-			n->inport = ofport ++;
-			n->outport = n->inport;
-			break;
-			
-			default: break;
+		if (n->get_neighbors().size() == 0) {
+			std::string command = add_port_merger + std::to_string(eth_inx) + " --ipaddress=" + 
+				ip_assign + std::to_string(ip_inx) + " " + "merger";
+			std::cout << "command: " << command << std::endl;
+			nodeid_to_eth[n->get_id()] = eth_inx;
+			j["eth" + std::to_string(eth_inx)] = n->get_name();
+			system(command.c_str());
+			eth_inx++;
 		}
 	}
 
-	return conf;
+	std::ofstream out("../../../src/common/eth_leaf_map.json");
+    out << j;
+
+	//int ofport = 3;
+	std::string add_port_command = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br";
+	for (RuntimeNode* n : nodes) {
+		//NOTE: Docker containers must be named the same as functions
+
+		std::string command1 = add_port_command + " eth1 " + n->get_name();
+		std::string command2 = add_port_command + " eth2 " + n->get_name();
+		std::cout << "command: " << command1 << std::endl;
+		std::cout << "command: " << command2 << std::endl;
+		system(command1.c_str());
+		n->inport = eth_inx ++;
+		system(command2.c_str());
+		n-> outport = eth_inx ++;
+		// std::string node_id = std::to_string(n.get_id());
+		/*switch(n->get_nf()) {
+			case snort:
+				system((add_port_command + " eth1 " + n->get_name()).c_str());
+				n->inport = ofport ++;
+				system((add_port_command + " eth2 " + n->get_name()).c_str());
+				n->outport = ofport ++;
+				break;
+			
+			case haproxy:
+				system((add_port_command + " eth1 " + n->get_name() + " --ipaddress=" + n->ip).c_str());
+				n->inport = ofport ++;
+				n->outport = n->inport;
+				break;
+			
+			default: break;
+		}*/
+	}
+
+	return nodeid_to_eth;
 }
 
 /**
  * Adds OVS flow rules between the containers.
  * reference: https://paper.dropbox.com/doc/Flows-in-OpenVSwitch-nVRg9phHBr5JSZO2vFwCJ?_tk=share_copylink
  */
-void make_flow_rules(MachineConfigurator conf) {
+void make_flow_rules(MachineConfigurator conf, std::unordered_map<int,int> leaf_to_eth) {
 	std::string add_flow_command = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-ofctl add-flow ovs-br in_port=";
 	
 	std::vector<RuntimeNode*> nodes = get_internal_nodes(conf);
@@ -200,7 +241,8 @@ void make_flow_rules(MachineConfigurator conf) {
 		}
 
 		if (n->get_neighbors().size() == 0) { // if node is a sink, flow from this node to merger
-			system((add_flow_command + std::to_string(n->outport) + ",actions=2").c_str());
+			int merger_port = leaf_to_eth[n->get_id()];
+			system((add_flow_command + std::to_string(n->outport) + ",actions=" + std::to_string(merger_port)).c_str());
 		} else { // flow from output port of this node to all its successors ports
 			std::vector<int> neighbors = n->get_neighbors();
 			std::string outport_ports = "";
@@ -211,7 +253,6 @@ void make_flow_rules(MachineConfigurator conf) {
 					outport_ports += ",";
 				}
 			}
-
 			system((add_flow_command + std::to_string(n->outport) + ",actions=" + outport_ports).c_str());
 		}
 	}
@@ -226,7 +267,7 @@ void make_flow_rules(MachineConfigurator conf) {
 		i++;
 	}
 
-	system((add_flow_command + "1,actions=" + outport_ports).c_str());
+	//system((add_flow_command + "1,actions=" + outport_ports).c_str());
 }
 
 /**
@@ -301,8 +342,8 @@ int main(int argc, char *argv[]) {
 	} else {
 		// making a dummy service graph
 		setup_nodes(conf);
-		conf = setup_bridge_ports(conf);
-		make_flow_rules(conf);
+		std::unordered_map<int, int> leaf_to_eth = setup_bridge_ports(conf);
+		make_flow_rules(conf, leaf_to_eth);
 		start_network_functions(conf);
 	}
 

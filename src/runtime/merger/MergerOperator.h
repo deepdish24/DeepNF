@@ -18,8 +18,6 @@
 #include <vector>
 #include <fstream>
 
-#include "nlohmann/json.hpp"
-
 #include "packet.h"
 #include "pcap.h"
 #include "RuntimeNode.h"
@@ -32,7 +30,7 @@
 class MergerOperator {
 
     public:
-        MergerOperator(std::string action_file_path);
+        MergerOperator();
 
         // runs the merger
         void run();

@@ -7,17 +7,16 @@
 
 #include <set>
 #include <string>
+#include <map>
 
-#include "nlohmann/json.hpp"
 #include "NF.h"
 #include "Field.h"
 
-using json = nlohmann::json;
 
 class ActionTableHelper {
 
     public:
-        ActionTableHelper(json action_table);
+        ActionTableHelper();
 
          /**
          * @return a map mapping each NF to a list of all fields that the NF might write to
@@ -37,9 +36,6 @@ class ActionTableHelper {
         static bool is_writable(std::string rw_field);
 
     private:
-        // json action table object that this ActionTableHelper instance will parse
-        json action_table;
-
         std::map<NF, std::set<Field>> fields_map; // cache results of get_write_fields_map to increase efficiency
         bool fields_map_initialized;
 
