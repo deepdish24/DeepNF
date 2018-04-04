@@ -3,6 +3,7 @@
 #include <net/ethernet.h>
 #include <netinet/tcp.h>   //Provides declarations for tcp header
 #include <netinet/ip.h>    //Provides declarations for ip header
+#include <string>
 
 struct packet
 {
@@ -10,6 +11,7 @@ struct packet
 public:
 
 	packet(const u_char *packet, int packet_size);
+    packet(std::string sip, int sp, std::string dip, int dp, unsigned int id, std::string data);
 
 	/* reference:
      * http://tonylukasavage.com/blog/2010/12/19/offline-packet-capture-analysis-with-c-c----amp--libpcap/ */
@@ -23,4 +25,5 @@ public:
     
     bool is_null();
     void nullify();
+    void print_info();
 };
