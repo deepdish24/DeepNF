@@ -9,9 +9,7 @@ RUN apt-get update -y && \
 COPY packet.h .
 COPY packet.cpp .
 COPY dnf_firewall.cpp .
-COPY NF.h .
 
-RUN  g++ -std=c++11 -c NF.h
 RUN  g++ -std=c++11 -c packet.h packet.cpp
 RUN g++ -std=c++11 packet.h packet.cpp dnf_firewall.cpp \
 	-o fw -I /usr/include/pcap -lpcap
