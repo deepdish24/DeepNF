@@ -6,7 +6,7 @@ set(SOURCE_FILES
     Machine.cpp
     ServiceGraphUtil.cpp
     MachineConfigurator.cpp
-)
+        )
 
 set(HEADERS
     # add headers files here eventually
@@ -15,12 +15,12 @@ set(HEADERS
     MachineConfigurator.h
     NF.h
     ServiceGraphUtil.h
-)
+        )
 
 set(PROTOCOL_BUFFERS
         ${PROTO_DIR}/Machine.pb.cc
         ${PROTO_DIR}/Machine.pb.h
-        )
+     )
 set_source_files_properties(${PROTOCOL_BUFFERS} PROPERTIES GENERATED TRUE)
 
 

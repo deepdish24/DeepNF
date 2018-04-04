@@ -30,6 +30,14 @@ public:
 		parents.insert(n);
 	}
 
+	ServiceGraphNode* get_parent() {
+		if (parents.empty()) {
+			return NULL;
+		}
+		auto it = parents.begin();
+		return *it;
+	}
+
 	bool isLeaf() {
 		return neighbors.empty();
 	}

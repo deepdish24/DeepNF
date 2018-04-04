@@ -6,14 +6,27 @@ RUN apt-get update -y && \
     apt-get upgrade -y && \
     apt-get install -y g++ libpcap-dev
 
+
+COPY ActionTableHelper.cpp .
+COPY ActionTableHelper.h .
+COPY ConflictItem.cpp .
+COPY ConflictItem.h .
+COPY Field.h .
+COPY Field.cpp .
 COPY merge.cpp .
-COPY RuntimeNode.h .
-COPY RuntimeNode.cpp .
+COPY Field.h .
+COPY Field.cpp .
+COPY MergerInfo.h .
+COPY MergerInfo.cpp .
+COPY MergerOperator.h .
+COPY MergerOperator.cpp .
 COPY NF.h .
+COPY NF.cpp .
 COPY packet.h .
 COPY packet.cpp .
+COPY RuntimeNode.h .
+COPY RuntimeNode.cpp .
 
-RUN  g++ -std=c++11 -c RuntimeNode.h RuntimeNode.cpp
-RUN  g++ -std=c++11 -c packet.h packet.cpp
-RUN g++ -std=c++11 RuntimeNode.cpp packet.cpp merge.cpp \
-	-o merge -I /usr/include/pcap -lpcap
+COPY build.sh .
+
+RUN bash build.sh
