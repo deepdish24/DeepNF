@@ -105,14 +105,57 @@ bool is_source_node(RuntimeNode* n, std::vector<RuntimeNode*> nodes) {
 }
 
 /**
+* Function creates directory to setup docker container
+* at path specified by config_dir
+*/
+void make_config_dir(std::string config_dir) {
+    system(("mkdir " + config_dir).c_str());
+}
+
+/**
+* Function copies specified file into config_dir
+* (assuming such a directory exists)
+*/
+void copy_dockerfile(std::string file, std::string config_dir) {
+    system(("cp " + file + " " + config_dir).c_str());
+}
+
+/**
+* Function builds docker image based in config directory
+* (assuming such a directory exists)
+*/
+void build_docker_image(std::string image_name, std::string config_dir) {
+    system(("docker build -t=" + image_name + " " + config_dir).c_str());
+}
+
+/**
+* Function starts docker container
+*/
+void start_docker_container(std::string container_name, std::string image_name) {
+    system(("docker run -d -t -i --name " + container_name + " " + image_name + ":latest /bin/bash").c_str());
+}
+
+/**
  * Creates the containers using Dockerfiles.
  */
 void setup_nodes(MachineConfigurator conf) {
 
+    // All config directories will be stored at root of project
+
 	std::string to_root = "../../../";
 	std::string path_to_merger_dockerfile = "src/runtime/merger/Dockerfile";
-	std::string merger_config_dir = "";
+	std::string merger_config_dir = to_root + "merger_config";
+
+    make_config_dir(merger_config_dir);
+    copy_dockerfile(to_root + path_to_merger_dockerfile, merger_config_dir);
+    build_docker_image("merger_image", merger_config_dir);
+    start_docker_container("merger", "merger_image");
+
+
+    // list of nodes on this machine
 	std::vector<RuntimeNode*> nodes = get_internal_nodes(conf);
+
+
 
 	// create new containers for classifier and merger
 	//system("docker run -d -t -i --name classifier ubuntu /bin/bash");
@@ -345,8 +388,8 @@ int main(int argc, char *argv[]) {
 	} else {
 		// making a dummy service graph
         std::cout << "graph here!" << std::endl;
-		/*setup_nodes(conf);
-		std::unordered_map<int, int> leaf_to_eth = setup_bridge_ports(conf);
+		setup_nodes(conf);
+		/*std::unordered_map<int, int> leaf_to_eth = setup_bridge_ports(conf);
 		make_flow_rules(conf, leaf_to_eth);
 		start_network_functions(conf);*/
 	}
