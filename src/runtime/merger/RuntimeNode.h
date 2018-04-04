@@ -1,9 +1,4 @@
-<<<<<<< HEAD
-#ifndef DEEPNF_RUNTIME_NODE_H
-#define DEEPNF_RUNTIME_NODE_H
-=======
 #pragma once
->>>>>>> master
 
 #include <string>
 #include <stdlib.h>
@@ -13,11 +8,6 @@
 #include "NF.h"
 
 
-<<<<<<< HEAD
-=======
-using namespace std;
-
->>>>>>> master
 class RuntimeNode {
 
 private:
@@ -54,8 +44,3 @@ public:
     NF get_nf();
 
 };
-<<<<<<< HEAD
-
-#endif
-=======
->>>>>>> master
