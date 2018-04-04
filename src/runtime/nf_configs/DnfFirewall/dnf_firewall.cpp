@@ -5,7 +5,8 @@
 #include <stdlib.h>
 #include <string>
 #include <unistd.h>
-// #include <string.h>
+#include <string.h>
+#include <errno.h>
 // #include <sys/socket.h>
 
 // #include "packet.h"
@@ -102,7 +103,8 @@ std::string read(int sockfd)
    if (n < 0) {
     std::cerr << "read error: " << strerror(errno) << std::endl;
    }
-   buf[1023] = 0;
+   std::cout << "read " << n << " bytes\n";
+   buf[n] = 0;
 
    close(comm_fd);
 
@@ -123,12 +125,16 @@ void write(std::string data, std::string ip, int port)
     servaddr.sin_port = htons(port);
     inet_pton(AF_INET, ip.c_str(), &(servaddr.sin_addr));
     
-    connect(sockfd, (struct sockaddr*)&servaddr, sizeof(servaddr));    
+    if (connect(sockfd, (struct sockaddr*)&servaddr, sizeof(servaddr)) < 0) {
+        std::cerr << "connect error: " << strerror(errno) << std::endl;
+        exit(-1);
+    }    
 
     int num_bytes = write(sockfd, data.c_str(), data.size());
     if (num_bytes < 0) {
         std::cerr << "write error: " << strerror(errno) << "\n";
     }
+    std::cout << "wrote " << num_bytes << " bytes\n";
     
     close(sockfd);
 }

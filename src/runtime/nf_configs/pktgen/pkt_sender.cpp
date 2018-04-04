@@ -26,7 +26,10 @@ int main(int argc, char *argv[])
 	servaddr.sin_port = htons(std::stoi(argv[2]));
 	inet_pton(AF_INET, argv[1], &(servaddr.sin_addr));
 	
-	connect(sockfd, (struct sockaddr*)&servaddr, sizeof(servaddr));    
+	if (connect(sockfd, (struct sockaddr*)&servaddr, sizeof(servaddr)) < 0) {
+		std::cerr << "connect error: " << strerror(errno) << std::endl;
+		return -1;
+	}    
 	
 	std::string data = "hi this is akash\n";
 

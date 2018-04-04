@@ -15,7 +15,10 @@ int main()
 	servaddr.sin_addr.s_addr = htons(INADDR_ANY);
 	servaddr.sin_port = htons(800);
 	
-	bind(listen_fd, (struct sockaddr*)&servaddr, sizeof(servaddr));
+	if (bind(listen_fd, (struct sockaddr*)&servaddr, sizeof(servaddr)) < 0) {
+		std::cerr << "bind error: " << strerror(errno) << std::endl;
+		return -1;
+	}
 	listen(listen_fd, 10);
 	
 	while (true) {
@@ -30,7 +33,8 @@ int main()
 			std::cerr << "read error: " << strerror(errno) << std::endl;
 			return -1;
 		}
-		buf[1023] = 0;
+		std::cout << "read " << n << " bytes\n";
+		buf[n] = 0;
 
 		std::cout << buf << "\n";
 		close(comm_fd);
