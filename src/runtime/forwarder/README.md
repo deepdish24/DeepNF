@@ -14,7 +14,7 @@ To run forwarder:
     1. Prepare a input.txt file that lists mappings from the real port
        number of a container to its virtual IP and portno. Each listing
        should be in the format:
-            [real portno];[virtual IP]:[virtual porno]
+            [real portno];[virtual IP]:[virtual portno]
        Refer to sample_input.txt for an example.
 
     2. Compile forwarder
