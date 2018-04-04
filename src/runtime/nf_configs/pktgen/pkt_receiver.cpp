@@ -5,6 +5,8 @@
 #include <string>
 #include <iostream>
 
+#include "packet.h"
+
 int main()
 {
 	int listen_fd = socket(PF_INET, SOCK_STREAM, 0);
@@ -27,6 +29,7 @@ int main()
 		int comm_fd = accept(listen_fd, (struct sockaddr*)&clientaddr, &clientaddrlen);    
 		printf("Connection from %s\n", inet_ntoa(clientaddr.sin_addr));
 
+
 		char buf[1024];
 		int n = read(comm_fd, buf, 1023);
 		if (n < 0) {
@@ -35,8 +38,12 @@ int main()
 		}
 		std::cout << "read " << n << " bytes\n";
 		buf[n] = 0;
-
-		std::cout << buf << "\n";
+		u_char *pkt_char = (u_char*)malloc(n);
+		memcpy(pkt_char, (void *)buf, n);
+		struct packet p(pkt_char, n);
+		p.print_info();
+		free(pkt_char);
+		
 		close(comm_fd);
 	}
 

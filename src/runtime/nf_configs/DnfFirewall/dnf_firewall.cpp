@@ -31,11 +31,16 @@
 // pcap_t* src_dev_handle;
 // pcap_t* dst_dev_handle;
 
-std::string read(int sockfd);
+struct data {
+    int size;
+    char *buffer;
+};
+
+struct data* read(int sockfd);
 
 void process();
 
-void write(std::string data, std::string ip, int port);
+void write(struct data *d, std::string ip, int port);
 
 int main(int argc,char **argv)
 {   
@@ -57,12 +62,11 @@ int main(int argc,char **argv)
     
     while (true) {
 
-        std::string data = read(listen_fd);
-
+        struct data *d = read(listen_fd);
         // TODO: process packet
 
         // forward packet 
-        write(data, argv[1], std::stoi(argv[2]));
+        write(d, argv[1], std::stoi(argv[2]));
 
         // std::cout << buf << "\n";
         // close(comm_fd);
@@ -92,26 +96,28 @@ int main(int argc,char **argv)
 }
 
 
-std::string read(int sockfd)
+struct data* read(int sockfd)
 {
    struct sockaddr_in clientaddr;
    socklen_t clientaddrlen = sizeof(clientaddr);
    int comm_fd = accept(sockfd, (struct sockaddr*)&clientaddr, &clientaddrlen);    
 
-   char buf[1024];
+   char *buf = (char*)malloc(1024);
    int n = read(comm_fd, buf, 1023);
    if (n < 0) {
     std::cerr << "read error: " << strerror(errno) << std::endl;
    }
    std::cout << "read " << n << " bytes\n";
    buf[n] = 0;
-
+   struct data *d = new struct data();
+   d->size = n;
+   d->buffer = buf;
    close(comm_fd);
 
-   return std::string(buf);
+   return d;
 }
 
-void write(std::string data, std::string ip, int port)
+void write(struct data *d, std::string ip, int port)
 {
     int sockfd = socket(PF_INET, SOCK_STREAM, 0);  
     if (sockfd < 0) {
@@ -130,12 +136,13 @@ void write(std::string data, std::string ip, int port)
         exit(-1);
     }    
 
-    int num_bytes = write(sockfd, data.c_str(), data.size());
-    if (num_bytes < 0) {
+    int num_bytes = write(sockfd, d->buffer, d->size);
+    if (num_bytes <= 0) {
         std::cerr << "write error: " << strerror(errno) << "\n";
     }
     std::cout << "wrote " << num_bytes << " bytes\n";
-    
+    free(d->buffer);
+    delete d;
     close(sockfd);
 }
 
