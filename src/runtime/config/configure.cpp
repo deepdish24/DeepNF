@@ -109,13 +109,16 @@ bool is_source_node(RuntimeNode* n, std::vector<RuntimeNode*> nodes) {
  */
 void setup_nodes(MachineConfigurator conf) {
 
+	std::string to_root = "../../../";
+	std::string path_to_merger_dockerfile = "src/runtime/merger/Dockerfile";
+	std::string merger_config_dir = "";
 	std::vector<RuntimeNode*> nodes = get_internal_nodes(conf);
 
 	// create new containers for classifier and merger
-	system("docker run -d -t -i --name classifier ubuntu /bin/bash");
-	system("docker run -d -t -i --name merger ubuntu /bin/bash");	
+	//system("docker run -d -t -i --name classifier ubuntu /bin/bash");
+	//system("docker run -d -t -i --name merger ubuntu /bin/bash");	
 	
-	for (RuntimeNode* n : nodes) {
+	/*for (RuntimeNode* n : nodes) {
 		int node_id = n->get_id();
 		NF node_nf = n->get_nf();
 
@@ -139,7 +142,7 @@ void setup_nodes(MachineConfigurator conf) {
 
 		// create a new Docker container for the node
 		system(("docker run -d -t -i --name " + n->get_name() + " " + image_name + ":latest /bin/bash").c_str());
-	}
+	}*/
 }
 
 std::unordered_map<int, int> setup_bridge_ports(MachineConfigurator &conf) {
@@ -341,10 +344,11 @@ int main(int argc, char *argv[]) {
 		reset(conf);
 	} else {
 		// making a dummy service graph
-		setup_nodes(conf);
+        std::cout << "graph here!" << std::endl;
+		/*setup_nodes(conf);
 		std::unordered_map<int, int> leaf_to_eth = setup_bridge_ports(conf);
 		make_flow_rules(conf, leaf_to_eth);
-		start_network_functions(conf);
+		start_network_functions(conf);*/
 	}
 
 	return 0;

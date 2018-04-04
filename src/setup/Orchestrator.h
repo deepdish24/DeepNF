@@ -84,8 +84,7 @@ private:
     void findAllLeaves(ServiceGraphNode* root, std::set<ServiceGraphNode*> &leaves);
     void write_json_dictionary(std::unordered_map<std::string, int> func_to_inx);
     void round_robin_partitioning(std::vector<std::string> &ips, std::vector<std::string> &functions);
-    void single_node_partitioning(std::vector<std::string> &ips, 
-    std::vector<std::string> &functions);
+    void single_node_partitioning(std::vector<std::string> &ips, std::vector<std::string> &functions);
     std::string fieldToString(Field a);
     NF stringToNF(std::string function);
 
