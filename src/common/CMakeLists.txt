@@ -23,9 +23,6 @@ set(PROTOCOL_BUFFERS
      )
 set_source_files_properties(${PROTOCOL_BUFFERS} PROPERTIES GENERATED TRUE)
 
-
-add_subdirectory(sgu_test)
-
 add_library(common ${SOURCE_FILES} ${HEADERS} ${PROTOCOL_BUFFERS})
 
 set_source_files_properties(${PROTOCOL_BUFFERS} PROPERTIES GENERATED TRUE)

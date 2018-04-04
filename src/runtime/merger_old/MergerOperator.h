@@ -32,7 +32,7 @@ class MergerOperator {
     public:
         MergerOperator();
 
-        // runs the merger
+        // runs the merger_old
         void run();
         void process_packet(u_char *arg, const struct pcap_pkthdr* pkthdr, const u_char* packet);
 

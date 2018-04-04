@@ -12,6 +12,7 @@
 #include "packet.h"
 #include "pcap.h"
 #include "RuntimeNode.h"
+#include "MergerOperator.h"
 
 int main(int argc,char **argv)
 {

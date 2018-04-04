@@ -143,13 +143,13 @@ void setup_nodes(MachineConfigurator conf) {
     // All config directories will be stored at root of project
 
 	std::string to_root = "../../../";
-	std::string path_to_merger_dockerfile = "src/runtime/merger/Dockerfile";
+	std::string path_to_merger_dockerfile = "src/runtime/merger_old/Dockerfile";
 	std::string merger_config_dir = to_root + "merger_config";
 
     make_config_dir(merger_config_dir);
     copy_dockerfile(to_root + path_to_merger_dockerfile, merger_config_dir);
     build_docker_image("merger_image", merger_config_dir);
-    start_docker_container("merger", "merger_image");
+    start_docker_container("merger_old", "merger_image");
 
 
     // list of nodes on this machine
@@ -157,9 +157,9 @@ void setup_nodes(MachineConfigurator conf) {
 
 
 
-	// create new containers for classifier and merger
+	// create new containers for classifier and merger_old
 	//system("docker run -d -t -i --name classifier ubuntu /bin/bash");
-	//system("docker run -d -t -i --name merger ubuntu /bin/bash");	
+	//system("docker run -d -t -i --name merger_old ubuntu /bin/bash");
 	
 	/*for (RuntimeNode* n : nodes) {
 		int node_id = n->get_id();
@@ -207,7 +207,7 @@ std::unordered_map<int, int> setup_bridge_ports(MachineConfigurator &conf) {
 
 	// connect containers to the bridge
 	// std::string add_port_classifier = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br eth1 classifier";
-	//std::string add_port_merger = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br eth1 merger";
+	//std::string add_port_merger = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br eth1 merger_old";
 	//system(add_port_classifier.c_str());
 	//system(add_port_merger.c_str());
 
@@ -222,7 +222,7 @@ std::unordered_map<int, int> setup_bridge_ports(MachineConfigurator &conf) {
 	for (RuntimeNode* n : nodes) {
 		if (n->get_neighbors().size() == 0) {
 			std::string command = add_port_merger + std::to_string(eth_inx) + " --ipaddress=" + 
-				ip_assign + std::to_string(ip_inx) + " " + "merger";
+				ip_assign + std::to_string(ip_inx) + " " + "merger_old";
 			std::cout << "command: " << command << std::endl;
 			nodeid_to_eth[n->get_id()] = eth_inx;
 			j["eth" + std::to_string(eth_inx)] = n->get_name();
@@ -286,7 +286,7 @@ void make_flow_rules(MachineConfigurator conf, std::unordered_map<int,int> leaf_
 			// system((add_flow_command + "1,actions=" + std::to_string(n.inport)).c_str());
 		}
 
-		if (n->get_neighbors().size() == 0) { // if node is a sink, flow from this node to merger
+		if (n->get_neighbors().size() == 0) { // if node is a sink, flow from this node to merger_old
 			int merger_port = leaf_to_eth[n->get_id()];
 			system((add_flow_command + std::to_string(n->outport) + ",actions=" + std::to_string(merger_port)).c_str());
 		} else { // flow from output port of this node to all its successors ports
@@ -340,10 +340,10 @@ void start_network_functions(MachineConfigurator c) {
 void reset(MachineConfigurator c) {
 	std::string del_ports_cmd = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker del-ports ovs-br ";
 
-	// clean up merger and classifier
+	// clean up merger_old and classifier
 	system((del_ports_cmd + "classifier").c_str());
-	system((del_ports_cmd + "merger").c_str());
-	system("docker stop classifier merger; docker rm classifier merger");
+	system((del_ports_cmd + "merger_old").c_str());
+	system("docker stop classifier merger_old; docker rm classifier merger_old");
 
 	std::vector<RuntimeNode*> nodes = get_internal_nodes(c);
 	for (RuntimeNode* n : nodes) {
