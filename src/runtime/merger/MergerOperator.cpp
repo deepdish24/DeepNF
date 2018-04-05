@@ -110,10 +110,10 @@ void MergerOperator::run_node_thread(int port, int node_id) {
 
 packet* MergerOperator::merge_packet(int pkt_id) {
     printf("MergerOperator::merge_packet\n");
-    if (packet_map.count(pkt_id) != num_nodes) {
+    std::map<int, packet*>* this_pkt_map = packet_map.at(pkt_id);
+    if ((int) this_pkt_map->size() != num_nodes) {
         fprintf(stderr, "Called merge_packet on an invalid pkt_id\n");
     }
-    std::map<int, packet*>* this_pkt_map = packet_map.at(pkt_id);
     std::vector<ConflictItem*> conflicts_list = merger_info->get_conflicts_list();
 
     bool was_changed = true; // has at least one merge conflict been resolved in this iteration?
