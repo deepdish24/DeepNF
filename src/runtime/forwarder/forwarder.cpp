@@ -106,36 +106,36 @@ int main(int argc, char *argv[]) {
     printf("Read %d lines\n", num_threads);
 
 
-    pthread_t threads[num_threads];
-
-    // read in input mapping port to virtual IP and port
-    rewind(fp);
-    num_threads = 0;
-    char *ptr;
-    while ((read = getline(&line, &len, fp)) != -1) {
-        auto *tp = (THREAD_PARAMS *) malloc(sizeof(THREAD_PARAMS));
-
-        // read real port
-        ptr = strtok(line, ";");
-        tp->real_port = std::stoi(ptr);
-
-        //read virtual ip
-        ptr = strtok(nullptr, ";");
-        ptr = strtok(ptr, ":");
-        char *virtual_ip = (char *) malloc(strlen(ptr));
-        strcpy(virtual_ip, ptr);
-        tp->virtual_ip = virtual_ip;
-
-        // read virtual port
-        ptr = strtok(nullptr, ":");
-        tp->virtual_port = std::stoi(ptr);
-
-        pthread_create(&threads[num_threads++], nullptr, run_thread, tp);
-    }
-
-    void *status;
-    for (int i = 0; i < num_threads; i++) {
-        pthread_join(threads[i], &status);
-    }
+//    pthread_t threads[num_threads];
+//
+//    // read in input mapping port to virtual IP and port
+//    rewind(fp);
+//    num_threads = 0;
+//    char *ptr;
+//    while ((read = getline(&line, &len, fp)) != -1) {
+//        auto *tp = (THREAD_PARAMS *) malloc(sizeof(THREAD_PARAMS));
+//
+//        // read real port
+//        ptr = strtok(line, ";");
+//        tp->real_port = std::stoi(ptr);
+//
+//        //read virtual ip
+//        ptr = strtok(nullptr, ";");
+//        ptr = strtok(ptr, ":");
+//        char *virtual_ip = (char *) malloc(strlen(ptr));
+//        strcpy(virtual_ip, ptr);
+//        tp->virtual_ip = virtual_ip;
+//
+//        // read virtual port
+//        ptr = strtok(nullptr, ":");
+//        tp->virtual_port = std::stoi(ptr);
+//
+//        pthread_create(&threads[num_threads++], nullptr, run_thread, tp);
+//    }
+//
+//    void *status;
+//    for (int i = 0; i < num_threads; i++) {
+//        pthread_join(threads[i], &status);
+//    }
 }
 #pragma clang diagnostic pop
