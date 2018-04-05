@@ -18,6 +18,9 @@
 #include <pthread.h>
 
 #include <runtime/packet.h>
+#include <runtime/socket_util.h>
+#include <runtime/address.h>
+
 #include "ActionTable.h"
 #include "MergerInfo.h"
 
