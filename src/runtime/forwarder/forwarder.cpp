@@ -5,8 +5,12 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <string>
+#include <pthread.h>
 
 
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-noreturn"
 typedef struct threadParams {
     int real_port;
     int virtual_port;
@@ -15,7 +19,7 @@ typedef struct threadParams {
 
 
 void *run_thread(void *arg) {
-    THREAD_PARAMS *tp = (THREAD_PARAMS*) arg;
+    auto *tp = (THREAD_PARAMS*) arg;
     printf("initializing thread with port: %d, ip: %s:%d\n", tp->real_port, tp->virtual_ip, tp->virtual_port);
 
     // open socket to listen for requests
@@ -41,7 +45,7 @@ void *run_thread(void *arg) {
         exit(-1);
     }
 
-    int bufsize = 65535;
+    size_t bufsize = 65535;
     char buffer[bufsize];
     listen(r_sockfd, 1000);
 
@@ -54,14 +58,14 @@ void *run_thread(void *arg) {
         memset(buffer, 0, bufsize);
         newsockfd = accept(r_sockfd, (struct sockaddr *) &cli_addr, &clilen);
         int buf_i = 0;
-        int cur_i = read(newsockfd, buffer + buf_i, bufsize - buf_i);
+        ssize_t cur_i = read(newsockfd, buffer + buf_i, bufsize - buf_i);
 
         while (cur_i > 0) {
             buf_i += cur_i;
             cur_i = read(newsockfd, buffer + buf_i, bufsize - buf_i);
         }
         close(newsockfd);
-        printf("Received message on %d: [%s] (%d bytes)\n", tp->real_port, buffer, strlen(buffer));
+        printf("Received message on %d: [%s] (%d bytes)\n", tp->real_port, buffer, (int) strlen(buffer));
 
         // open connection to virtual port/IP
         v_sockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -94,7 +98,7 @@ int main(int argc, char *argv[]) {
     int num_threads = 0;
     size_t len = 2048;
     ssize_t read;
-    char *line = NULL;
+    char *line = nullptr;
     while ((read = getline(&line, &len, fp)) != -1) {
         num_threads++;
     }
@@ -109,24 +113,24 @@ int main(int argc, char *argv[]) {
     num_threads = 0;
     char *ptr;
     while ((read = getline(&line, &len, fp)) != -1) {
-        THREAD_PARAMS *tp = (THREAD_PARAMS *) malloc(sizeof(THREAD_PARAMS));
+        auto *tp = (THREAD_PARAMS *) malloc(sizeof(THREAD_PARAMS));
 
         // read real port
         ptr = strtok(line, ";");
         tp->real_port = std::stoi(ptr);
 
         //read virtual ip
-        ptr = strtok(NULL, ";");
+        ptr = strtok(nullptr, ";");
         ptr = strtok(ptr, ":");
         char *virtual_ip = (char *) malloc(strlen(ptr));
         strcpy(virtual_ip, ptr);
         tp->virtual_ip = virtual_ip;
 
         // read virtual port
-        ptr = strtok(NULL, ":");
+        ptr = strtok(nullptr, ":");
         tp->virtual_port = std::stoi(ptr);
 
-        pthread_create(&threads[num_threads++], NULL, run_thread, tp);
+        pthread_create(&threads[num_threads++], nullptr, run_thread, tp);
     }
 
     void *status;
@@ -134,3 +138,4 @@ int main(int argc, char *argv[]) {
         pthread_join(threads[i], &status);
     }
 }
+#pragma clang diagnostic pop
