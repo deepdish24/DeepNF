@@ -6,9 +6,11 @@ set(SOURCE_FILES
     configure.cpp
 )
 
-#set(HEADERS
-    # add headers files here eventually
-    #       ../merger_old/MergerOperator.cpp ../merger_old/MergerOperator.h ../merger_old/ActionTableHelper.cpp ../merger_old/ActionTableHelper.h)
+
+set(HEADERS
+    configure.cpp
+)
+
 
 add_executable(configure ${SOURCE_FILES} ${HEADERS})
 target_link_libraries(configure common merger_lib)
