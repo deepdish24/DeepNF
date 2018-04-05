@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
         char* addr_str = (char*) malloc(strlen(ip)+strlen(argv[2])+2);
         strcpy(addr_str, ip);
         strcat(addr_str, ":");
-        strcat(addr_str, argv[2]);
+        strcat(addr_str, argv[3]);
         printf("Address to send to: %s\n", addr_str);
         address* addr = address_from_string(addr_str);
 
