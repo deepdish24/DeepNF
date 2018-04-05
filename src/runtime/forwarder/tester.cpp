@@ -49,6 +49,7 @@ int main(int argc, char *argv[]) {
 
     // argc[1] == "1" is a receiver
     else if (strcmp(argv[1], "1")) {
+        printf("Opening receiver to listening on port %d\n", portno);
 
         // opens a datagram socket and returns the fd or -1 */
         int sockfd = open_socket();
@@ -56,11 +57,14 @@ int main(int argc, char *argv[]) {
             fprintf(stderr, "Cannot open socket: %s", strerror(errno));
             exit(-1);
         }
+        printf("opened socket\n");
 
         // binds socket with given fd to given port */
         bind_socket(sockfd, portno);
+        printf("binded socket\n");
 
         while (true) {
+            printf("listening for data...\n")
             sockdata *pkt_data = receive_data(sockfd);
 
             printf("Echo: [%s] (%d bytes)\n", pkt_data->buffer, pkt_data->size);

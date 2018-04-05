@@ -9,6 +9,11 @@ receiver in receiver.cpp to be used for testing purposes; it just
 listens on a port number indicated by the first argument and prints
 all received messages.
 
+To run tester:
+    1. Compile tester
+        => mkdir build; cd build; 
+        => cmake ../; make google_protobuf; make
+
 To run forwarder:
 
     1. Prepare a input.txt file that lists mappings from the real port
