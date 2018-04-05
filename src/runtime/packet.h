@@ -1,9 +1,14 @@
-#pragma once
+#ifndef __FAVOR_BSD
+#define __FAVOR_BSD
+#endif
+// #pragma once
 
 #include <net/ethernet.h>
 #include <netinet/tcp.h>   //Provides declarations for tcp header
 #include <netinet/ip.h>    //Provides declarations for ip header
 #include <string>
+
+#include "address.h"
 
 struct packet
 {
