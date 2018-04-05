@@ -20,15 +20,21 @@ MergerOperator::MergerOperator() {
 }
 
 
-void MergerOperator::run_node_thread() {
-    printf("run_node_thread\n");
-//    printf("initializing thread with port: %d, node_id: %d\n", tp->port, tp->node_id);
+    /**
+     * Listens on the given port for packets from the given runtime_id, merging as necessary
+     *
+     * @param port          The port to listen for packets from runtime_id
+     * @param node_id    The id of the runtime node leaf
+     */
+void run_node_thread(int port, int node_id) {
+    printf("initializing thread with port: %d, node_id: %d\n", port, node_id);
 }
+
 
 void* MergerOperator::run_node_thread_wrapper(void *arg) {
     auto *tp = (THREAD_PARAMS*) arg;
     MergerOperator *this_mo = tp->inst;
-    this_mo->run_node_thread();
+    this_mo->run_node_thread(tp->port, tp->node_id);
 
     return nullptr;
 }

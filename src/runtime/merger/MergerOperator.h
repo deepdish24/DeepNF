@@ -31,7 +31,13 @@ public:
      */
     void run();
 
-    void run_node_thread();
+    /**
+     * Listens on the given port for packets from the given runtime_id, merging as necessary
+     *
+     * @param port          The port to listen for packets from runtime_id
+     * @param node_id    The id of the runtime node leaf
+     */
+    void run_node_thread(int port, int node_id);
     static void* run_node_thread_wrapper(void *arg);
 
 private:
