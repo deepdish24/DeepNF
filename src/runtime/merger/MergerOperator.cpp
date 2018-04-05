@@ -5,6 +5,7 @@
 #include "MergerOperator.h"
 
 typedef struct threadParams {
+    MergerOperator* inst; // the MergerOperator instance to operate on
     int port; // port that the leaf node will send packets to
     int node_id; // the id of the runtime node for this thread
 } THREAD_PARAMS;
@@ -19,12 +20,15 @@ MergerOperator::MergerOperator() {
 }
 
 
-void *run_node_thread(void *arg) {
+void run_node_thread(void *arg) {
     auto *tp = (THREAD_PARAMS*) arg;
-    printf("initializing thread with port: %d, node_id: %s\n", tp->port, tp->node_id);
-
+    printf("initializing thread with port: %d, node_id: %d\n", tp->port, tp->node_id);
 }
 
+static void* run_node_thread_wrapper(void *arg) {
+    auto *tp = (THREAD_PARAMS*) arg;
+    tp->inst->run_node_thread(arg);
+}
 
 /**
  * Setup MergerOperator to start listening and merging packets
@@ -39,9 +43,10 @@ void MergerOperator::run() {
     int thread_i = 0;
     for (std::map<int, int>::iterator it = port_to_node_map.begin(); it != port_to_node_map.end(); ++it) {
         THREAD_PARAMS* tp = (THREAD_PARAMS*) malloc(sizeof(THREAD_PARAMS));
+        tp->inst = this;
         tp->port = it->first;
         tp->node_id = it->second;
-        pthread_create(&threads[thread_i++], NULL, run_node_thread, tp);
+        pthread_create(&threads[thread_i++], NULL, run_node_thread_wrapper, tp);
     }
 
 }

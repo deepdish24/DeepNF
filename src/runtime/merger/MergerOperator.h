@@ -31,6 +31,8 @@ public:
      */
     void run();
 
+    void run_node_thread(void *arg);
+
 private:
 
     // contains information about virtual network interfaces, conflicting NF pairs, etc.
@@ -39,7 +41,7 @@ private:
     // contains information about the NF action table
     ActionTable* action_table;
 
-    void *run_node_thread(void *arg);
+    static void* run_node_thread_wrapper(void *arg);
 };
 
 
