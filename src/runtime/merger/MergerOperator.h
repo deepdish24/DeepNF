@@ -55,6 +55,13 @@ private:
     /* for each packet id, map each runtime node id to the body of the packet is received with that packet id
         (if such a packet has been received) */
     std::map<int, std::map<int, packet*>*> packet_map;
+    pthread_mutex_t packet_map_mutex;
+
+
+    /**
+     * Helper function that prints the contents of packet_map to stdout
+     */
+    void print_packet_map();
 };
 
 

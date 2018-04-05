@@ -16,9 +16,11 @@ typedef struct threadParams {
 MergerOperator::MergerOperator() {
     printf("MergerOperator::MergerOperator \n");
 
-    // set up action table
     this->action_table = new ActionTable();
     this->merger_info = MergerInfo::get_dummy_merger_info();
+
+    // set up mutexes
+    packet_map_mutex = PTHREAD_MUTEX_INITIALIZER;
 }
 
 
@@ -40,10 +42,6 @@ void* MergerOperator::run_node_thread_wrapper(void *arg) {
 void MergerOperator::run_node_thread(int port, int node_id) {
     printf("Calling run_node_thread with port: %d, node_id: %d\n", port, node_id);
 
-//    // open a port and start listening for packets
-//    int portno = std::stoi(argv[2]);
-//    printf("Opening receiver to listening on port %d\n", portno);
-
     // opens a datagram socket and returns the fd or -1 */
     int sockfd = open_socket();
     if (sockfd < 0) {
@@ -58,6 +56,7 @@ void MergerOperator::run_node_thread(int port, int node_id) {
 
     std::map<int, packet *>* this_node_map;
     while (true) {
+        // listen for packets
         printf("\nlistening for data...\n");
         sockdata *pkt_data = receive_data(sockfd);
         packet* p = packet_from_data(pkt_data);
@@ -65,7 +64,7 @@ void MergerOperator::run_node_thread(int port, int node_id) {
         printf("Echo: [%s] (%d bytes)\n", p->data, p->data_size);
 
         // add packet to packet_map
-
+        pthread_mutex_lock(&packet_map_mutex);
         if (packet_map.count(p->ip_header->ip_id) == 0) {
             std::map<int, packet *>* new_node_map = new std::map<int, packet *>();
             packet_map.insert(std::make_pair(p->ip_header->ip_id, new_node_map));
@@ -74,20 +73,10 @@ void MergerOperator::run_node_thread(int port, int node_id) {
         this_node_map->insert(std::make_pair(node_id, p));
         printf("Printing this_node_map\n");
 
-        for (auto it2 = this_node_map->begin(); it2 != this_node_map->end(); ++it2) {
-            printf("%d: %s, ", it2->first, it2->second->data);
-        }
-        printf("\n");
         packet_map.insert(std::make_pair(p->ip_header->ip_id, this_node_map));
+        pthread_mutex_unlock(&packet_map_mutex);
 
-        for (auto it = packet_map.begin(); it != packet_map.end(); ++it) {
-            printf("id: %d -> {", it->first);
-            std::map<int, packet*>* this_node_map2 = it->second;
-            for (auto it2 = this_node_map2->begin(); it2 != this_node_map2->end(); ++it2) {
-                printf("%d: %s, ", it2->first, it2->second->data);
-            }
-            printf("}\n");
-        }
+        print_packet_map();
     }
 }
 
@@ -114,6 +103,20 @@ void MergerOperator::run() {
     void *status;
     for (size_t i = 0; i < port_to_node_map.size(); i++) {
         pthread_join(threads[i], &status);
+    }
+}
+
+/**
+ * Helper function that prints the contents of packet_map to stdout
+ */
+void MergerOperator::print_packet_map() {
+    for (auto it = packet_map.begin(); it != packet_map.end(); ++it) {
+        printf("id: %d -> {", it->first);
+        std::map<int, packet*>* this_node_map2 = it->second;
+        for (auto it2 = this_node_map2->begin(); it2 != this_node_map2->end(); ++it2) {
+            printf("%d: %s, ", it2->first, it2->second->data);
+        }
+        printf("}\n");
     }
 }
 #pragma clang diagnostic pop
