@@ -37,7 +37,7 @@ packet::packet(std::string sip, int sp, std::string dip, int dp, unsigned int id
 	tcp_header->dest = htons(dp);
 	
 	this->data = (u_char *)data.c_str();
-	std::cout << this->data << "\n";
+	std::cout << "[" << this->data << "]\n";
 	data_size = data.size();
 	size = sizeof(struct ether_header) + sizeof(struct ip) + sizeof(struct tcphdr) + data_size;
 	ip_header->ip_len = htons(size);
