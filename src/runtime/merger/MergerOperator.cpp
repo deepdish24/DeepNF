@@ -29,6 +29,8 @@ void* MergerOperator::run_node_thread_wrapper(void *arg) {
     auto *tp = (THREAD_PARAMS*) arg;
     MergerOperator *this_mo = tp->inst;
     this_mo->run_node_thread();
+
+    return nullptr;
 }
 
 /**
@@ -42,12 +44,12 @@ void MergerOperator::run() {
 
     pthread_t threads[port_to_node_map.size()];
     int thread_i = 0;
-    for (std::map<int, int>::iterator it = port_to_node_map.begin(); it != port_to_node_map.end(); ++it) {
-        THREAD_PARAMS* tp = (THREAD_PARAMS*) malloc(sizeof(THREAD_PARAMS));
+    for (auto it = port_to_node_map.begin(); it != port_to_node_map.end(); ++it) {
+        auto * tp = (THREAD_PARAMS*) malloc(sizeof(THREAD_PARAMS));
         tp->inst = this;
         tp->port = it->first;
         tp->node_id = it->second;
-        pthread_create(&threads[thread_i++], NULL, MergerOperator::run_node_thread_wrapper, tp);
+        pthread_create(&threads[thread_i++], nullptr, MergerOperator::run_node_thread_wrapper, tp);
     }
 
 }

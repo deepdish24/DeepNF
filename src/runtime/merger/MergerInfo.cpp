@@ -33,6 +33,9 @@ std::map<int, RuntimeNode*> MergerInfo::get_node_map() {
  */
 MergerInfo* MergerInfo::get_dummy_merger_info() {
     std::map<int, int> port_to_node_map;
+    port_to_node_map.insert(std::make_pair(8000, 0));
+    port_to_node_map.insert(std::make_pair(8001, 1));
+
     std::vector<ConflictItem*> conflicts_list;
     std::map<int, RuntimeNode*> node_map;
 
