@@ -26,8 +26,9 @@ Orchestrator::Orchestrator(std::string filepath, std::string action_file_path) {
 
     std::vector<std::string> functions = userInput["functions"];
     std::vector<std::string> ips_tmp = userInput["ips"];
+    std::vector<int> ports_tmp = userInput["ports"];
     ips = ips_tmp;
-    std::vector<int> ports = userInput["ports"];
+    ports = ports_tmp;
 
     /* setting up sockaddr data structures to connect 
      to ip + port of all available machines */
@@ -456,12 +457,13 @@ void Orchestrator::setup_containers() {
     std::cout << "proceeding to setup containers" << std::endl;
     for (int i = 0; i < (int) ips.size(); i++) {
         std::cout << "current ip: " << ips[i] << std::endl;
+        std::cout << "current port: " << ports[i] << std::endl;
         struct sockaddr_in servaddr;
         int sockfd = socket(AF_INET, SOCK_STREAM, 0);
         bzero(&servaddr, sizeof(servaddr));
 
         servaddr.sin_family = AF_INET;
-        servaddr.sin_port = htons(10000);
+        servaddr.sin_port = htons(ports[i]);
 
         inet_pton(AF_INET, ips[i].c_str(), &(servaddr.sin_addr));
         connect(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr));
@@ -482,8 +484,11 @@ void Orchestrator::setup_containers() {
         std::string ack = "ACK";
         bzero(recvline, 100);
         while (true) {
+            std::cout << "writing serialized data" << std::endl;
             write(sockfd, conf_str, sizeof(conf_str));
+            std::cout << "proceeding to read from connection" << std::endl;
             read(sockfd, recvline, 100);
+            std::cout << "RECEIVED: " << recvline << std::endl;
             if (strcmp(recvline, ack.c_str()) == 0) {
                 break;
             }

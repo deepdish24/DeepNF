@@ -5,6 +5,19 @@ Distributed NFV scheduling framework for senior design
 1. Install nlohmann's json library:
     => brew tap nlohmann/json; brew install nlohmann_json
 
+### Setting up instance
+1. Install cmake:
+    => wget https://cmake.org/files/v3.11/cmake-3.11.0.tar.gz
+    => tar xvf cmake-3.11.0.tar.gz
+    => cd cmake-3.11.0.tar.gz && ./bootstrap && make && sudo make install
+    => $PATH=$PATH:/usr/local/bin/cmake (if cmake is not recognized by bash)
+2. Install nolohmann/json
+    => sudo apt install linuxbrew-wrapper
+    => brew tap nlohmann/json
+    => brew install nlohmann_json
+    => include the following line in CMakeLists.txt (in modules that use json library)
+        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I/home/ubuntu/.linuxbrew/Cellar/nlohmann_json/3.1.2/include")
+
 ### Building
 1. Create build directory:
     => mkdir build && cd build

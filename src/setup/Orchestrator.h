@@ -65,6 +65,7 @@ private:
     std::unordered_map<std::string, ServiceGraphNode*> func_to_nodes = {};
     std::unordered_map<std::string, std::string> ip_to_mc = {};
     std::vector<std::string> ips;
+    std::vector<int> ports;
 
     // map if pair of functions (a, b) -> conflicts between a and b
     std::unordered_map<std::string, std::unordered_map<std::string, std::vector<Field>>> pair_to_conflicts = {};
