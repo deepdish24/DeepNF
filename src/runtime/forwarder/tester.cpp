@@ -48,6 +48,7 @@ int main(int argc, char *argv[]) {
             exit(-1);
         }
         printf("Sent packet\n");
+        delete p;
     }
 
     // argc[1] == "1" is a receiver
@@ -70,8 +71,10 @@ int main(int argc, char *argv[]) {
         while (true) {
             printf("listening for data...\n");
             sockdata *pkt_data = receive_data(sockfd);
+            packet* p = packet_from_data(pkt_data);
 
-            printf("Echo: [%s] (%d bytes)\n", pkt_data->buffer, pkt_data->size);
+            printf("Echo: [%s] (%d bytes)\n", p->data, p->data_size);
+            delete p;
             delete pkt_data;
         }
     }
