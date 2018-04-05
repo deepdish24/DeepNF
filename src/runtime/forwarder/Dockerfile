@@ -1,0 +1,16 @@
+FROM ubuntu:latest
+
+MAINTAINER Victoria Xiao
+
+RUN apt-get update -y && \
+    apt-get upgrade -y && \
+    apt-get install -y g++ libpcap-dev && \
+    apt-get install build-essential && \
+    wget https://cmake.org/files/v3.11/cmake-3.11.0.tar.gz && \
+    tar xvf cmake-3.11.0.tar.gz && \
+    cd cmake-3.11.0 && ./bootstrap && make && sudo make install
+
+ADD . DeepNF
+
+RUN cd DeepNf && mkdir build && cd build && \
+    cmake ../ && make google_protobuf && make
