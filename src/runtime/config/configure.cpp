@@ -141,9 +141,8 @@ void start_docker_container(std::string container_name, std::string image_name) 
 void setup_nodes(MachineConfigurator conf) {
 
     // All config directories will be stored at root of project
-
-	std::string to_root = "../../../";
-	std::string path_to_merger_dockerfile = "src/runtime/merger/Dockerfile";
+	std::string to_root = "../../../../../";
+	std::string path_to_merger_dockerfile = "DeepNF/src/runtime/merger/Dockerfile";
 	std::string merger_config_dir = to_root + "merger_config";
 
     make_config_dir(merger_config_dir);
