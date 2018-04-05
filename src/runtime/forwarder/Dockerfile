@@ -8,7 +8,6 @@ RUN apt-get update -y && \
     apt-get install build-essential -y && apt install wget -y && \
     apt-get install git -y && \
     apt install linuxbrew-wrapper -y && \
-    brew tap nlohmann/json && brew install nlohmann_json &&\
     wget https://cmake.org/files/v3.11/cmake-3.11.0.tar.gz && \
     tar xvf cmake-3.11.0.tar.gz && \
     cd cmake-3.11.0 && ./bootstrap && make && make install

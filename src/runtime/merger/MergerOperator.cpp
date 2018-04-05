@@ -6,11 +6,11 @@
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
-typedef struct threadParams {
+typedef struct node_thread_params {
     MergerOperator* inst; // the MergerOperator instance to operate on
     int port; // port that the leaf node will send packets to
     int node_id; // the id of the runtime node for this thread
-} THREAD_PARAMS;
+} NODE_THREAD_PARAMS;
 
 
 MergerOperator::MergerOperator() {
@@ -18,6 +18,7 @@ MergerOperator::MergerOperator() {
 
     this->action_table = new ActionTable();
     this->merger_info = MergerInfo::get_dummy_merger_info();
+    this->num_nodes = this->merger_info->get_port_to_node_map().size();
 
     // set up mutexes
     packet_map_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -25,7 +26,7 @@ MergerOperator::MergerOperator() {
 
 
 void* MergerOperator::run_node_thread_wrapper(void *arg) {
-    auto *tp = (THREAD_PARAMS*) arg;
+    auto *tp = (NODE_THREAD_PARAMS*) arg;
     MergerOperator *this_mo = tp->inst;
     this_mo->run_node_thread(tp->port, tp->node_id);
 
@@ -77,7 +78,17 @@ void MergerOperator::run_node_thread(int port, int node_id) {
         pthread_mutex_unlock(&packet_map_mutex);
 
         print_packet_map();
+
+        // if all packets have been received for this packet_id, begin merging process
+        if (this_node_map->size() == num_nodes) {
+            merge_packet(p->ip_header->ip_id);
+        }
     }
+}
+
+
+packet* MergerOperator::merge_packet(int pkt_id) {
+    printf("MergerOperator::merge_packet\n");
 }
 
 
@@ -90,10 +101,10 @@ void MergerOperator::run() {
     // send up one thread to handle each leaf node
     std::map<int, int> port_to_node_map = this->merger_info->get_port_to_node_map();
 
-    pthread_t threads[port_to_node_map.size()];
+    pthread_t threads[num_nodes];
     int thread_i = 0;
     for (auto it = port_to_node_map.begin(); it != port_to_node_map.end(); ++it) {
-        auto * tp = (THREAD_PARAMS*) malloc(sizeof(THREAD_PARAMS));
+        auto * tp = (NODE_THREAD_PARAMS*) malloc(sizeof(NODE_THREAD_PARAMS));
         tp->inst = this;
         tp->port = it->first;
         tp->node_id = it->second;
@@ -101,7 +112,7 @@ void MergerOperator::run() {
     }
 
     void *status;
-    for (size_t i = 0; i < port_to_node_map.size(); i++) {
+    for (size_t i = 0; i < num_nodes; i++) {
         pthread_join(threads[i], &status);
     }
 }

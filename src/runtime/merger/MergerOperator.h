@@ -48,15 +48,25 @@ private:
 
     // contains information about virtual network interfaces, conflicting NF pairs, etc.
     MergerInfo* merger_info;
+    // the total number of leaf runtime nodes that merger should listen for
+    int num_nodes;
 
     // contains information about the NF action table
     ActionTable* action_table;
 
-    /* for each packet id, map each runtime node id to the body of the packet is received with that packet id
-        (if such a packet has been received) */
+    /* for each packet id, map each runtime node id to the body of the packet is received with that
+     * packet id (if such a packet has been received) */
     std::map<int, std::map<int, packet*>*> packet_map;
     pthread_mutex_t packet_map_mutex;
 
+    /**
+     * Retrieves all packets for the given pkt_id stored in packet_map and outputs a merged packet
+     * based on the conflict items in merger_info
+     *
+     * @param pkt_id    The id of the packet to merge
+     * @return Pointer to a packet with all changes merged
+     */
+    packet* merge_packet(int pkt_id);
 
     /**
      * Helper function that prints the contents of packet_map to stdout
