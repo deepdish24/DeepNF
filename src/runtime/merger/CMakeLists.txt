@@ -1,18 +1,22 @@
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I /usr/include/pcap -lpcap")
 
 set(SOURCE_FILES
-    merge.cpp
-)
+    merger.cpp
+    ActionTable.cpp
+    MergerInfo.cpp
+    ConflictItem.cpp
+    MergerOperator.cpp
+        )
 
 set(HEADERS
-    # add headers files here eventually
-)
+    ActionTable.h
+    MergerInfo.h
+    ConflictItem.h
+    MergerOperator.h
+        )
 
-add_executable(merge ${SOURCE_FILES} ${HEADERS})
-<<<<<<< HEAD
-=======
+add_library(merger_lib ${SOURCE_FILES} ${HEADERS})
+add_executable(merger ${SOURCE_FILES} ${HEADERS})
 
- 
->>>>>>> 8c611b2f0ed616771ecc55a0b886025b5e869727
+add_dependencies(merger common)

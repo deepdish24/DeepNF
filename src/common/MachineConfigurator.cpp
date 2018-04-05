@@ -27,9 +27,7 @@ std::string MachineConfigurator::get_config_dir(int node_id) {
 
 std::string MachineConfigurator::get_docker_image_name(int node_id, NF nf) {
 	switch(nf) {
-		case snort: return std::to_string(node_id) + "_snort";
-		break;
-		case haproxy: return std::to_string(node_id) + "_haproxy";
+		case dnf_firewall: return std::to_string(node_id) + "_dnf_firewall";
 		break;
 		default: return "";
 	}
@@ -38,9 +36,7 @@ std::string MachineConfigurator::get_docker_image_name(int node_id, NF nf) {
 std::string MachineConfigurator::get_dockerfile(NF nf) {
 	std::string path = "/home/ec2-user/DeepNF/src/runtime/nf_configs/";
 	switch(nf) {
-		case snort: path += "snort";
-		break;
-		case haproxy: path += "haproxy";
+		case dnf_firewall: path += "DnfFirewall";
 		break;
 		default: return "";
 	}

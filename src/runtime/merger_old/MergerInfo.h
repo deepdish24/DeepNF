@@ -5,18 +5,21 @@
 #ifndef DEEPNF_MERGERINFO_H
 #define DEEPNF_MERGERINFO_H
 
+#include "RuntimeNode.h"
+#include "ConflictItem.h"
+
 #include <map>
 #include <vector>
 
-#include "../../common/RuntimeNode.h"
+#include "RuntimeNode.h"
 #include "ConflictItem.h"
 
 class MergerInfo {
 
 
     private:
-        // maps each port to its corresponding runtime node id
-        std::map<std::string, int> port_to_node_map;
+        // maps each network interface name to its corresponding runtime node
+        std::map<std::string, RuntimeNode*> interface_leaf_map;
 
         // list of conflicting NFs
         std::vector<ConflictItem*> conflicts_list;
@@ -25,21 +28,20 @@ class MergerInfo {
         std::map<int, RuntimeNode*> node_map;
 
     public:
-        MergerInfo(std::map<std::string, int> port_to_node_map,
+        MergerInfo(std::map<std::string, RuntimeNode*> interface_leaf_map,
                    std::vector<ConflictItem*> conflicts_list,
                    std::map<int, RuntimeNode*> node_map);
 
-        std::map<std::string, int> get_port_to_node_map();
+        std::map<std::string, RuntimeNode*> get_interface_leaf_map();
 
         std::vector<ConflictItem*> get_conflicts_list();
 
         std::map<int, RuntimeNode*> get_node_map();
 
         /**
-         *
-         * @return A pointer to a MergerInfo object with dummy data for testing purposes
+         * @return A deep copy of conflicts_list
          */
-        static MergerInfo* get_dummy_merger_info();
+        std::vector<ConflictItem*> copy_conflicts_list();
 
 };
 

@@ -1,14 +1,14 @@
-#######################################################
+###############################################################
 
-SETTING UP AND RUNNING MERGER
+INSTRUCTIONS FOR RUNNING MERGER
 
-#######################################################
+###############################################################
 
-1. Setup docker container (from AWS instance, in /merger folder)
-    => docker build -t=merger .
-    => docker run -d -t -i --name merger merger:latest /bin/bash
-    => docker exec -t -i merger /bin/bash
-    => bash build.sh; ./merge
 
-2. To copy files from AWS instance to container
-    => docker cp . merger:/
+1. To compile merger, run the following commands from the root DeepNF folder:
+    => mkdir build; cd build; 
+    => cmake ../; make google_protobuf; make
+
+2. To start running merger, run the following commands from the /build folder:
+    => ./src/runtime/merger/merger
+

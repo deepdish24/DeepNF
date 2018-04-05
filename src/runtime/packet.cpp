@@ -2,6 +2,7 @@
 #include <cstring>
 #include <iostream>
 #include <netinet/in.h>
+#include <arpa/inet.h>
 
 #include "packet.h"
 
@@ -23,33 +24,36 @@ packet::packet(const u_char *pkt, int pkt_size)
 packet::packet(std::string sip, int sp, std::string dip, int dp, unsigned int id, std::string data)
 {
 	ethernet_header = new struct ether_header();
-	// memset(&(ethernet_header), 0, sizeof(struct ether_header));
 	ethernet_header->ether_type = htons(ETHERTYPE_IP);
 
 	ip_header = new struct ip();
-	// memset(&(ip_header), 0, sizeof(struct ip));
 	ip_header->ip_p = IPPROTO_TCP;
 	inet_pton(AF_INET, sip.c_str(), &(ip_header->ip_src));
 	inet_pton(AF_INET, dip.c_str(), &(ip_header->ip_dst));
 	ip_header->ip_id = htons(id);
 
 	tcp_header = new struct tcphdr();
-	// memset(&(tcp_header), 0, sizeof(struct tcphdr));
 	tcp_header->source = htons(sp);
 	tcp_header->dest = htons(dp);
 	
 	this->data = (u_char *)data.c_str();
-	std::cout << this->data << "\n";
+	std::cout << "[" << this->data << "]\n";
 	data_size = data.size();
 	size = sizeof(struct ether_header) + sizeof(struct ip) + sizeof(struct tcphdr) + data_size;
 	ip_header->ip_len = htons(size);
-	// std::cout << ntohs(ip_header->ip_len) << "\n";
+	
 	u_char *pkt_char = (u_char*)malloc(size);
 	memcpy(pkt_char, (void *)ethernet_header, sizeof(struct ether_header));
 	memcpy(pkt_char + sizeof(struct ether_header), (void *)ip_header, sizeof(struct ip));
 	memcpy(pkt_char + sizeof(struct ether_header) + sizeof(struct ip), (void *)tcp_header, sizeof(struct tcphdr));
 	memcpy(pkt_char + sizeof(struct ether_header) + sizeof(struct ip) + sizeof(struct tcphdr), (void *)this->data, data_size);
 	pkt = pkt_char;
+}
+
+packet::~packet() {
+	delete this->tcp_header;
+	delete this->ip_header;
+	delete this->ethernet_header;
 }
 
 bool packet::is_null()

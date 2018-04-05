@@ -23,6 +23,5 @@ namespace field
             case PAYLOAD:
                 return "PAYLOAD";
         }
-
     }
 }

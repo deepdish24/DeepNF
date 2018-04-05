@@ -9,7 +9,7 @@ Distributed NFV scheduling framework for senior design
 1. Install cmake:
     => wget https://cmake.org/files/v3.11/cmake-3.11.0.tar.gz
     => tar xvf cmake-3.11.0.tar.gz
-    => cd cmake-3.11.0.tar.gz && ./bootstrap && make && sudo make install
+    => cd cmake-3.11.0 && ./bootstrap && make && sudo make install
     => $PATH=$PATH:/usr/local/bin/cmake (if cmake is not recognized by bash)
 2. Install nolohmann/json
     => sudo apt install linuxbrew-wrapper
@@ -44,3 +44,15 @@ To run runtime program:
 
 To run setup program:
     ./src/setup/setup
+
+
+### Running scripts under runtime
+
+To run src/runtime/nf_configs/DnfFirewall/dnf_firewall.cpp:
+    ./fw portno destIP:port [destIP:port destIP:port ....] (example: ./fw 800 173.16.1.4:800 173.16.1.5:800)  
+
+To run src/runtime/nf_configs/pktgen/pkt_sender.cpp:
+    ./sender -n <num_packets> destIP:port [destIP:port destIP:port ....] (example: ./sender -n 100 173.16.1.3:800)
+
+To run src/runtime/nf_configs/pktgen/pkt_receiver.cpp:
+    ./receiver portno (example: ./receiver 800)

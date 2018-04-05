@@ -8,7 +8,7 @@
 #include <map>
 #include <vector>
 
-#include "../../common/Field.h"
+#include "Field.h"
 
 class ConflictItem {
 
