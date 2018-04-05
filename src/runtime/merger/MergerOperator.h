@@ -42,7 +42,9 @@ public:
      * @param node_id    The id of the runtime node leaf
      */
     void run_node_thread(int port, int node_id);
+
     static void* run_node_thread_wrapper(void *arg);
+    static void* merge_packet_wrapper(void *arg);
 
 private:
 

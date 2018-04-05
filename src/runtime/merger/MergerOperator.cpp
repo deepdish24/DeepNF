@@ -6,6 +6,7 @@
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
+
 typedef struct node_thread_params {
     MergerOperator* inst; // the MergerOperator instance to operate on
     int port; // port that the leaf node will send packets to
@@ -22,6 +23,21 @@ MergerOperator::MergerOperator() {
 
     // set up mutexes
     packet_map_mutex = PTHREAD_MUTEX_INITIALIZER;
+}
+
+
+typedef struct merge_thread_params {
+    MergerOperator* inst; // the MergerOperator instance to operate on
+    int packet_id; // the packet_id of the packets to merge
+} MERGE_THREAD_PARAMS;
+
+
+void* MergerOperator::merge_packet_wrapper(void *arg) {
+    auto *tp = (MERGE_THREAD_PARAMS*) arg;
+    MergerOperator *this_mo = tp->inst;
+    this_mo->merge_packet(tp->packet_id);
+
+    return nullptr;
 }
 
 
@@ -55,7 +71,7 @@ void MergerOperator::run_node_thread(int port, int node_id) {
     bind_socket(sockfd, port);
     printf("binded socket\n");
 
-    std::map<int, packet *>* this_node_map;
+    std::map<int, packet *>* this_pkt_map;
     while (true) {
         // listen for packets
         printf("\nlistening for data...\n");
@@ -70,18 +86,23 @@ void MergerOperator::run_node_thread(int port, int node_id) {
             std::map<int, packet *>* new_node_map = new std::map<int, packet *>();
             packet_map.insert(std::make_pair(p->ip_header->ip_id, new_node_map));
         }
-        this_node_map = packet_map.at(p->ip_header->ip_id);
-        this_node_map->insert(std::make_pair(node_id, p));
+        this_pkt_map = packet_map.at(p->ip_header->ip_id);
+        this_pkt_map->insert(std::make_pair(node_id, p));
         printf("Printing this_node_map\n");
 
-        packet_map.insert(std::make_pair(p->ip_header->ip_id, this_node_map));
+        packet_map.insert(std::make_pair(p->ip_header->ip_id, this_pkt_map));
         pthread_mutex_unlock(&packet_map_mutex);
 
         print_packet_map();
 
         // if all packets have been received for this packet_id, begin merging process
-        if ((int) this_node_map->size() == num_nodes) {
-            merge_packet(p->ip_header->ip_id);
+        if ((int) this_pkt_map->size() == num_nodes) {
+            pthread_t merge_thread;
+            auto * tp = (MERGE_THREAD_PARAMS*) malloc(sizeof(MERGE_THREAD_PARAMS));
+            tp->inst = this;
+            tp->packet_id = p->ip_header->ip_id;
+            pthread_create(&merge_thread, nullptr, MergerOperator::merge_packet_wrapper, tp);
+            pthread_detach(merge_thread);
         }
     }
 }
@@ -89,6 +110,17 @@ void MergerOperator::run_node_thread(int port, int node_id) {
 
 packet* MergerOperator::merge_packet(int pkt_id) {
     printf("MergerOperator::merge_packet\n");
+    if (packet_map.count(pkt_id) != num_nodes) {
+        fprintf(stderr, "Called merge_packet on an invalid pkt_id\n");
+    }
+    std::map<int, packet*>* this_pkt_map = packet_map.at(pkt_id);
+    std::vector<ConflictItem*> conflicts_list = merger_info->get_conflicts_list();
+
+    bool was_changed = true; // has at least one merge conflict been resolved in this iteration?
+
+    for (int i = 0; i < num_nodes; i++) {
+        printf("Iterating through conflicts list: %d\n", i);
+    }
 
     return nullptr;
 }
