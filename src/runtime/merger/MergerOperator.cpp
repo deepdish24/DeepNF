@@ -108,9 +108,19 @@ void MergerOperator::run_node_thread(int port, int node_id) {
 }
 
 
+/**
+ * Retrieves all packets for the given pkt_id stored in packet_map and outputs a merged packet
+ * based on the conflict items in merger_info
+ *
+ * @param pkt_id    The id of the packet to merge
+ * @return Pointer to a packet with all changes merged
+ */
 packet* MergerOperator::merge_packet(int pkt_id) {
     printf("MergerOperator::merge_packet\n");
     std::map<int, packet*>* this_pkt_map = packet_map.at(pkt_id);
+
+    // convert this_pkt_map to a map from node ids to packet_infos
+
     if ((int) this_pkt_map->size() != num_nodes) {
         fprintf(stderr, "Called merge_packet on an invalid pkt_id\n");
     }
@@ -123,6 +133,38 @@ packet* MergerOperator::merge_packet(int pkt_id) {
     }
 
     return nullptr;
+}
+
+
+/**
+ * Converts a map from node ids to packets to a map from node ids to equivalent packet_infos
+ * @return A map of runtime node ids to a packet_info struct equivalent to the node's
+ *         packet in packet_map
+ */
+std::map<int, packet_info*>* MergerOperator::packet_map_to_packet_info_map(std::map<int, packet*>* packet_map) {
+
+};
+
+
+/**
+ * Encapsulates the given packet into a packet_info struct
+ *
+ * @param packet    The packet to encapsulate
+ * @param node_id   The id of the runtime node that send the input packet
+ * @return Packet_info struct encapsulating the input packet instance
+ */
+MergerOperator::packet_info* MergerOperator::packet_to_packet_info(packet* packet, int node_id) {
+    auto* pi = (PACKET_INFO*) malloc(sizeof(PACKET_INFO));
+
+    if (this->merger_info->get_node_map().count(node_id) == 0) {
+        fprintf(stderr, "Called packet_to_packet_info on invalid node_id: %d", node_id);
+        exit(-1);
+    }
+    RuntimeNode* rn = this->merger_info->get_node_map().at(node_id);
+
+    pi->packet = packet;
+    pi->written_fields = this->action_table->get_write_fields(rn->get_nf());
+    return pi;
 }
 
 

@@ -48,6 +48,14 @@ public:
 
 private:
 
+    typedef struct packet_info
+    {
+        packet* packet;
+        /* list of all fields of the packet that should be considered "written to" during the merging
+         * process */
+        std::set<Field> written_fields;
+    } PACKET_INFO;
+
     // contains information about virtual network interfaces, conflicting NF pairs, etc.
     MergerInfo* merger_info;
     // the total number of leaf runtime nodes that merger should listen for
@@ -69,6 +77,23 @@ private:
      * @return Pointer to a packet with all changes merged
      */
     packet* merge_packet(int pkt_id);
+
+    /**
+     * Converts a map from node ids to packets to a map from node ids to equivalent packet_infos
+     * @return A map of runtime node ids to a packet_info struct equivalent to the node's
+     *         packet in packet_map
+     */
+    std::map<int, PACKET_INFO*>* packet_map_to_packet_info_map(std::map<int, packet*>* packet_map);
+
+
+    /**
+     * Encapsulates the given packet into a packet_info struct
+     *
+     * @param packet    The packet to encapsulate
+     * @param node_id   The id of the runtime node that send the input packet
+     * @return Packet_info struct encapsulating the input packet instance
+     */
+    PACKET_INFO* packet_to_packet_info(packet* packet, int node_id);
 
     /**
      * Helper function that prints the contents of packet_map to stdout
