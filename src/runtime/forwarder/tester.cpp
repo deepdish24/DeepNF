@@ -64,7 +64,7 @@ int main(int argc, char *argv[]) {
         printf("binded socket\n");
 
         while (true) {
-            printf("listening for data...\n")
+            printf("listening for data...\n");
             sockdata *pkt_data = receive_data(sockfd);
 
             printf("Echo: [%s] (%d bytes)\n", pkt_data->buffer, pkt_data->size);

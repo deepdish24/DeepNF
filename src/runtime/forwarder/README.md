@@ -5,7 +5,7 @@ INSTRUCTIONS FOR RUNNING FORWARDER
 ###############################################################
 
 The forwarder program is located in forwarder.cpp. There is a sample
-receiver in receiver.cpp to be used for testing purposes; it just
+program in tester.cpp to be used for testing purposes; it just
 listens on a port number indicated by the first argument and prints
 all received messages.
 
@@ -13,6 +13,9 @@ To run tester:
     1. Compile tester
         => mkdir build; cd build; 
         => cmake ../; make google_protobuf; make
+        
+    2. To run packet receiver from /build
+        => ./src/runtime/forwarder/tester 1 [port to listen from]
 
 To run forwarder:
 
