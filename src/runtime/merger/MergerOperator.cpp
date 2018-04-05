@@ -67,7 +67,7 @@ void MergerOperator::run_node_thread(int port, int node_id) {
         // add packet to packet_map
 
         if (packet_map.count(p->ip_header->ip_id) == 0) {
-            std::map<int, packet *> new_node_map;
+            std::map<int, packet *>* new_node_map = new std::map<int, packet *>();
             packet_map.insert(std::make_pair(p->ip_header->ip_id, new_node_map));
         }
         this_node_map = packet_map.at(p->ip_header->ip_id);
