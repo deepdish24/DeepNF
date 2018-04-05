@@ -8,9 +8,9 @@
 #include <pthread.h>
 
 
-
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
+
 typedef struct threadParams {
     int real_port;
     int virtual_port;
@@ -89,7 +89,7 @@ void *run_thread(void *arg) {
 
 int main(int argc, char *argv[]) {
     FILE *fp = fopen(argv[1], "r");
-    if (fp < 0) {
+    if (fp < (FILE*) 0) {
         perror("Cannot open file (%s)\n");
         exit(1);
     }

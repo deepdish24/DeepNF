@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <string>
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-noreturn"
 int main(int argc, char *argv[]) {
     // open socket
     int sockfd = socket(PF_INET, SOCK_STREAM, 0);
@@ -39,15 +41,17 @@ int main(int argc, char *argv[]) {
     while (true) {
         newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
         int buf_i = 0;
-        int cur_i = read(newsockfd, buffer + buf_i, 65535 - buf_i);
+        ssize_t cur_i = read(newsockfd, buffer + buf_i, (size_t) 65535 - buf_i);
 
         while (cur_i > 0) {
             buf_i += cur_i;
-            cur_i = read(newsockfd, buffer + buf_i, 65535 - buf_i);
+            cur_i = read(newsockfd, buffer + buf_i, (size_t) 65535 - buf_i);
         }
         close(newsockfd);
 
-        printf("Echo: [%s] (%d bytes)\n", buffer, strlen(buffer));
+        printf("Echo: [%s] (%d bytes)\n", buffer, (int) strlen(buffer));
         close(newsockfd);
     }
 }
+
+#pragma clang diagnostic pop
