@@ -32,6 +32,7 @@ public:
     void run();
 
     void run_node_thread();
+    static void* run_node_thread_wrapper(void *arg);
 
 private:
 
@@ -40,8 +41,6 @@ private:
 
     // contains information about the NF action table
     ActionTable* action_table;
-
-    static void* run_node_thread_wrapper(void *arg);
 };
 
 
