@@ -18,4 +18,4 @@ add_library(runtime ${SOURCE_FILES} ${HEADERS})
 
 add_subdirectory(merger)
 add_subdirectory(config)
-#add_subdirectory(forwarder)
+add_subdirectory(forwarder)
