@@ -9,14 +9,6 @@ program in tester.cpp to be used for testing purposes; it just
 listens on a port number indicated by the first argument and prints
 all received messages.
 
-To run tester:
-    1. Compile tester
-        => mkdir build; cd build; 
-        => cmake ../; make google_protobuf; make
-        
-    2. To run packet receiver from /build
-        => ./src/runtime/forwarder/tester 1 [port to listen from]
-
 To run forwarder:
 
     1. Prepare a input.txt file that lists mappings from the real port
@@ -38,3 +30,13 @@ To run forwarder:
        will fail.
 
 
+To run tester:
+    1. Compile tester
+        => mkdir build; cd build; 
+        => cmake ../; make google_protobuf; make
+        
+    2. To run packet receiver from /build
+        => ./src/runtime/forwarder/tester 1 [port to listen from]
+        
+    3. To run packet sender from /build
+        => ./src/runtime/forwarder/tester 0 [ip to send to] [port to send to] [msg to send]

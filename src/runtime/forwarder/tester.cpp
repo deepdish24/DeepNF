@@ -14,16 +14,16 @@
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
 int main(int argc, char *argv[]) {
-    int portno = std::stoi(argv[2]);
 
     // argc[1] == "0" is a sender
-    if (strcmp(argv[1], "0")) {
+    if (std::stoi(argv[1]) == 0) {
         int sockfd = open_socket();
         if (sockfd < 0) {
             fprintf(stderr, "Cannot open socket: %s", strerror(errno));
             exit(-1);
         }
-        char* ip = argv[3];
+        char* ip = argv[2];
+        int portno = std::stoi(argv[3]);
         char* msg = argv[4];
 
         // prepare destination address
@@ -48,7 +48,8 @@ int main(int argc, char *argv[]) {
     }
 
     // argc[1] == "1" is a receiver
-    else if (strcmp(argv[1], "1")) {
+    else if (std::stoi(argv[1]) == 1) {
+        int portno = std::stoi(argv[2]);
         printf("Opening receiver to listening on port %d\n", portno);
 
         // opens a datagram socket and returns the fd or -1 */
