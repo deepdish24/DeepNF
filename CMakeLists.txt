@@ -19,6 +19,7 @@ set_target_properties(google_protobuf PROPERTIES EXCLUDE_FROM_ALL TRUE)
 file(GLOB PROTOCOL_BUFFERS src/proto/*.proto)
 
 set(GENERATED_DIR ${CMAKE_CURRENT_BINARY_DIR}/generated)
+set(PROTO_DIR ${GENERATED_DIR}/src/proto)
 
 add_custom_target(protocol_buffers ALL SOURCES ${PROTOCOL_BUFFERS})
 add_custom_command(TARGET protocol_buffers PRE_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory ${GENERATED_DIR})

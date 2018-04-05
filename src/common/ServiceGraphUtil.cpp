@@ -1,5 +1,5 @@
 
-#include "src/proto/Machine.pb.h"
+#include "../proto/Machine.pb.h"
 #include "ServiceGraphUtil.h"
 
 using namespace google::protobuf::io;

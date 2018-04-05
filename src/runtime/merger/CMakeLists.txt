@@ -20,4 +20,3 @@ add_library(merger_lib ${SOURCE_FILES} ${HEADERS})
 add_executable(merger ${SOURCE_FILES} ${HEADERS})
 
 add_dependencies(merger common)
-

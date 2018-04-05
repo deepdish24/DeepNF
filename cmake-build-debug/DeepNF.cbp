@@ -370,10 +370,10 @@
 				</MakeCommands>
 			</Target>
 		</Build>
-		<Unit filename="//Machine.pb.cc">
+		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/generated/src/proto/Machine.pb.cc">
 			<Option target="common"/>
 		</Unit>
-		<Unit filename="//Machine.pb.h">
+		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/generated/src/proto/Machine.pb.h">
 			<Option target="common"/>
 		</Unit>
 		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/common/Field.cpp">
