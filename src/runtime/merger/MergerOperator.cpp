@@ -27,7 +27,7 @@ MergerOperator::MergerOperator() {
      * @param node_id    The id of the runtime node leaf
      */
 void MergerOperator::run_node_thread(int port, int node_id) {
-    printf("initializing thread with port: %d, node_id: %d\n", port, node_id);
+    printf("Calling run_node_thread with port: %d, node_id: %d\n", port, node_id);
 }
 
 
@@ -48,9 +48,11 @@ void MergerOperator::run() {
     // send up one thread to handle each leaf node
     std::map<int, int> port_to_node_map = this->merger_info->get_port_to_node_map();
 
+    printf("port_to_node_map.size(): %d\n", port_to_node_map.size());
     pthread_t threads[port_to_node_map.size()];
     int thread_i = 0;
     for (auto it = port_to_node_map.begin(); it != port_to_node_map.end(); ++it) {
+        printf("Initializing thread for port: %d\n", it->first);
         auto * tp = (THREAD_PARAMS*) malloc(sizeof(THREAD_PARAMS));
         tp->inst = this;
         tp->port = it->first;
