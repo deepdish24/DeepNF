@@ -60,4 +60,8 @@ void MergerOperator::run() {
         pthread_create(&threads[thread_i++], nullptr, MergerOperator::run_node_thread_wrapper, tp);
     }
 
+    void *status;
+    for (int i = 0; i < port_to_node_map.size(); i++) {
+        pthread_join(threads[i], &status);
+    }
 }
