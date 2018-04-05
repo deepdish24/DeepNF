@@ -31,6 +31,7 @@ int main(int argc, char *argv[]) {
         strcpy(addr_str, ip);
         strcat(addr_str, ":");
         strcat(addr_str, argv[2]);
+        printf("Address to send to: %s\n", addr_str);
         address* addr = address_from_string(addr_str);
 
         // prepare packet
@@ -40,11 +41,13 @@ int main(int argc, char *argv[]) {
         std::string dip(argv[3]);
         int dp = portno;
         struct packet p(sip, sp, dip, dp, (unsigned short) rand(), data);
+        printf("Prepared packet\n");
 
         if (send_packet(&p, sockfd, addr) < 0) {
             fprintf(stderr, "Send packet error: %s", strerror(errno));
             exit(-1);
         }
+        printf("Sent packet\n");
     }
 
     // argc[1] == "1" is a receiver
@@ -73,7 +76,9 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    printf("Invalid 1st argument, should be 1 for receiver or 0 for sender");
+    else {
+        printf("Invalid 1st argument, should be 1 for receiver or 0 for sender\n");
+    }
 }
 
 #pragma clang diagnostic pop
