@@ -72,12 +72,16 @@ void MergerOperator::run_node_thread(int port, int node_id) {
         }
         this_node_map = packet_map.at(p->ip_header->ip_id);
         this_node_map.insert(std::make_pair(node_id, p));
+        printf("Printing this_node_map\n");
+        for (auto it2 = this_node_map.begin(); it2 != this_node_map.end(); ++it2) {
+            printf("%d: %s, ", it2->first, it2->second->data);
+        }
         packet_map.insert(std::make_pair(p->ip_header->ip_id, this_node_map));
 
         for (auto it = packet_map.begin(); it != packet_map.end(); ++it) {
             printf("id: %d -> {", it->first);
-            std::map<int, packet*> this_node_map = packet_map.at(it->first);
-            for (auto it2 = this_node_map.begin(); it2 != this_node_map.end(); ++it2) {
+            std::map<int, packet*> this_node_map2 = it->second;
+            for (auto it2 = this_node_map2.begin(); it2 != this_node_map2.end(); ++it2) {
                 printf("%d: %s, ", it2->first, it2->second->data);
             }
             printf("}\n");
