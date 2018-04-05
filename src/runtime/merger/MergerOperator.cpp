@@ -80,7 +80,7 @@ void MergerOperator::run_node_thread(int port, int node_id) {
         print_packet_map();
 
         // if all packets have been received for this packet_id, begin merging process
-        if (this_node_map->size() == num_nodes) {
+        if ((int) this_node_map->size() == num_nodes) {
             merge_packet(p->ip_header->ip_id);
         }
     }
@@ -89,6 +89,8 @@ void MergerOperator::run_node_thread(int port, int node_id) {
 
 packet* MergerOperator::merge_packet(int pkt_id) {
     printf("MergerOperator::merge_packet\n");
+
+    return nullptr;
 }
 
 
@@ -112,7 +114,7 @@ void MergerOperator::run() {
     }
 
     void *status;
-    for (size_t i = 0; i < num_nodes; i++) {
+    for (int i = 0; i < num_nodes; i++) {
         pthread_join(threads[i], &status);
     }
 }
