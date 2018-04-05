@@ -4,11 +4,13 @@
 #include <arpa/inet.h> 
 #include <string>
 #include <iostream>
+#include <signal.h>
+#include<unistd.h>
 
 #include "socket_util.h"
 
 
-void int_handler(int signal);
+void int_handler(int sig);
 
 
 int sockfd;
@@ -27,7 +29,7 @@ int main(int argc,char **argv)
 
 	sockfd = open_socket();
 
-    if (bind_socket(bind_port) < 0) {
+    if (bind_socket(sockfd, bind_port) < 0) {
         std::cerr << "bind failure: " << strerror(errno) << std::endl;
         return -1;
     }
@@ -50,7 +52,7 @@ int main(int argc,char **argv)
 	return 0;
 }
 
-void int_handler(int signal)
+void int_handler(int sig)
 {
     close(sockfd);
     exit(0);

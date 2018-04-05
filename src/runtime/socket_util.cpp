@@ -1,13 +1,17 @@
-#include <arpa/inet.h> 
+#include <arpa/inet.h>
+#include <string.h>
+#include <strings.h> 
+#include <iostream>
 
 #include "socket_util.h"
 
-#define BUFFER_SIZE 1024
+
+#define BUFFER_SIZE 1000
 
 
 int open_socket()
 {
-	return socket(PF_INET, SOCK_STREAM, 0);
+	return socket(PF_INET, SOCK_DGRAM, 0);
 }
 
 int bind_socket(int sockfd, int portno)
@@ -35,16 +39,18 @@ int send_data(char *buf, int size, int sockfd, address *addr)
 	inet_pton(AF_INET, addr->ip.c_str(), &(server_dest.sin_addr));
 
 	int num_bytes = sendto(sockfd, buf, size, 0, 
-			(struct sockaddr*)server_dest, sizeof(struct sockaddr));
+			(struct sockaddr*)&server_dest, sizeof(struct sockaddr));
 	if (num_bytes < 0) {
 		return -1;
 	}
+	std::cout << "sent " << num_bytes << " bytes\n";
 	return num_bytes;
 }
 
 int send_packet(packet *p, int sockfd, address *addr)
 {
-	return send_data(p->pkt, p->size, sockfd, addr);
+	std::cout << "packet size = " << p->size << "\n";
+	return send_data((char*) p->pkt, p->size, sockfd, addr);
 }
 
 
@@ -54,14 +60,15 @@ sockdata *receive_data(int sockfd)
 	socklen_t srclen = sizeof(src);
 	
 	char *buf = (char*)malloc(BUFFER_SIZE);
-	int rlen = recvfrom(sockfd, buf, sizeof(buf) - 1, 0, (struct sockaddr*)&src, &srclen);
+	int rlen = recvfrom(sockfd, buf, BUFFER_SIZE - 1, 0, (struct sockaddr*)&src, &srclen);
 	if (rlen < 0) {
 		return NULL;
 	}
+	std::cout << "received " << rlen << " bytes\n";
 	buf[rlen] = 0;
 
-	struct sockdata *d = new struct data();
-	d->size = n;
+	sockdata *d = new sockdata();
+	d->size = rlen;
 	d->buffer = buf;
 
 	return d;

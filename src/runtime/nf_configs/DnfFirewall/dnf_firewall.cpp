@@ -7,6 +7,9 @@
 #include <unistd.h>
 #include <string.h>
 #include <errno.h>
+#include <vector>
+#include <signal.h>
+#include<unistd.h>
 // #include <sys/socket.h>
 
 #include "../address_util.h"
@@ -14,7 +17,7 @@
 
 
 
-void int_handler(int signal);
+void int_handler(int signo);
 
 
 int sockfd;
@@ -48,9 +51,7 @@ int main(int argc,char **argv)
     int sockfd = open_socket();
 
     // bind onto a port
-    int res = bind_socket(bind_port);
-
-    if (res == -1) {
+    if (bind_socket(sockfd, bind_port) == -1) {
         std::cerr << "bind failure: " << strerror(errno) << std::endl;
         return -1;
     }
@@ -76,7 +77,7 @@ int main(int argc,char **argv)
     return 0;
 }
 
-void int_handler(int signal)
+void int_handler(int signo)
 {
     close(sockfd);
     exit(0);

@@ -26,4 +26,7 @@ int send_packet(packet *p, int sockfd, address *addr);
 /* receives data from a socket with given fd and returns a sockdata struct */
 sockdata *receive_data(int sockfd);
 
+/* parses sockdata into a packet struct */
+packet *packet_from_data(sockdata *d);
+
 
