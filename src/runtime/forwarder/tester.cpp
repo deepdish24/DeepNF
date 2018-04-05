@@ -73,8 +73,8 @@ int main(int argc, char *argv[]) {
             packet* p = packet_from_data(pkt_data);
 
             printf("Echo: [%s] (%d bytes)\n", p->data, p->data_size);
-            delete p;
-            delete pkt_data;
+            free(p);
+            free(pkt_data);
         }
     }
 
