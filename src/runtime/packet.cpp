@@ -50,6 +50,12 @@ packet::packet(std::string sip, int sp, std::string dip, int dp, unsigned int id
 	pkt = pkt_char;
 }
 
+packet::~packet() {
+	delete this->tcp_header;
+	delete this->ip_header;
+	delete this->ethernet_header;
+}
+
 bool packet::is_null()
 {
 	char sourceIp[INET_ADDRSTRLEN];

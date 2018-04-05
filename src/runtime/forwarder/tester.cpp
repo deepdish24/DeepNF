@@ -5,32 +5,70 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <string>
+#include <cmath>
+#include <cstdlib>
+
+#include "../address_util.h"
+#include "../socket_util.h"
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
 int main(int argc, char *argv[]) {
+    int portno = std::stoi(argv[2]);
 
-    // opens a datagram socket and returns the fd or -1 */
-    int open_socket();
-
-    // binds socket with given fd to given port */
-    int bind_socket(int sockfd, int portno);
-
-
-    while (true) {
-        newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
-        int buf_i = 0;
-        ssize_t cur_i = read(newsockfd, buffer + buf_i, (size_t) 65535 - buf_i);
-
-        while (cur_i > 0) {
-            buf_i += cur_i;
-            cur_i = read(newsockfd, buffer + buf_i, (size_t) 65535 - buf_i);
+    // argc[1] == "1" is a sender
+    if (argv[1] == "0") {
+        int sockfd = open_socket();
+        if (sockfd < 0) {
+            fprintf(stderr, "Cannot open socket: %s", strerror(errno));
+            exit(-1);
         }
-        close(newsockfd);
+        char* ip = argv[3];
+        char* msg = argv[4];
 
-        printf("Echo: [%s] (%d bytes)\n", buffer, (int) strlen(buffer));
-        close(newsockfd);
+        // prepare destination address
+        char* addr_str = (char*) malloc(strlen(ip)+strlen(argv[2])+2);
+        strcpy(addr_str, ip);
+        strcat(addr_str, ":");
+        strcat(addr_str, argv[2]);
+        address* addr = address_from_string(addr_str);
+
+        // prepare packet
+        std::string data(msg);
+        std::string sip = "127.0.0.1";
+        int sp = 8001;
+        std::string dip(argv[3]);
+        int dp = portno;
+        struct packet p(sip, sp, dip, dp, (unsigned short) rand(), data);
+
+        if (send_packet(&p, sockfd, addr) < 0) {
+            fprintf(stderr, "Send packet error: %s", strerror(errno));
+            exit(-1);
+        }
     }
+
+    // argc[1] == "1" is a receiver
+    else if (argv[1] == "1") {
+
+        // opens a datagram socket and returns the fd or -1 */
+        int sockfd = open_socket();
+        if (sockfd < 0) {
+            fprintf(stderr, "Cannot open socket: %s", strerror(errno));
+            exit(-1);
+        }
+
+        // binds socket with given fd to given port */
+        bind_socket(sockfd, portno);
+
+        while (true) {
+            sockdata *pkt_data = receive_data(sockfd);
+
+            printf("Echo: [%s] (%d bytes)\n", pkt_data->buffer, pkt_data->size);
+            delete pkt_data;
+        }
+    }
+
+    printf("Invalid 1st argument, should be 1 for receiver or 0 for sender");
 }
 
 #pragma clang diagnostic pop

@@ -12,11 +12,13 @@
 #include<unistd.h>
 // #include <sys/socket.h>
 
-#include "../address_util.h"
-#include "../socket_util.h"
+#include "../../address_util.h"
+#include "../../socket_util.h"
 
 
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-noreturn"
 void int_handler(int signo);
 
 
@@ -94,3 +96,5 @@ void int_handler(int signo)
 //     forward_packet(pkt_info->pkt, pkt_info->size);
 // }
 
+
+#pragma clang diagnostic pop

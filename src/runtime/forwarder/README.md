@@ -18,10 +18,11 @@ To run forwarder:
        Refer to sample_input.txt for an example.
 
     2. Compile forwarder
-            => make clean; make all
-
-    3. Run forwarder
-            => ./forwarder [path to input.txt file]
+            => mkdir build; cd build; 
+            => cmake ../; make google_protobuf; make
+            
+    3. Run forwarder from /build
+            => ./src/runtime/forwarder/forwarder [path to input.txt file relative to /build]
        Make sure all virtual ports are open and accepting TCP connections
        before sending any messages to the forwarder, or else the program
        will fail.

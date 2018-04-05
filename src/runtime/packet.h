@@ -17,6 +17,7 @@ public:
 
 	packet(const u_char *packet, int packet_size);
     packet(std::string sip, int sp, std::string dip, int dp, unsigned int id, std::string data);
+	~packet();
 
 	/* reference:
      * http://tonylukasavage.com/blog/2010/12/19/offline-packet-capture-analysis-with-c-c----amp--libpcap/ */
