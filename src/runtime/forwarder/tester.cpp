@@ -16,8 +16,8 @@
 int main(int argc, char *argv[]) {
     int portno = std::stoi(argv[2]);
 
-    // argc[1] == "1" is a sender
-    if (argv[1] == "0") {
+    // argc[1] == "0" is a sender
+    if (strcmp(argv[1], "0")) {
         int sockfd = open_socket();
         if (sockfd < 0) {
             fprintf(stderr, "Cannot open socket: %s", strerror(errno));
@@ -48,7 +48,7 @@ int main(int argc, char *argv[]) {
     }
 
     // argc[1] == "1" is a receiver
-    else if (argv[1] == "1") {
+    else if (strcmp(argv[1], "1")) {
 
         // opens a datagram socket and returns the fd or -1 */
         int sockfd = open_socket();
