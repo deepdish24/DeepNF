@@ -12,5 +12,5 @@ RUN apt-get update -y && \
 
 ADD . DeepNF
 
-RUN cd DeepNf && mkdir build && cd build && \
+RUN cd DeepNF && mkdir build && cd build && \
     cmake ../ && make google_protobuf && make

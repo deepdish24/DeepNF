@@ -7,9 +7,8 @@
 #include <string>
 #include <cmath>
 #include <cstdlib>
-
-#include "../address_util.h"
-#include "../socket_util.h"
+#include <runtime/socket_util.h>
+#include <runtime/address_util.h>
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"

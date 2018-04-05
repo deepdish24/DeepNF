@@ -17,6 +17,7 @@
 #include <vector>
 #include <pthread.h>
 
+#include <runtime/packet.h>
 #include "ActionTable.h"
 #include "MergerInfo.h"
 
@@ -47,6 +48,10 @@ private:
 
     // contains information about the NF action table
     ActionTable* action_table;
+
+    /* for each packet id, map each runtime node id to the body of the packet is received with that packet id
+        (if such a packet has been received) */
+    std::map<int, std::map<int, packet*>> packet_map;
 };
 
 
