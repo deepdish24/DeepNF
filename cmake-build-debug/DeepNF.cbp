@@ -318,51 +318,6 @@
 				</MakeCommands>
 			</Target>
 		</Build>
-		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/generated/src/proto/Machine.pb.cc">
-			<Option target="common"/>
-		</Unit>
-		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/generated/src/proto/Machine.pb.h">
-			<Option target="common"/>
-		</Unit>
-		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/common/Field.cpp">
-			<Option target="common"/>
-		</Unit>
-		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/common/Field.h">
-			<Option target="common"/>
-		</Unit>
-		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/common/Machine.cpp">
-			<Option target="common"/>
-		</Unit>
-		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/common/Machine.h">
-			<Option target="common"/>
-		</Unit>
-		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/common/MachineConfigurator.cpp">
-			<Option target="common"/>
-		</Unit>
-		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/common/MachineConfigurator.h">
-			<Option target="common"/>
-		</Unit>
-		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/common/NF.h">
-			<Option target="common"/>
-		</Unit>
-		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/common/RuntimeNode.cpp">
-			<Option target="common"/>
-		</Unit>
-		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/common/RuntimeNode.h">
-			<Option target="common"/>
-		</Unit>
-		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/common/ServiceGraphUtil.cpp">
-			<Option target="common"/>
-		</Unit>
-		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/common/ServiceGraphUtil.h">
-			<Option target="common"/>
-		</Unit>
-		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/common/packet.cpp">
-			<Option target="common"/>
-		</Unit>
-		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/common/packet.h">
-			<Option target="common"/>
-		</Unit>
 		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/listener/listener.cpp">
 			<Option target="listener"/>
 		</Unit>
