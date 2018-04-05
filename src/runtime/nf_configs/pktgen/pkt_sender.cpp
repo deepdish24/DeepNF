@@ -7,51 +7,70 @@
 #include <string>
 #include <iostream>
 #include <math.h>  
+#include <vector>
 
-#include "packet.h"
+#include "../address_util.h"
+#include "../socket_util.h"
+
+// list of addresses to forward packets to
+std::vector<address*> addresses;
 
 int main(int argc, char *argv[]) 
 {
-	if (argc != 4) {
-		std::cerr << "need 3 arguments, ip , port and number of fake packets\n";
+	if (argc < 2) {
+		std::cerr << "./sender [-n <number of packets>] IP:port [IP:port] .....\n";
 		return -1;
 	}
 
-	std::string dip = argv[1];
-	int dp = std::stoi(argv[2]);
+	// TODO: addresses shouldn't be hardcoded
 	std::string sip = "173.16.1.2";
-	int sp = dp;
-	int n = std::stoi(argv[3]);
+	int sp = 800;
+	std::string dip = "173.16.1.4";
+	int dp = 800;
+	
+	int num_packets = 10;
 
-	for (int i = 0; i < n; i++) {
-		int sockfd = socket(PF_INET, SOCK_STREAM, 0);  
-		if (sockfd < 0) {
-		  fprintf(stderr, "Cannot open socket (%s)\n", strerror(errno));    
-		  exit(1);
-		}  
-		
-		struct sockaddr_in servaddr;
-		bzero(&servaddr, sizeof(servaddr));
-		servaddr.sin_family = AF_INET;
-		servaddr.sin_port = htons(dp);
-		inet_pton(AF_INET, dip.c_str(), &(servaddr.sin_addr));
-
-		if (connect(sockfd, (struct sockaddr*)&servaddr, sizeof(servaddr)) < 0) {
-				std::cerr << "connect error: " << strerror(errno) << std::endl;
-				return -1;
-		}
-		std::string data = "hello" + std::to_string(i);
-		struct packet p(sip, sp, dip, dp, (int)pow(2, 15) + i, data);
-		int num_bytes = write(sockfd, p.pkt, p.size);
-		if (num_bytes < 0) {
-			std::cerr << "write error: " << strerror(errno) << "\n";
-			return -1;
-		}
-		std::cout << "wrote " << num_bytes << " bytes\n";
-		close(sockfd);
+	// processing program arguments
+	// -n flag is used to specify number of packets
+	static const char *optString = "n:";
+	int opt = 0;
+	opt = getopt(argc, argv, optString);
+	
+	if (opt == 'n') {
+		num_packets = atoi(optarg);
 	}
 	
+	// store the addresses to forward packets to
+	if (optind <= argc - 1) {
+		for (int i = optind; i < argc; i++) {
+			addresses.push_back(address_from_string(argv[i]));
+		}
+	} else {
+		std::cerr << "./sender [-n <number of packets>] IP:port [IP:port] .....\n";
+		return -1;
+	}
 
+	// creating a datagram socket
+	int sockfd = open_socket();
+	if (sockfd < 0) {
+		std::cerr << "Cannot open socket: " << strerror(errno) << std::endl;
+		exit(-1);
+	}  
+
+	for (int i = 0; i < num_packets; i++) {
+		// construct the packet
+		std::string data = "hello" + std::to_string(i);
+		struct packet p(sip, sp, dip, dp, (int)pow(2, 15) + i, data);
+		
+		for (address *addr : addresses) {
+			if (send_packet(&p, sockfd, addr) < 0) {
+				std::cerr << "packet send error: " << strerror(errno) << std::endl;
+			}
+		}	
+	}
+	
+	close(sockfd);
+	
 	return 0;
 }
 
