@@ -1,4 +1,4 @@
 #pragma once
 
-enum NF { snort, haproxy };
+enum NF { dnf_firewall };
 

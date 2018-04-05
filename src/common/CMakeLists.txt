@@ -6,6 +6,8 @@ set(SOURCE_FILES
     Machine.cpp
     ServiceGraphUtil.cpp
     MachineConfigurator.cpp
+    Field.cpp
+    packet.cpp
         )
 
 set(HEADERS
@@ -15,6 +17,8 @@ set(HEADERS
     MachineConfigurator.h
     NF.h
     ServiceGraphUtil.h
+    Field.h
+    packet.h
         )
 
 set(PROTOCOL_BUFFERS

@@ -326,12 +326,17 @@ void start_network_functions(MachineConfigurator c) {
 	for (RuntimeNode* n : nodes) {
 		std::string exec_nf_cmd = docker_exec_command + n->get_name() + " ";
 		switch(n->get_nf()) {
-		case snort:
-			exec_nf_cmd += "snort -N -A console -q -c /etc/snort/snort.conf -Q -i eth1:eth2"; 
-			break;
-		case haproxy:
-			exec_nf_cmd += "service haproxy start";
-			break;
+			case dnf_firewall:
+				// TODO (deepan): write correct command to setup firewall
+				exec_nf_cmd += "";
+				break;
+
+//		case snort:
+//			exec_nf_cmd += "snort -N -A console -q -c /etc/snort/snort.conf -Q -i eth1:eth2";
+//			break;
+//		case haproxy:
+//			exec_nf_cmd += "service haproxy start";
+//			break;
 		}
 		system(exec_nf_cmd.c_str());
 	}

@@ -10,4 +10,4 @@ set(SOURCE_FILES
     #       ../merger_old/MergerOperator.cpp ../merger_old/MergerOperator.h ../merger_old/ActionTableHelper.cpp ../merger_old/ActionTableHelper.h)
 
 add_executable(configure ${SOURCE_FILES} ${HEADERS})
-target_link_libraries(configure common)
+target_link_libraries(configure common merger_lib)

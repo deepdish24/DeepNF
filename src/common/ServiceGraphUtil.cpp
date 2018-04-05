@@ -59,12 +59,8 @@ namespace service_graph_util
             NF nf;
 
             switch(message->nf()) {
-                case RuntimeNodeMsg::SNORT:
-                    nf = snort;
-                    break;
-
-                case RuntimeNodeMsg::HAPROXY:
-                    nf = haproxy;
+                case RuntimeNodeMsg::DNF_FIREWALL:
+                    nf = dnf_firewall;
                     break;
 
                 default:
@@ -96,12 +92,8 @@ namespace service_graph_util
             RuntimeNodeMsg message;
 
             switch(rn->get_nf()) {
-                case snort:
-                    message.set_nf(RuntimeNodeMsg::SNORT);
-                    break;
-
-                case haproxy:
-                    message.set_nf(RuntimeNodeMsg::HAPROXY);
+                case dnf_firewall:
+                    message.set_nf(RuntimeNodeMsg::DNF_FIREWALL);
                     break;
 
                 default:
