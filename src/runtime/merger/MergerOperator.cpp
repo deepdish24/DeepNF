@@ -20,14 +20,15 @@ MergerOperator::MergerOperator() {
 }
 
 
-void run_node_thread(void *arg) {
-    auto *tp = (THREAD_PARAMS*) arg;
-    printf("initializing thread with port: %d, node_id: %d\n", tp->port, tp->node_id);
+void run_node_thread() {
+    printf("run_node_thread\n");
+//    printf("initializing thread with port: %d, node_id: %d\n", tp->port, tp->node_id);
 }
 
 static void* run_node_thread_wrapper(void *arg) {
     auto *tp = (THREAD_PARAMS*) arg;
-    tp->inst->run_node_thread(arg);
+    MergerOperator *this_mo = tp->inst;
+    this_mo->run_node_thread();
 }
 
 /**

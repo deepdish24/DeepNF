@@ -31,7 +31,7 @@ public:
      */
     void run();
 
-    void run_node_thread(void *arg);
+    void run_node_thread();
 
 private:
 
