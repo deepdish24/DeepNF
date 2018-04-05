@@ -6,7 +6,7 @@
 
 
 
-MergerInfo::MergerInfo(std::map<std::string, int> port_to_node_map,
+MergerInfo::MergerInfo(std::map<int, int> port_to_node_map,
                        std::vector<ConflictItem*> conflicts_list,
                        std::map<int, RuntimeNode*> node_map) {
     this->port_to_node_map = port_to_node_map;
@@ -14,7 +14,7 @@ MergerInfo::MergerInfo(std::map<std::string, int> port_to_node_map,
     this->node_map = node_map;
 }
 
-std::map<std::string, int> MergerInfo::get_port_to_node_map() {
+std::map<int, int> MergerInfo::get_port_to_node_map() {
     return port_to_node_map;
 };
 
@@ -32,7 +32,7 @@ std::map<int, RuntimeNode*> MergerInfo::get_node_map() {
  * @return A pointer to a MergerInfo object with dummy data for testing purposes
  */
 MergerInfo* MergerInfo::get_dummy_merger_info() {
-    std::map<std::string, int> port_to_node_map;
+    std::map<int, int> port_to_node_map;
     std::vector<ConflictItem*> conflicts_list;
     std::map<int, RuntimeNode*> node_map;
 

@@ -15,6 +15,7 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <vector>
+#include <pthread.h>
 
 #include "ActionTable.h"
 #include "MergerInfo.h"
@@ -24,6 +25,10 @@ class MergerOperator {
 public:
 
     MergerOperator();
+
+    /**
+     * Setup MergerOperator to start listening and merging packets
+     */
     void run();
 
 private:
@@ -33,6 +38,8 @@ private:
 
     // contains information about the NF action table
     ActionTable* action_table;
+
+    void *run_node_thread(void *arg);
 };
 
 

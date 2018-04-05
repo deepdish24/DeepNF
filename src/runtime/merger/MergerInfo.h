@@ -16,7 +16,7 @@ class MergerInfo {
 
     private:
         // maps each port to its corresponding runtime node id
-        std::map<std::string, int> port_to_node_map;
+        std::map<int, int> port_to_node_map;
 
         // list of conflicting NFs
         std::vector<ConflictItem*> conflicts_list;
@@ -25,11 +25,11 @@ class MergerInfo {
         std::map<int, RuntimeNode*> node_map;
 
     public:
-        MergerInfo(std::map<std::string, int> port_to_node_map,
+        MergerInfo(std::map<int, int> port_to_node_map,
                    std::vector<ConflictItem*> conflicts_list,
                    std::map<int, RuntimeNode*> node_map);
 
-        std::map<std::string, int> get_port_to_node_map();
+        std::map<int, int> get_port_to_node_map();
 
         std::vector<ConflictItem*> get_conflicts_list();
 

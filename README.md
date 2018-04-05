@@ -56,3 +56,5 @@ To run src/runtime/nf_configs/pktgen/pkt_sender.cpp:
 
 To run src/runtime/nf_configs/pktgen/pkt_receiver.cpp:
     ./receiver portno (example: ./receiver 800)
+
+To run merger, refer to README.md in src/runtime/merger
