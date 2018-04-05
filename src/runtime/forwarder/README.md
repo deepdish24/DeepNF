@@ -30,10 +30,12 @@ To run forwarder on local machine:
        will fail.
 
 
-To create a new container running forwarder:
+To create a new container running forwarder (assuming docker is installed):
     
-    1. 
-
+    1. From the root directory of DeepNF, run:
+        => docker build -t=forwarder -f src/runtime/forwarder/Dockerfile .
+        (Be warned that this takes an extremely long time.)
+        
 To run tester:
     1. Compile tester
         => mkdir build; cd build; 
