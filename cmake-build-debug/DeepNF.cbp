@@ -369,8 +369,8 @@
 					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/runtime/config/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
-			<Target title="receiver">
-				<Option output="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/runtime/forwarder/receiver" prefix_auto="0" extension_auto="0"/>
+			<Target title="forwarder">
+				<Option output="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/runtime/forwarder/forwarder" prefix_auto="0" extension_auto="0"/>
 				<Option working_dir="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/runtime/forwarder"/>
 				<Option object_output="./"/>
 				<Option type="1"/>
@@ -389,14 +389,14 @@
 					<Add directory="/Library/Frameworks"/>
 				</Compiler>
 				<MakeCommands>
-					<Build command="/usr/bin/make -j4 -f &quot;/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/runtime/forwarder/Makefile&quot;  VERBOSE=1 receiver"/>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/runtime/forwarder/Makefile&quot;  VERBOSE=1 forwarder"/>
 					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/runtime/forwarder/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
 					<Clean command="/usr/bin/make -j4 -f &quot;/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/runtime/forwarder/Makefile&quot;  VERBOSE=1 clean"/>
 					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/runtime/forwarder/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
-			<Target title="receiver/fast">
-				<Option output="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/runtime/forwarder/receiver" prefix_auto="0" extension_auto="0"/>
+			<Target title="forwarder/fast">
+				<Option output="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/runtime/forwarder/forwarder" prefix_auto="0" extension_auto="0"/>
 				<Option working_dir="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/runtime/forwarder"/>
 				<Option object_output="./"/>
 				<Option type="1"/>
@@ -415,7 +415,7 @@
 					<Add directory="/Library/Frameworks"/>
 				</Compiler>
 				<MakeCommands>
-					<Build command="/usr/bin/make -j4 -f &quot;/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/runtime/forwarder/Makefile&quot;  VERBOSE=1 receiver/fast"/>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/runtime/forwarder/Makefile&quot;  VERBOSE=1 forwarder/fast"/>
 					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/runtime/forwarder/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
 					<Clean command="/usr/bin/make -j4 -f &quot;/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/runtime/forwarder/Makefile&quot;  VERBOSE=1 clean"/>
 					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/runtime/forwarder/Makefile&quot;  VERBOSE=1 clean"/>
@@ -531,8 +531,10 @@
 		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/runtime/config/configure.cpp">
 			<Option target="configure"/>
 		</Unit>
+		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/runtime/forwarder/forwarder.cpp">
+			<Option target="forwarder"/>
+		</Unit>
 		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/runtime/forwarder/tester.cpp">
-			<Option target="receiver"/>
 			<Option target="tester"/>
 		</Unit>
 		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/runtime/merger/ActionTable.cpp">

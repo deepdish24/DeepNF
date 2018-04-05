@@ -23,6 +23,8 @@ To run forwarder:
             
     3. Run forwarder from /build
             => ./src/runtime/forwarder/forwarder [path to input.txt file relative to /build]
+            (ie. ./src/runtime/forwarder/forwarder  ../src/runtime/forwarder/sample_input.txt)
+            
        Make sure all virtual ports are open and accepting TCP connections
        before sending any messages to the forwarder, or else the program
        will fail.
