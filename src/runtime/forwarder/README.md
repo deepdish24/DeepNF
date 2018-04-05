@@ -9,7 +9,7 @@ program in tester.cpp to be used for testing purposes; it just
 listens on a port number indicated by the first argument and prints
 all received messages.
 
-To run forwarder:
+To run forwarder on local machine:
 
     1. Prepare a input.txt file that lists mappings from the real port
        number of a container to its virtual IP and portno. Each listing
@@ -29,6 +29,10 @@ To run forwarder:
        before sending any messages to the forwarder, or else the program
        will fail.
 
+
+To create a new container running forwarder:
+    
+    1. 
 
 To run tester:
     1. Compile tester
