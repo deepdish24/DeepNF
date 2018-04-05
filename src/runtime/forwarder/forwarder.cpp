@@ -22,6 +22,13 @@ void *run_thread(void *arg) {
     auto *tp = (THREAD_PARAMS*) arg;
     printf("initializing thread with port: %d, ip: %s:%d\n", tp->real_port, tp->virtual_ip, tp->virtual_port);
 
+    // open socket to listen for requests
+    int r_sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (r_sockfd < 0) {
+        fprintf(stderr, "Cannot open socket (%s)\n", strerror(errno));
+        exit(1);
+    }
+
     // open connection to virtual port/IP
     int v_sockfd;
     struct sockaddr_in v_servaddr;
@@ -82,7 +89,7 @@ void *run_thread(void *arg) {
 
 int main(int argc, char *argv[]) {
     FILE *fp = fopen(argv[1], "r");
-    if (fp < (FILE*) 0) {
+    if (fp < 0) {
         perror("Cannot open file (%s)\n");
         exit(1);
     }
