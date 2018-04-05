@@ -56,15 +56,22 @@ void MergerOperator::run_node_thread(int port, int node_id) {
     bind_socket(sockfd, port);
     printf("binded socket\n");
 
+    std::map<int, packet *> this_node_map;
     while (true) {
         printf("\nlistening for data...\n");
         sockdata *pkt_data = receive_data(sockfd);
         packet* p = packet_from_data(pkt_data);
 
-        // add packet to packet_map
-        std::map<int, packet*> this_node_map = packet_map.at(p->ip_header->ip_id);
-
         printf("Echo: [%s] (%d bytes)\n", p->data, p->data_size);
+
+        // add packet to packet_map
+
+        if (packet_map.count(p->ip_header->ip_id) == 0) {
+            std::map<int, packet *> new_node_map;
+            packet_map.insert(std::make_pair(p->ip_header->ip_id, new_node_map));
+        }
+        this_node_map = packet_map.at(p->ip_header->ip_id);
+        this_node_map.insert(std::make_pair(node_id, p));
 
         for (auto it = packet_map.begin(); it != packet_map.end(); ++it) {
             printf("id: %d -> {", it->first);
