@@ -4,6 +4,8 @@
 
 #include "MergerOperator.h"
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-noreturn"
 typedef struct threadParams {
     MergerOperator* inst; // the MergerOperator instance to operate on
     int port; // port that the leaf node will send packets to
@@ -48,10 +50,10 @@ void MergerOperator::run_node_thread(int port, int node_id) {
         fprintf(stderr, "Cannot open socket: %s", strerror(errno));
         exit(-1);
     }
-    printf("opened socket\n");
+    printf("opened socket on port: %d\n", port);
 
     // binds socket with given fd to given port */
-    bind_socket(sockfd, portno);
+    bind_socket(sockfd, port);
     printf("binded socket\n");
 
     while (true) {
@@ -59,9 +61,19 @@ void MergerOperator::run_node_thread(int port, int node_id) {
         sockdata *pkt_data = receive_data(sockfd);
         packet* p = packet_from_data(pkt_data);
 
+        // add packet to packet_map
+        std::map<int, packet*> this_node_map = packet_map.at(p->ip_header->ip_id);
+
         printf("Echo: [%s] (%d bytes)\n", p->data, p->data_size);
-        free(p);
-        free(pkt_data);
+
+        for (auto it = packet_map.begin(); it != packet_map.end(); ++it) {
+            printf("id: %d -> {", it->first);
+            std::map<int, packet*> this_node_map = packet_map.at(it->first);
+            for (auto it2 = this_node_map.begin(); it != this_node_map.end(); ++it) {
+                printf("%d: %s, ", it2->first, it2->second->data);
+            }
+            printf("}\n");
+        }
     }
 }
 
@@ -90,3 +102,4 @@ void MergerOperator::run() {
         pthread_join(threads[i], &status);
     }
 }
+#pragma clang diagnostic pop

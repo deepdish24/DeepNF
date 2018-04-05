@@ -40,7 +40,6 @@ int main(int argc, char *argv[]) {
         std::string dip(argv[3]);
         int dp = portno;
         struct packet p(sip, sp, dip, dp, (unsigned short) rand(), data);
-        printf("Prepared packet\n");
 
         if (send_packet(&p, sockfd, addr) < 0) {
             fprintf(stderr, "Send packet error: %s", strerror(errno));
@@ -60,11 +59,9 @@ int main(int argc, char *argv[]) {
             fprintf(stderr, "Cannot open socket: %s", strerror(errno));
             exit(-1);
         }
-        printf("opened socket\n");
 
         // binds socket with given fd to given port */
         bind_socket(sockfd, portno);
-        printf("binded socket\n");
 
         while (true) {
             printf("\nlistening for data...\n");
