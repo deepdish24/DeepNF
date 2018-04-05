@@ -5,8 +5,8 @@ set(SOURCE_FILES
         tester.cpp
         )
 
-add_executable(tester)
+#add_executable(tester ${SOURCE_FILES})
 #add_executable(forwarder forwarder.cpp)
 
-add_dependencies(tester runtime)
+#add_dependencies(tester runtime)
 #add_dependencies(forwarder runtime)
