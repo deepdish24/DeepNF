@@ -7,7 +7,6 @@ set(SOURCE_FILES
     ServiceGraphUtil.cpp
     MachineConfigurator.cpp
     Field.cpp
-    packet.cpp
         )
 
 set(HEADERS
@@ -18,7 +17,6 @@ set(HEADERS
     NF.h
     ServiceGraphUtil.h
     Field.h
-    packet.h
         )
 
 set(PROTOCOL_BUFFERS
