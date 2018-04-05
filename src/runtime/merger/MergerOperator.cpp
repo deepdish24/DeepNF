@@ -25,7 +25,7 @@ void MergerOperator::run_node_thread() {
 //    printf("initializing thread with port: %d, node_id: %d\n", tp->port, tp->node_id);
 }
 
-static void* MergerOperator::run_node_thread_wrapper(void *arg) {
+void* MergerOperator::run_node_thread_wrapper(void *arg) {
     auto *tp = (THREAD_PARAMS*) arg;
     MergerOperator *this_mo = tp->inst;
     this_mo->run_node_thread();
