@@ -7,7 +7,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <unordered_map>
-#include "nlohmann/json.hpp"
+#include "../../setup/json.hpp"
 
 #include "../../common/RuntimeNode.h"
 #include "../../common/MachineConfigurator.h"
@@ -116,7 +116,8 @@ void make_config_dir(std::string config_dir) {
 * Function copies specified file into config_dir
 * (assuming such a directory exists)
 */
-void copy_dockerfile(std::string file, std::string config_dir) {
+void copy_dockerfile(std::string file, std::string config_dir, std::string to_root) {
+    system(("cp -R " + to_root + "DeepNF/" + " " + config_dir).c_str());
     system(("cp " + file + " " + config_dir).c_str());
 }
 
@@ -139,27 +140,48 @@ void start_docker_container(std::string container_name, std::string image_name) 
  * Creates the containers using Dockerfiles.
  */
 void setup_nodes(MachineConfigurator conf) {
+    // All config directories will be stored at root of instance
+    // function assumes ./src/runtime/config/configure is run 
+    // from build directory
 
-    // All config directories will be stored at root of project
-
-	std::string to_root = "../../../";
-	std::string path_to_merger_dockerfile = "src/runtime/merger/Dockerfile";
+	std::string to_root = "../../";
+	std::string path_to_merger_dockerfile = to_root + "DeepNF/src/runtime/merger/Dockerfile";
+    std::string path_to_fwd_dockerfile = to_root + "DeepnNF/src/runtime/forwarder/Dockerfile";
+    std::string fwd_config_dir = to_root + "fwd_config";
 	std::string merger_config_dir = to_root + "merger_config";
 
+    /* Forwarder Container Setup */
     make_config_dir(merger_config_dir);
-    copy_dockerfile(to_root + path_to_merger_dockerfile, merger_config_dir);
-    build_docker_image("merger_image", merger_config_dir);
-    start_docker_container("merger", "merger_image");
+    copy_dockerfile(path_to_fwd_dockerfile, fwd_config_dir, to_root);
+    start_docker_container("forwarder", "base_img");
 
+    /* Merger Container Setup */
+    make_config_dir(merger_config_dir);
+    copy_dockerfile(path_to_merger_dockerfile, merger_config_dir, to_root);
+    //build_docker_image("merger_image", merger_config_dir);
+    start_docker_container("merger", "base_img");
 
     // list of nodes on this machine
 	std::vector<RuntimeNode*> nodes = get_internal_nodes(conf);
 
+    for (RuntimeNode* node : nodes) {
+        std::string func_name = node->get_name();
+        std::string func_config_dir = to_root + conf.get_config_dir(node->get_id()) + "_config";
+        std::string path_to_dockerfile = to_root + conf.get_dockerfile(node->get_nf()) + "Dockerfile";
+        std::string image_name = conf.get_config_dir(node->get_id()) + "_img";
+        std::string container_name = conf.get_config_dir(node->get_id());
+
+        make_config_dir(func_config_dir);
+        copy_dockerfile(path_to_dockerfile, func_config_dir, to_root);
+        //build_docker_image(image_name, func_config_dir);
+        start_docker_container(container_name, "base_img");
+    }
 
 
-	// create new containers for classifier and merger
+
+	// create new containers for classifier and merger_old
 	//system("docker run -d -t -i --name classifier ubuntu /bin/bash");
-	//system("docker run -d -t -i --name merger ubuntu /bin/bash");	
+	//system("docker run -d -t -i --name merger_old ubuntu /bin/bash");
 	
 	/*for (RuntimeNode* n : nodes) {
 		int node_id = n->get_id();
@@ -189,6 +211,8 @@ void setup_nodes(MachineConfigurator conf) {
 }
 
 std::unordered_map<int, int> setup_bridge_ports(MachineConfigurator &conf) {
+    system("sudo “PATH=$PATH” /home/ubuntu/ovs/utilities/ovs-ctl --system-id=random --no-ovs-vswitchd start");
+    system("sudo “PATH=$PATH” /home/ubuntu/ovs/utilities/ovs-ctl --no-ovsdb-server start");
 
 	// create a bridge
 	system("sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-vsctl add-br ovs-br");
@@ -207,16 +231,23 @@ std::unordered_map<int, int> setup_bridge_ports(MachineConfigurator &conf) {
 
 	// connect containers to the bridge
 	// std::string add_port_classifier = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br eth1 classifier";
-	//std::string add_port_merger = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br eth1 merger";
+	//std::string add_port_merger = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br eth1 merger_old";
 	//system(add_port_classifier.c_str());
 	//system(add_port_merger.c_str());
+
+    /* Connect Forwarder to Bridge (with one ETH) */
+    std::string add_ip_port_forwarder = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br eth1 --ipaddress=" + ip_assign + std::to_string(ip_inx) +  " forwarder ";
+    system(add_ip_port_forwarder.c_str());
+    ip_inx++;
 
 	std::vector<RuntimeNode*> nodes = get_internal_nodes(conf);
 
 	/* MERGER PORT SETUP */
+
 	// node id to eth setup map
-	std::unordered_map<int, int> nodeid_to_eth;
+	/*std::unordered_map<int, int> nodeid_to_eth;
 	std::string add_port_merger = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br eth";
+    // inx of virtual ethernet port
 	int eth_inx = 1;
 	auto j = json::object();
 	for (RuntimeNode* n : nodes) {
@@ -230,40 +261,25 @@ std::unordered_map<int, int> setup_bridge_ports(MachineConfigurator &conf) {
 			eth_inx++;
 		}
 	}
-
-	std::ofstream out("../../../src/common/eth_leaf_map.json");
+    ip_inx++;
+    std::string to_root = "../../";
+    std::string path_to_json = to_root + "DeepNF/src/common/eth_leaf_map.json";
+	std::ofstream out(path_to_json);
     out << j;
-
-	//int ofport = 3;
+    out.close();*/
+    int eth_inx = 1;
+    std::unordered_map<int, int> nodeid_to_eth;
 	std::string add_port_command = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br";
 	for (RuntimeNode* n : nodes) {
 		//NOTE: Docker containers must be named the same as functions
+        std::string container_name = conf.get_config_dir(n->get_id());
 
-		std::string command1 = add_port_command + " eth1 " + n->get_name();
-		std::string command2 = add_port_command + " eth2 " + n->get_name();
+		std::string command1 = add_port_command + " eth1 --ipaddress=" + ip_assign + std::to_string(ip_inx) + 
+            " " + container_name;
 		std::cout << "command: " << command1 << std::endl;
-		std::cout << "command: " << command2 << std::endl;
 		system(command1.c_str());
-		n->inport = eth_inx ++;
-		system(command2.c_str());
-		n-> outport = eth_inx ++;
-		// std::string node_id = std::to_string(n.get_id());
-		/*switch(n->get_nf()) {
-			case snort:
-				system((add_port_command + " eth1 " + n->get_name()).c_str());
-				n->inport = ofport ++;
-				system((add_port_command + " eth2 " + n->get_name()).c_str());
-				n->outport = ofport ++;
-				break;
-			
-			case haproxy:
-				system((add_port_command + " eth1 " + n->get_name() + " --ipaddress=" + n->ip).c_str());
-				n->inport = ofport ++;
-				n->outport = n->inport;
-				break;
-			
-			default: break;
-		}*/
+		n->inport = eth_inx++;
+		ip_inx++;
 	}
 
 	return nodeid_to_eth;
@@ -277,7 +293,25 @@ void make_flow_rules(MachineConfigurator conf, std::unordered_map<int,int> leaf_
 	std::string add_flow_command = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-ofctl add-flow ovs-br in_port=";
 	
 	std::vector<RuntimeNode*> nodes = get_internal_nodes(conf);
-	std::vector<int> source_node_inports;
+    /* for each node in machine set its outputs properly
+        RULES FOR SETTING output
+            1. if neighbor is within machine -> then set give container ip
+            2. if neighbor is outside machine -> give ip/port of other machine
+            3. if node is leaf point to merger -> give ip/port of merger
+
+        RULES FOR FORWARDER
+            1. Map port from forwarder to ip of container running function */
+
+
+
+
+
+
+
+
+
+
+	/*std::vector<int> source_node_inports;
 	
 	for (RuntimeNode* n : nodes) {
 		
@@ -286,7 +320,7 @@ void make_flow_rules(MachineConfigurator conf, std::unordered_map<int,int> leaf_
 			// system((add_flow_command + "1,actions=" + std::to_string(n.inport)).c_str());
 		}
 
-		if (n->get_neighbors().size() == 0) { // if node is a sink, flow from this node to merger
+		if (n->get_neighbors().size() == 0) { // if node is a sink, flow from this node to merger_old
 			int merger_port = leaf_to_eth[n->get_id()];
 			system((add_flow_command + std::to_string(n->outport) + ",actions=" + std::to_string(merger_port)).c_str());
 		} else { // flow from output port of this node to all its successors ports
@@ -313,7 +347,7 @@ void make_flow_rules(MachineConfigurator conf, std::unordered_map<int,int> leaf_
 		i++;
 	}
 
-	//system((add_flow_command + "1,actions=" + outport_ports).c_str());
+	//system((add_flow_command + "1,actions=" + outport_ports).c_str());*/
 }
 
 /**
@@ -326,12 +360,17 @@ void start_network_functions(MachineConfigurator c) {
 	for (RuntimeNode* n : nodes) {
 		std::string exec_nf_cmd = docker_exec_command + n->get_name() + " ";
 		switch(n->get_nf()) {
-		case snort:
-			exec_nf_cmd += "snort -N -A console -q -c /etc/snort/snort.conf -Q -i eth1:eth2"; 
-			break;
-		case haproxy:
-			exec_nf_cmd += "service haproxy start";
-			break;
+			case dnf_firewall:
+				// TODO (deepan): write correct command to setup firewall
+				exec_nf_cmd += "";
+				break;
+
+//		case snort:
+//			exec_nf_cmd += "snort -N -A console -q -c /etc/snort/snort.conf -Q -i eth1:eth2";
+//			break;
+//		case haproxy:
+//			exec_nf_cmd += "service haproxy start";
+//			break;
 		}
 		system(exec_nf_cmd.c_str());
 	}
@@ -340,10 +379,10 @@ void start_network_functions(MachineConfigurator c) {
 void reset(MachineConfigurator c) {
 	std::string del_ports_cmd = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker del-ports ovs-br ";
 
-	// clean up merger and classifier
+	// clean up merger_old and classifier
 	system((del_ports_cmd + "classifier").c_str());
-	system((del_ports_cmd + "merger").c_str());
-	system("docker stop classifier merger; docker rm classifier merger");
+	system((del_ports_cmd + "merger_old").c_str());
+	system("docker stop classifier merger_old; docker rm classifier merger_old");
 
 	std::vector<RuntimeNode*> nodes = get_internal_nodes(c);
 	for (RuntimeNode* n : nodes) {

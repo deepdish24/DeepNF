@@ -6,16 +6,16 @@
 
 
 
-MergerInfo::MergerInfo(std::map<std::string, RuntimeNode*> interface_leaf_map,
+MergerInfo::MergerInfo(std::map<int, int> port_to_node_map,
                        std::vector<ConflictItem*> conflicts_list,
                        std::map<int, RuntimeNode*> node_map) {
-    this->interface_leaf_map = interface_leaf_map;
+    this->port_to_node_map = port_to_node_map;
     this->conflicts_list = conflicts_list;
     this->node_map = node_map;
 }
 
-std::map<std::string, RuntimeNode*> MergerInfo::get_interface_leaf_map() {
-    return interface_leaf_map;
+std::map<int, int> MergerInfo::get_port_to_node_map() {
+    return port_to_node_map;
 };
 
 std::vector<ConflictItem*> MergerInfo::get_conflicts_list() {
@@ -26,23 +26,19 @@ std::map<int, RuntimeNode*> MergerInfo::get_node_map() {
     return node_map;
 }
 
+
 /**
- * @return A deep copy of conflicts_list
+ *
+ * @return A pointer to a MergerInfo object with dummy data for testing purposes
  */
-std::vector<ConflictItem*> MergerInfo::copy_conflicts_list() {
-    std::vector<ConflictItem*> copy_list;
+MergerInfo* MergerInfo::get_dummy_merger_info() {
+    std::map<int, int> port_to_node_map;
+    port_to_node_map.insert(std::make_pair(8000, 0));
+    port_to_node_map.insert(std::make_pair(8001, 1));
 
-    for (std::vector<ConflictItem*>::iterator it = conflicts_list.begin(); it != conflicts_list.end(); ++it) {
-        ConflictItem* ci = *it;
+    std::vector<ConflictItem*> conflicts_list;
+    std::map<int, RuntimeNode*> node_map;
 
-        // create a copy of ci
-        ConflictItem* copy_ci = new ConflictItem(ci->get_major(),
-                                                 ci->get_minor(),
-                                                 ci->get_parent(),
-                                                 ci->get_conflicts());
-        copy_list.push_back(copy_ci);
-    }
-
-    return copy_list;
-
+    MergerInfo* mi = new MergerInfo(port_to_node_map, conflicts_list, node_map);
+    return mi;
 }

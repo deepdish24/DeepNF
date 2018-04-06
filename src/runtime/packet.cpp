@@ -37,7 +37,7 @@ packet::packet(std::string sip, int sp, std::string dip, int dp, unsigned int id
 	tcp_header->dest = htons(dp);
 	
 	this->data = (u_char *)data.c_str();
-	std::cout << this->data << "\n";
+	std::cout << "[" << this->data << "]\n";
 	data_size = data.size();
 	size = sizeof(struct ether_header) + sizeof(struct ip) + sizeof(struct tcphdr) + data_size;
 	ip_header->ip_len = htons(size);
@@ -48,6 +48,12 @@ packet::packet(std::string sip, int sp, std::string dip, int dp, unsigned int id
 	memcpy(pkt_char + sizeof(struct ether_header) + sizeof(struct ip), (void *)tcp_header, sizeof(struct tcphdr));
 	memcpy(pkt_char + sizeof(struct ether_header) + sizeof(struct ip) + sizeof(struct tcphdr), (void *)this->data, data_size);
 	pkt = pkt_char;
+}
+
+packet::~packet() {
+	delete this->tcp_header;
+	delete this->ip_header;
+	delete this->ethernet_header;
 }
 
 bool packet::is_null()

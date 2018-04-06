@@ -6,6 +6,7 @@ set(SOURCE_FILES
     Machine.cpp
     ServiceGraphUtil.cpp
     MachineConfigurator.cpp
+    Field.cpp
         )
 
 set(HEADERS
@@ -15,6 +16,7 @@ set(HEADERS
     MachineConfigurator.h
     NF.h
     ServiceGraphUtil.h
+    Field.h
         )
 
 set(PROTOCOL_BUFFERS
@@ -22,9 +24,6 @@ set(PROTOCOL_BUFFERS
         ${PROTO_DIR}/Machine.pb.h
      )
 set_source_files_properties(${PROTOCOL_BUFFERS} PROPERTIES GENERATED TRUE)
-
-
-add_subdirectory(sgu_test)
 
 add_library(common ${SOURCE_FILES} ${HEADERS} ${PROTOCOL_BUFFERS})
 

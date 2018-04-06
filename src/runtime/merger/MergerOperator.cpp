@@ -1,419 +1,209 @@
 //
-// Created by Victoria on 2018-03-31.
+// Created by Victoria on 2018-04-04.
 //
 
 #include "MergerOperator.h"
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-noreturn"
 
-std::string packet_filter_expr = "tcp";
-
-
-void process_packet_handler(unsigned char * user,
-                            const struct pcap_pkthdr *pkthdr,
-                            const unsigned char * packet) {
-    ((MergerOperator*) user)->process_packet(user, pkthdr, packet);
-}
+typedef struct node_thread_params {
+    MergerOperator* inst; // the MergerOperator instance to operate on
+    int port; // port that the leaf node will send packets to
+    int node_id; // the id of the runtime node for this thread
+} NODE_THREAD_PARAMS;
 
 
 MergerOperator::MergerOperator() {
     printf("MergerOperator::MergerOperator \n");
 
-    // set up action table
-    this->action_table_helper = new ActionTableHelper();
+    this->action_table = new ActionTable();
+    this->merger_info = MergerInfo::get_dummy_merger_info();
+    this->num_nodes = this->merger_info->get_port_to_node_map().size();
+
+    // set up mutexes
+    packet_map_mutex = PTHREAD_MUTEX_INITIALIZER;
 }
 
 
-/* FUNCTIONS FOR PERFORMING MERGER OPERATIONS */
+typedef struct merge_thread_params {
+    MergerOperator* inst; // the MergerOperator instance to operate on
+    int packet_id; // the packet_id of the packets to merge
+} MERGE_THREAD_PARAMS;
 
-/* sets up hardcoded MergerInfo object to do testing on */
-MergerInfo* MergerOperator::setup_dummy_info() {
-    RuntimeNode* n1 = new RuntimeNode(1, snort); // node that drops packets
-    RuntimeNode* n2 = new RuntimeNode(2, snort); // node that sends packets
 
-    std::map<std::string, RuntimeNode*> interface_leaf_map;
-    interface_leaf_map.insert(std::make_pair("eth1", n1));
-    interface_leaf_map.insert(std::make_pair("eth2", n2));
+void* MergerOperator::merge_packet_wrapper(void *arg) {
+    auto *tp = (MERGE_THREAD_PARAMS*) arg;
+    MergerOperator *this_mo = tp->inst;
+    this_mo->merge_packet(tp->packet_id);
 
-    std::vector<ConflictItem*> conflicts_list;
-    std::map<int, RuntimeNode*> node_map;
-
-    MergerInfo* mi = new MergerInfo(interface_leaf_map, conflicts_list, node_map);
-    return mi;
+    return nullptr;
 }
 
 
+void* MergerOperator::run_node_thread_wrapper(void *arg) {
+    auto *tp = (NODE_THREAD_PARAMS*) arg;
+    MergerOperator *this_mo = tp->inst;
+    this_mo->run_node_thread(tp->port, tp->node_id);
+
+    return nullptr;
+}
+
+
+/**
+ * Listens on the given port for packets from the given runtime_id, merging as necessary
+ *
+ * @param port          The port to listen for packets from runtime_id
+ * @param node_id    The id of the runtime node leaf
+ */
+void MergerOperator::run_node_thread(int port, int node_id) {
+    printf("Calling run_node_thread with port: %d, node_id: %d\n", port, node_id);
+
+    // opens a datagram socket and returns the fd or -1 */
+    int sockfd = open_socket();
+    if (sockfd < 0) {
+        fprintf(stderr, "Cannot open socket: %s", strerror(errno));
+        exit(-1);
+    }
+    printf("opened socket on port: %d\n", port);
+
+    // binds socket with given fd to given port */
+    bind_socket(sockfd, port);
+    printf("binded socket\n");
+
+    std::map<int, packet *>* this_pkt_map;
+    while (true) {
+        // listen for packets
+        printf("\nlistening for data...\n");
+        sockdata *pkt_data = receive_data(sockfd);
+        packet* p = packet_from_data(pkt_data);
+
+        printf("Echo: [%s] (%d bytes)\n", p->data, p->data_size);
+
+        // add packet to packet_map
+        pthread_mutex_lock(&packet_map_mutex);
+        if (packet_map.count(p->ip_header->ip_id) == 0) {
+            std::map<int, packet *>* new_node_map = new std::map<int, packet *>();
+            packet_map.insert(std::make_pair(p->ip_header->ip_id, new_node_map));
+        }
+        this_pkt_map = packet_map.at(p->ip_header->ip_id);
+        this_pkt_map->insert(std::make_pair(node_id, p));
+        printf("Printing this_node_map\n");
+
+        packet_map.insert(std::make_pair(p->ip_header->ip_id, this_pkt_map));
+        pthread_mutex_unlock(&packet_map_mutex);
+
+        print_packet_map();
+
+        // if all packets have been received for this packet_id, begin merging process
+        if ((int) this_pkt_map->size() == num_nodes) {
+            pthread_t merge_thread;
+            auto * tp = (MERGE_THREAD_PARAMS*) malloc(sizeof(MERGE_THREAD_PARAMS));
+            tp->inst = this;
+            tp->packet_id = p->ip_header->ip_id;
+            pthread_create(&merge_thread, nullptr, MergerOperator::merge_packet_wrapper, tp);
+            pthread_detach(merge_thread);
+        }
+    }
+}
+
+
+/**
+ * Retrieves all packets for the given pkt_id stored in packet_map and outputs a merged packet
+ * based on the conflict items in merger_info
+ *
+ * @param pkt_id    The id of the packet to merge
+ * @return Pointer to a packet with all changes merged
+ */
+packet* MergerOperator::merge_packet(int pkt_id) {
+    printf("MergerOperator::merge_packet\n");
+    std::map<int, packet*>* this_pkt_map = packet_map.at(pkt_id);
+
+    // convert this_pkt_map to a map from node ids to packet_infos
+
+    if ((int) this_pkt_map->size() != num_nodes) {
+        fprintf(stderr, "Called merge_packet on an invalid pkt_id\n");
+    }
+    std::vector<ConflictItem*> conflicts_list = merger_info->get_conflicts_list();
+
+    bool was_changed = true; // has at least one merge conflict been resolved in this iteration?
+
+    for (int i = 0; i < num_nodes; i++) {
+        printf("Iterating through conflicts list: %d\n", i);
+    }
+
+    return nullptr;
+}
+
+
+/**
+ * Converts a map from node ids to packets to a map from node ids to equivalent packet_infos
+ * @return A map of runtime node ids to a packet_info struct equivalent to the node's
+ *         packet in packet_map
+ */
+std::map<int, MergerOperator::PACKET_INFO*>* MergerOperator::packet_map_to_packet_info_map(std::map<int, packet*>* packet_map) {
+    return nullptr;
+};
+
+
+/**
+ * Encapsulates the given packet into a packet_info struct
+ *
+ * @param packet    The packet to encapsulate
+ * @param node_id   The id of the runtime node that send the input packet
+ * @return Packet_info struct encapsulating the input packet instance
+ */
+MergerOperator::PACKET_INFO* MergerOperator::packet_to_packet_info(packet* pkt, int node_id) {
+    auto* pi = (PACKET_INFO*) malloc(sizeof(PACKET_INFO));
+
+    if (this->merger_info->get_node_map().count(node_id) == 0) {
+        fprintf(stderr, "Called packet_to_packet_info on invalid node_id: %d", node_id);
+        exit(-1);
+    }
+    RuntimeNode* rn = this->merger_info->get_node_map().at(node_id);
+
+    pi->pkt = pkt;
+//    pi->written_fields = this->action_table->get_write_fields(rn->get_nf());
+    return pi;
+}
+
+
+/**
+ * Setup MergerOperator to start listening and merging packets
+ */
 void MergerOperator::run() {
     printf("MergerOperator::run() \n");
 
-    // create dummy MergerInfo object
-    this->merger_info = setup_dummy_info();
+    // send up one thread to handle each leaf node
+    std::map<int, int> port_to_node_map = this->merger_info->get_port_to_node_map();
 
-    this->logfile = fopen("log.txt","w");
-    if (this->logfile == NULL) printf("Unable to create file.");
+    pthread_t threads[num_nodes];
+    int thread_i = 0;
+    for (auto it = port_to_node_map.begin(); it != port_to_node_map.end(); ++it) {
+        auto * tp = (NODE_THREAD_PARAMS*) malloc(sizeof(NODE_THREAD_PARAMS));
+        tp->inst = this;
+        tp->port = it->first;
+        tp->node_id = it->second;
+        pthread_create(&threads[thread_i++], nullptr, MergerOperator::run_node_thread_wrapper, tp);
+    }
 
-    // create pcap handles
-    std::string dst_dev = "eth3"; // destination to send packets after merge
-
-    configure_device_read_handles(packet_filter_expr);
-    configure_device_write_handle(packet_filter_expr, dst_dev);
-
-    printf("finished setting up bullshit, listening for packets...\n");
-
-    // listen for and process incoming packets
-    for (std::map<std::string, RuntimeNode*>::iterator it = this->merger_info->get_interface_leaf_map().begin();
-         it != this->merger_info->get_interface_leaf_map().end(); ++it) {
-        /* loop for callback function */
-        this->cur_dev = it->first;
-        pcap_loop(src_dev_handle_map[it->first], 1, process_packet_handler, (u_char*) this);
+    void *status;
+    for (int i = 0; i < num_nodes; i++) {
+        pthread_join(threads[i], &status);
     }
 }
 
-void MergerOperator::process_packet(u_char *arg,
-                    const struct pcap_pkthdr* pkthdr,
-                    const u_char* packet)
-{
-    printf("Received new packet\n");
-
-    struct packet *pkt_info = new struct packet(packet, pkthdr->len);
-
-    int packet_id = ntohs(pkt_info->ip_header->ip_id);
-
-    /* add packet to the map */
-    std::map<int, NFPacket*>* runtime_pkt_map;
-    if (packet_map.count(packet_id) > 0) {
-        runtime_pkt_map = packet_map[packet_id];
-    } else {
-        runtime_pkt_map = new std::map<int, NFPacket*>();
-    }
-
-    printf("Created packet map\n");
-
-    struct NFPacket* p = (struct NFPacket *) malloc(sizeof(struct NFPacket));
-    p->pkt = pkt_info;
-
-    printf("this->cur_dev: %s\n", this->cur_dev.c_str());
-    RuntimeNode* n = this->merger_info->get_interface_leaf_map().at(this->cur_dev);
-    printf("this runtimeNode: %d\n", n->get_id());
-
-    p->runtime_id = n->get_id();
-    p->nf = n->get_nf();
-
-    printf("Created new packet \n");
-
-    runtime_pkt_map->insert(std::make_pair(p->runtime_id, p));
-    packet_map[packet_id] = runtime_pkt_map;
-
-    printf("Added packet %d to packet_map \n", packet_id);
-
-    // if all packets have been received for the given id, begin merging
-    printf("packet_map[packet_id]->size(): %lu\n", packet_map[packet_id]->size());
-    printf("merger_info->get_interface_leaf_map().size(): %lu\n", merger_info->get_interface_leaf_map().size());
-
-    unsigned long received_packet_num = packet_map[packet_id]->size();
-    unsigned long total_packet_num = merger_info->get_interface_leaf_map().size();
-    if (received_packet_num == total_packet_num) {
-        printf("All packets received for %d, beginning merging \n\n", packet_id);
-        NFPacket* merged_packet = merge_all(packet_id);
-
-        printf("Got merged packet\n");
-
-        // send packet to destination virtual interface
-        if (!merged_packet->pkt->is_null()) {
-            printf("Packet is not null, sending it to eth...\n");
-            if (pcap_sendpacket(this->dst_dev_handle, merged_packet->pkt->pkt_char, merged_packet->pkt->size) < 0) {
-                std::cerr << strerror(errno) << std::endl;
-            }
+/**
+ * Helper function that prints the contents of packet_map to stdout
+ */
+void MergerOperator::print_packet_map() {
+    for (auto it = packet_map.begin(); it != packet_map.end(); ++it) {
+        printf("id: %d -> {", it->first);
+        std::map<int, packet*>* this_node_map2 = it->second;
+        for (auto it2 = this_node_map2->begin(); it2 != this_node_map2->end(); ++it2) {
+            printf("%d: %s, ", it2->first, it2->second->data);
         }
-
-        // cleanup
-        printf("cleanup packet\n");
-        delete merged_packet;
-        packet_map.erase(packet_id);
-    }
-
-}
-
-
-MergerOperator::NFPacket* MergerOperator::resolve_packet_conflict(
-        NFPacket* major_p,
-        NFPacket* minor_p,
-        ConflictItem* conflict)
-{
-    // if either packet is null (was dropped), return null packet
-    if (major_p->pkt->is_null() || minor_p->pkt->is_null()) {
-        return copy_nfpacket(major_p);
-    }
-
-    // otherwise, merge packet based on conflicting items
-    struct packet *new_pkt = new struct packet(major_p->pkt->pkt_char, major_p->pkt->size);
-    std::map<NF, std::set<Field>> fields_map = action_table_helper->get_write_fields_map();
-
-    // write changes made in minor packet
-    std::set<Field> major_fields = fields_map[major_p->nf];
-    for (std::set<Field>::iterator it = major_p->written_fields.begin();
-         it != major_p->written_fields.end(); ++it) {
-        major_fields.insert(*it);
-    }
-
-    std::set<Field> minor_fields = fields_map[minor_p->nf];
-    for (std::set<Field>::iterator it = minor_p->written_fields.begin();
-         it != minor_p->written_fields.end(); ++it) {
-        minor_fields.insert(*it);
-    }
-
-
-    for (std::set<Field>::iterator it = minor_fields.begin(); it != minor_fields.end(); ++it) {
-        Field field = *it;
-
-        // write the minor's field changes as long as the change does NOT conflict with major
-        if (major_fields.find(field) == major_fields.end()) {
-            switch (field) {
-                case Field::SIP:
-                    new_pkt->ip_header->ip_src = minor_p->pkt->ip_header->ip_src;
-                    break;
-
-                case Field::DIP:
-                    new_pkt->ip_header->ip_dst = minor_p->pkt->ip_header->ip_dst;
-                    break;
-
-                case Field::SPORT:
-                    new_pkt->tcp_header->th_sport = minor_p->pkt->tcp_header->th_sport;
-                    break;
-
-                case Field::DPORT:
-                    new_pkt->tcp_header->th_dport = minor_p->pkt->tcp_header->th_dport;
-                    break;
-
-                case Field::PAYLOAD:
-                    new_pkt->data = minor_p->pkt->data;
-                    new_pkt->data_size = minor_p->pkt->data_size;
-                    break;
-            }
-        }
-    }
-
-    printf("Creating new NFPacket\n");
-    NFPacket* ret_p = new NFPacket();
-
-    delete ret_p;
-    printf("Deleted NFPacket\n");
-    ret_p->pkt = new_pkt;
-    ret_p->runtime_id = conflict->get_parent();
-    ret_p->nf = merger_info->get_node_map()[ret_p->runtime_id]->get_nf();
-
-    // construct written_fields set for merged packet
-    std::set<Field> written_fields;
-    for (std::set<Field>::iterator it = minor_fields.begin();
-         it != minor_fields.end(); ++it) {
-        ret_p->written_fields.insert(*it);
-    }
-    for (std::set<Field>::iterator it = major_fields.begin();
-         it != major_fields.end(); ++it) {
-        ret_p->written_fields.insert(*it);
-    }
-
-    return ret_p;
-}
-
-
-// returns merged packet for the given packet ID. Assumes that all packets for the packet ID have been received
-MergerOperator::NFPacket* MergerOperator::merge_all(int pkt_id) {
-    printf("MergerOperator::merge_all: pkt_id = %d\n", pkt_id);
-
-    // maps each runtime leaf id with its associated packet
-    std::map<int, NFPacket*>* rt_to_pkt_map = packet_map[pkt_id];
-
-    // list of conflict runtime ids
-    std::vector<ConflictItem*> conflicts_list = merger_info->get_conflicts_list();
-    printf("Got rt_to_pkt_map and conflicts_list\n");
-
-    bool was_changed = true; // has at least one merge conflict been resolved in this iteration?
-    bool major_exists;
-    bool minor_exists;
-
-    // iterate through conflicts list and resolve conflicts
-    while (was_changed) {
-        printf("Iterating through conflicts list\n");
-        was_changed = false;
-        for (std::vector<ConflictItem*>::iterator it = conflicts_list.begin(); it != conflicts_list.end(); ++it) {
-            ConflictItem* ci = *it;
-            printf("next conflict item:");
-            printf("%s", ci->to_string().c_str());
-            major_exists = rt_to_pkt_map->find(ci->get_major()) != rt_to_pkt_map->end();
-            minor_exists = rt_to_pkt_map->find(ci->get_minor()) != rt_to_pkt_map->end();
-
-            // if both major and minor of the conflict item exist in the map, merge them
-            if (major_exists && minor_exists) {
-                was_changed = true;
-
-                NFPacket* merged_pkt = this->resolve_packet_conflict((*rt_to_pkt_map)[ci->get_major()],
-                                                                     (*rt_to_pkt_map)[ci->get_minor()],
-                                                                     ci);
-
-                // if merged_pkt is null, drop and end merging process
-                if (merged_pkt->pkt->is_null()) {
-                    return merged_pkt;
-                }
-
-                // remove major and minor from packet_map and add merged pkt
-                delete (*rt_to_pkt_map)[ci->get_major()];
-                delete (*rt_to_pkt_map)[ci->get_minor()];
-                rt_to_pkt_map->erase(ci->get_major());
-                rt_to_pkt_map->erase(ci->get_minor());
-                rt_to_pkt_map->insert(std::make_pair(merged_pkt->runtime_id, merged_pkt));
-            }
-        }
-        printf("Finished iterating through conflicts list\n");
-    }
-
-    printf("Finished merging\n");
-    // merging process should be finished by now
-    if (rt_to_pkt_map->size() != 1) {
-        throw std::runtime_error("More than one packet exists in pkt map even thought merging is finished");
-    }
-
-    for (std::map<int, NFPacket*>::iterator it = rt_to_pkt_map->begin(); it != rt_to_pkt_map->end(); ++it) {
-        printf("Found final merged NFPacket, returning it now...\n");
-
-        NFPacket* final_pkt = it->second;
-        return final_pkt;
+        printf("}\n");
     }
 }
-
-
-/* HELPER FUNCTIONS FOR OPERATING ON PACKETS */
-void MergerOperator::configure_device_read_handles(std::string packet_filter_expr)
-{
-
-    std::map<std::string, RuntimeNode*> interface_leaf_map = this->merger_info->get_interface_leaf_map();
-
-    for (std::map<std::string, RuntimeNode*>::iterator it = interface_leaf_map.begin();
-        it != interface_leaf_map.end(); ++it) {
-
-        std::string dev = it->first;
-
-        char errbuf[PCAP_ERRBUF_SIZE];
-        struct bpf_program fp;        /* hold compiled program */
-        bpf_u_int32 maskp;            /* subnet mask */
-        bpf_u_int32 netp;             /* ip */
-
-        if (pcap_lookupnet(dev.c_str(), &netp, &maskp, errbuf) < 0) {
-            std::cerr << errbuf << std::endl;
-            exit(-1);
-        }
-
-        /* open device for reading in promiscuous mode */
-        src_dev_handle_map[dev] = pcap_open_live(dev.c_str(), BUFSIZ, 1,-1, errbuf);
-
-        if(src_dev_handle_map[dev] == NULL) {
-            printf("pcap_open_live(): %s\n", errbuf);
-            exit(-1);
-        }
-
-        /* Now we'll compile the filter expression*/
-        if(pcap_compile(src_dev_handle_map[dev], &fp, packet_filter_expr.c_str(), 0, netp) == -1) {
-            fprintf(stderr, "Error calling pcap_compile\n");
-            exit(-1);
-        }
-
-        /* set the filter */
-        if(pcap_setfilter(src_dev_handle_map[dev], &fp) == -1) {
-            fprintf(stderr, "Error setting filter\n");
-            exit(-1);
-        }
-    }
-}
-
-
-void MergerOperator::configure_device_write_handle(std::string packet_filter_expr,
-                                   std::string dev)
-{
-    char errbuf[PCAP_ERRBUF_SIZE];
-    const u_char *packet;
-    struct bpf_program fp;        /* hold compiled program */
-    bpf_u_int32 maskp;            /* subnet mask */
-    bpf_u_int32 netp;             /* ip */
-
-    if (pcap_lookupnet(dev.c_str(), &netp, &maskp, errbuf) < 0) {
-        std::cerr << errbuf << std::endl;
-    }
-
-
-    /* open device for reading in promiscuous mode */
-    dst_dev_handle = pcap_open_live(dev.c_str(), BUFSIZ, 1,-1, errbuf);
-
-    if(dst_dev_handle == NULL) {
-        printf("pcap_open_live(): %s\n", errbuf);
-        exit(-1);
-    }
-}
-
-
-MergerOperator::NFPacket* MergerOperator::copy_nfpacket(NFPacket* nfpacket) {
-    NFPacket* copy = new NFPacket();
-    copy->pkt = nfpacket->pkt->copy();
-    copy->runtime_id = nfpacket->runtime_id;
-    return copy;
-}
-
-
-/* HELPER FUNCTIONS THAT PRINT STUFF */
-void MergerOperator::print_tcp_packet(struct tcphdr *tcph)
-{
-    fprintf(this->logfile,"\n");
-    fprintf(this->logfile,"TCP Header\n");
-    fprintf(this->logfile,"   |-Source Port      : %u\n",ntohs(tcph->th_sport));
-    fprintf(this->logfile,"   |-Destination Port : %u\n",htons(tcph->th_dport));
-    fprintf(this->logfile,"   |-Sequence Number    : %u\n",ntohl(tcph->th_seq));
-    fprintf(this->logfile,"   |-Acknowledge Number : %u\n",ntohl(tcph->th_ack));
-    fprintf(this->logfile,"\n");
-    fprintf(this->logfile,"                        DATA Dump                         ");
-    fprintf(this->logfile,"\n");
-
-}
-
-
-
-void MergerOperator::print_ip_header(struct ip *iph)
-{
-    char sourceIp[INET_ADDRSTRLEN];
-    char destIp[INET_ADDRSTRLEN];
-
-    inet_ntop(AF_INET, &(iph->ip_src), sourceIp, INET_ADDRSTRLEN);
-    inet_ntop(AF_INET, &(iph->ip_dst), destIp, INET_ADDRSTRLEN);
-
-    fprintf(this->logfile,"\n");
-    fprintf(this->logfile,"IP Header\n");
-    fprintf(this->logfile,"   |-IP Version        : %d\n",(unsigned int)iph->ip_v);
-    fprintf(this->logfile,"   |-IP Header Length  : %d DWORDS or %d Bytes\n",(unsigned int)iph->ip_hl,((unsigned int)(iph->ip_hl))*4);
-    fprintf(this->logfile,"   |-Type Of Service   : %d\n",(unsigned int)iph->ip_tos);
-    fprintf(this->logfile,"   |-IP Total Length   : %d  Bytes(Size of Packet)\n",ntohs(iph->ip_len));
-    fprintf(this->logfile,"   |-Identification    : %d\n",ntohs(iph->ip_id));
-    //fprintf(this->logfile,"   |-Reserved ZERO Field   : %d\n",(unsigned int)iphdr->ip_reserved_zero);
-    //fprintf(this->logfile,"   |-Dont Fragment Field   : %d\n",(unsigned int)iphdr->ip_dont_fragment);
-    //fprintf(this->logfile,"   |-More Fragment Field   : %d\n",(unsigned int)iphdr->ip_more_fragment);
-    fprintf(this->logfile,"   |-TTL      : %d\n",(unsigned int)iph->ip_ttl);
-    fprintf(this->logfile,"   |-Protocol : %d\n",(unsigned int)iph->ip_p);
-    fprintf(this->logfile,"   |-Checksum : %d\n",ntohs(iph->ip_sum));
-    fprintf(this->logfile,"   |-Source IP        : %s\n", sourceIp);
-    fprintf(this->logfile,"   |-Destination IP   : %s\n", destIp);
-}
-
-void MergerOperator::print_data(u_char* data, int size)
-{
-    std::string dataStr = "";
-
-    /* convert non-printable characters, other than carriage return, line feed,
-     * or tab into periods when displayed. */
-    for (int i = 0; i < size; i++) {
-        if ((data[i] >= 32 && data[i] <= 126) || data[i] == 10 || data[i] == 11 || data[i] == 13) {
-            dataStr += (char)data[i];
-        } else {
-            dataStr += ".";
-        }
-    }
-
-    fprintf(this->logfile,"Data Payload\n%s", dataStr.c_str());
-
-    fprintf(this->logfile,"\n###########################################################\n");
-}
+#pragma clang diagnostic pop

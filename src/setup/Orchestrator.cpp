@@ -295,11 +295,9 @@ void Orchestrator::parseOrderDependencies(std::vector<std::vector<std::string>> 
 }
 
 NF Orchestrator::stringToNF(std::string function) {
-    NF nf = snort;
-    if (function.compare("snort") == 0) {
-        nf = snort;
-    } else if (function.compare("haproxy") == 0) {
-        nf = haproxy;
+    NF nf = dnf_firewall;
+    if (function.compare("dnf_firewall") == 0) {
+        nf = dnf_firewall;
     } else {
         perror("stringToNf called on unknown function");
     }

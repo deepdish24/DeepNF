@@ -39,6 +39,6 @@ find_library(protobuf_lib NAMES protobuf libprotobuf)
 find_library(protobufd_lib NAMES protobufd libprotobufd)
 
 add_subdirectory(src/common)
+add_subdirectory(src/setup)
 add_subdirectory(src/listener)
 add_subdirectory(src/runtime)
-add_subdirectory(src/setup)

@@ -7,7 +7,7 @@
 #define ORCHESTRATOR_H
 
 #include <string>
-#include "nlohmann/json.hpp"
+#include "json.hpp"
 #include <vector>
 #include <unordered_map>
 #include <sys/socket.h>

@@ -1,5 +1,5 @@
 //
-// Created by Victoria on 2018-03-31.
+// Created by Victoria on 2018-04-04.
 //
 
 #ifndef DEEPNF_MERGEROPERATOR_H
@@ -7,7 +7,6 @@
 
 #include <arpa/inet.h>
 #include <errno.h>
-#include <iostream>
 #include <map>
 #include <set>
 #include <stdio.h>
@@ -16,77 +15,92 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <vector>
-#include <fstream>
+#include <pthread.h>
 
-#include "packet.h"
-#include "pcap.h"
-#include "RuntimeNode.h"
+#include <runtime/packet.h>
+#include <runtime/socket_util.h>
+#include <runtime/address.h>
+
+#include "ActionTable.h"
 #include "MergerInfo.h"
-#include "ConflictItem.h"
-#include "NF.h"
-#include "Field.h"
-#include "ActionTableHelper.h"
+
 
 class MergerOperator {
 
-    public:
-        MergerOperator();
+public:
+    typedef struct packet_info
+    {
+        packet* pkt;
+        /* list of all fields of the packet that should be considered "written to" during the merging
+         * process */
+        std::set<Field> written_fields;
+    } PACKET_INFO;
 
-        // runs the merger
-        void run();
-        void process_packet(u_char *arg, const struct pcap_pkthdr* pkthdr, const u_char* packet);
+    MergerOperator();
+
+    /**
+     * Setup MergerOperator to start listening and merging packets
+     */
+    void run();
+
+    /**
+     * Listens on the given port for packets from the given runtime_id, merging as necessary
+     *
+     * @param port          The port to listen for packets from runtime_id
+     * @param node_id    The id of the runtime node leaf
+     */
+    void run_node_thread(int port, int node_id);
+
+    static void* run_node_thread_wrapper(void *arg);
+    static void* merge_packet_wrapper(void *arg);
+
+private:
+
+    // contains information about virtual network interfaces, conflicting NF pairs, etc.
+    MergerInfo* merger_info;
+    // the total number of leaf runtime nodes that merger should listen for
+    int num_nodes;
+
+    // contains information about the NF action table
+    ActionTable* action_table;
+
+    /* for each packet id, map each runtime node id to the body of the packet is received with that
+     * packet id (if such a packet has been received) */
+    std::map<int, std::map<int, packet*>*> packet_map;
+    pthread_mutex_t packet_map_mutex;
+
+    /**
+     * Retrieves all packets for the given pkt_id stored in packet_map and outputs a merged packet
+     * based on the conflict items in merger_info
+     *
+     * @param pkt_id    The id of the packet to merge
+     * @return Pointer to a packet with all changes merged
+     */
+    packet* merge_packet(int pkt_id);
+
+    /**
+     * Converts a map from node ids to packets to a map from node ids to equivalent packet_infos
+     * @return A map of runtime node ids to a packet_info struct equivalent to the node's
+     *         packet in packet_map
+     */
+    std::map<int, PACKET_INFO*>* packet_map_to_packet_info_map(std::map<int, packet*>* packet_map);
 
 
-    private:
-        struct NFPacket {
-            public:
-                struct packet *pkt;
-                int runtime_id;
-                NF nf;
-                // list of additional fields that have been written to, NOT INCLUDING fields written to by the
-                // packet's NF
-                std::set<Field> written_fields;
-        };
+    /**
+     * Encapsulates the given packet into a packet_info struct
+     *
+     * @param packet    The packet to encapsulate
+     * @param node_id   The id of the runtime node that send the input packet
+     * @return Packet_info struct encapsulating the input packet instance
+     */
+    PACKET_INFO* packet_to_packet_info(packet* packet, int node_id);
 
-        FILE *logfile;
-        pcap_t* dst_dev_handle;
-
-        // contains information about virtual network interfaces, conflicting NF pairs, etc.
-        MergerInfo* merger_info;
-
-        // contains information about the NF action table
-        ActionTableHelper* action_table_helper;
-
-        // maps name of virtual interface to its corresponding RuntimeNode
-        std::map<std::string, pcap_t*> src_dev_handle_map;
-
-        // maps packet IDs to a map of runtime_ids -> NFPacket
-        std::map<int, std::map<int, NFPacket*>*> packet_map;
-        std::string cur_dev;
-
-        /* FUNCTIONS FOR PERFORMING MERGER OPERATIONS */
-        // sets up hardcoded MergerInfo object to do testing on
-        MergerInfo* setup_dummy_info();
-
-        // given the two packets and the corresponding ConflictItem, return a merged packet
-        NFPacket* resolve_packet_conflict(NFPacket* major_p, NFPacket* minor_p, ConflictItem* conflict);
-
-        // returns merged packet for the given packet ID. Assumes that all packets for the packet ID have been received
-        NFPacket* merge_all(int pkt_id);
-
-
-
-        /* HELPER FUNCTIONS FOR OPERATING ON PACKETS */
-        void configure_device_read_handles(std::string packet_filter_expr);
-        void configure_device_write_handle(std::string packet_filter_expr, std::string dev);
-        static NFPacket* copy_nfpacket(NFPacket* nfpacket); // returns a pointer to a copy of input NFPacket
-
-
-        /* HELPER FUNCTIONS THAT PRINT STUFF */
-        void print_tcp_packet(struct tcphdr *tcph);
-        void print_ip_header(struct ip *iph);
-        void print_data(u_char* data, int size);
+    /**
+     * Helper function that prints the contents of packet_map to stdout
+     */
+    void print_packet_map();
 };
+
 
 
 #endif //DEEPNF_MERGEROPERATOR_H

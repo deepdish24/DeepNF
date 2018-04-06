@@ -2,7 +2,7 @@
 
 struct address* address_from_string(std::string str)
 {
-	int colon_index = str.find(":");
+	size_t colon_index = str.find(":");
 	if (colon_index != std::string::npos) {
 		if (colon_index == 0 || colon_index == str.length() - 1) {
 			return NULL;

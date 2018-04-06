@@ -1,0 +1,8 @@
+{
+    "ips": ["18.217.175.10", "18.188.160.168"],
+    "ports": [10000, 10000],
+    "functions": ["firewall", "loadbalancer"],
+    "positional": [],
+    "orderDependencies": [["loadbalancer", "firewall"]],
+    "priorities": []
+}

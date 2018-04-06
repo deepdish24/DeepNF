@@ -9,8 +9,7 @@ message MachineMsg {
 
 message RuntimeNodeMsg {
     enum NFMsg {
-        SNORT = 0;
-        HAPROXY = 1;
+        DNF_FIREWALL = 0;
     }
 
     uint64 id = 1;
