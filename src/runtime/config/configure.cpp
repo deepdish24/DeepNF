@@ -236,8 +236,7 @@ std::unordered_map<int, int> setup_bridge_ports(MachineConfigurator &conf) {
 	//system(add_port_merger.c_str());
 
     /* Connect Forwarder to Bridge (with one ETH) */
-    std::string add_ip_port_forwarder = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br eth1" +
-        " --ipaddress=" + ip_assign + std::to_string(ip_inx) +  " forwarder ";
+    std::string add_ip_port_forwarder = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br eth1 --ipaddress=" + ip_assign + std::to_string(ip_inx) +  " forwarder ";
     system(add_ip_port_forwarder.c_str());
     ip_inx++;
 
@@ -268,11 +267,12 @@ std::unordered_map<int, int> setup_bridge_ports(MachineConfigurator &conf) {
 	std::ofstream out(path_to_json);
     out << j;
     out.close();*/
-
+    int eth_inx = 1;
+    std::unordered_map<int, int> nodeid_to_eth;
 	std::string add_port_command = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br";
 	for (RuntimeNode* n : nodes) {
 		//NOTE: Docker containers must be named the same as functions
-        std::string container_name = conf.get_config_dir(node->get_id());
+        std::string container_name = conf.get_config_dir(n->get_id());
 
 		std::string command1 = add_port_command + " eth1 --ipaddress=" + ip_assign + std::to_string(ip_inx) + 
             " " + container_name;
@@ -310,7 +310,7 @@ void make_flow_rules(MachineConfigurator conf, std::unordered_map<int,int> leaf_
 
 
 
-    
+
 	/*std::vector<int> source_node_inports;
 	
 	for (RuntimeNode* n : nodes) {
