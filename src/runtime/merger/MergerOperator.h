@@ -28,6 +28,14 @@ class MergerOperator {
 
 public:
 
+    typedef struct packet_info
+    {
+        packet* pkt;
+        /* list of all fields of the packet that should be considered "written to" during the merging
+         * process */
+        std::set<Field> written_fields;
+    } PACKET_INFO;
+
     MergerOperator();
 
     /**
@@ -47,14 +55,6 @@ public:
     static void* merge_packet_wrapper(void *arg);
 
 private:
-
-    typedef struct packet_info
-    {
-        packet* pkt;
-        /* list of all fields of the packet that should be considered "written to" during the merging
-         * process */
-        std::set<Field> written_fields;
-    } PACKET_INFO;
 
     // contains information about virtual network interfaces, conflicting NF pairs, etc.
     MergerInfo* merger_info;
