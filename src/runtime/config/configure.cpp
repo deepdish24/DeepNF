@@ -116,16 +116,9 @@ void make_config_dir(std::string config_dir) {
 * Function copies specified file into config_dir
 * (assuming such a directory exists)
 */
-void copy_dockerfile(std::string file, std::string config_dir, 
-    std::string dependencies, std::string to_root) {
+void copy_dockerfile(std::string file, std::string config_dir, std::string to_root) {
+    system(("cp -R " + to_root + "DeepNF/" + " " + config_dir).c_str());
     system(("cp " + file + " " + config_dir).c_str());
-
-    ifstream in(dependencies);
-    std::string line;
-    while (std::getline(in, line)) {
-        system(("cp " + to_root + line + " " + config_dir).c_str());
-    }
-    in.close();
 }
 
 /**
@@ -147,17 +140,16 @@ void start_docker_container(std::string container_name, std::string image_name) 
  * Creates the containers using Dockerfiles.
  */
 void setup_nodes(MachineConfigurator conf) {
-    // All config directories will be stored at root of project
+    // All config directories will be stored at root of instance
     // function assumes ./src/runtime/config/configure is run 
     // from build directory
 
 	std::string to_root = "../../";
 	std::string path_to_merger_dockerfile = to_root + "DeepNF/src/runtime/merger/Dockerfile";
-    std::string path_to_dependencies = to_root + "DeepNF/src/runtime/merger/dependencies.txt";
 	std::string merger_config_dir = to_root + "merger_config";
 
     make_config_dir(merger_config_dir);
-    copy_dockerfile(path_to_merger_dockerfile, merger_config_dir, dependencies, to_root);
+    copy_dockerfile(path_to_merger_dockerfile, merger_config_dir, to_root);
     build_docker_image("merger_image", merger_config_dir);
     start_docker_container("merger", "merger_image");
 
@@ -167,13 +159,12 @@ void setup_nodes(MachineConfigurator conf) {
     for (RuntimeNode* node : nodes) {
         std::string func_name = node->get_name();
         std::string func_config_dir = to_root + conf.get_config_dir(node->get_id()) + "_config";
-        std::string path_to_dockerfile = to_root + conf.get_dockerfile(node->get_nf()); + "Dockerfile";
-        std::string path_to_dependencies = to_root + conf.get_dockerfile(node->get_nf()) + "dependencies.txt";
+        std::string path_to_dockerfile = to_root + conf.get_dockerfile(node->get_nf()) + "Dockerfile";
         std::string image_name = conf.get_config_dir(node->get_id()) + "_img";
         std::string container_name = conf.get_config_dir(node->get_id());
 
         make_config_dir(func_config_dir);
-        copy_dockerfile(path_to_dockerfile, func_config_dir, path_to_dependencies, to_root);
+        copy_dockerfile(path_to_dockerfile, func_config_dir, to_root);
         build_docker_image(image_name, func_config_dir);
         start_docker_container(container_name, image_name);
     }
@@ -214,7 +205,7 @@ void setup_nodes(MachineConfigurator conf) {
 std::unordered_map<int, int> setup_bridge_ports(MachineConfigurator &conf) {
     system("sudo “PATH=$PATH” /home/ubuntu/ovs/utilities/ovs-ctl --system-id=random --no-ovs-vswitchd start");
     system("sudo “PATH=$PATH” /home/ubuntu/ovs/utilities/ovs-ctl --no-ovsdb-server start");
-    
+
 	// create a bridge
 	system("sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-vsctl add-br ovs-br");
 	
