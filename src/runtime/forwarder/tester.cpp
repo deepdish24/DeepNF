@@ -7,9 +7,9 @@
 #include <string>
 #include <cmath>
 #include <cstdlib>
-
-#include "../address_util.h"
-#include "../socket_util.h"
+#include <runtime/socket_util.h>
+#include <runtime/address_util.h>
+#include <time.h>
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
@@ -40,8 +40,8 @@ int main(int argc, char *argv[]) {
         int sp = 8001;
         std::string dip(argv[3]);
         int dp = portno;
-        struct packet p(sip, sp, dip, dp, (unsigned short) rand(), data);
-        printf("Prepared packet\n");
+        srand ( time(NULL) );
+        struct packet p(sip, sp, dip, dp, (unsigned short) 17, data);
 
         if (send_packet(&p, sockfd, addr) < 0) {
             fprintf(stderr, "Send packet error: %s", strerror(errno));
@@ -58,24 +58,22 @@ int main(int argc, char *argv[]) {
         // opens a datagram socket and returns the fd or -1 */
         int sockfd = open_socket();
         if (sockfd < 0) {
-            fprintf(stderr, "Cannot open socket: %s", strerror(errno));
-            exit(-1);
-        }
-        printf("opened socket\n");
+        fprintf(stderr, "Cannot open socket: %s", strerror(errno));
+        exit(-1);
+    }
 
-        // binds socket with given fd to given port */
-        bind_socket(sockfd, portno);
-        printf("binded socket\n");
+    // binds socket with given fd to given port */
+    bind_socket(sockfd, portno);
 
-        while (true) {
-            printf("\nlistening for data...\n");
-            sockdata *pkt_data = receive_data(sockfd);
-            packet* p = packet_from_data(pkt_data);
+    while (true) {
+        printf("\nlistening for data...\n");
+        sockdata *pkt_data = receive_data(sockfd);
+        packet* p = packet_from_data(pkt_data);
 
-            printf("Echo: [%s] (%d bytes)\n", p->data, p->data_size);
-            free(p);
-            free(pkt_data);
-        }
+        printf("Echo: [%s] (%d bytes)\n", p->data, p->data_size);
+        free(p);
+        free(pkt_data);
+    }
     }
 
     else {

@@ -9,7 +9,7 @@ program in tester.cpp to be used for testing purposes; it just
 listens on a port number indicated by the first argument and prints
 all received messages.
 
-To run forwarder:
+To run forwarder on local machine:
 
     1. Prepare a input.txt file that lists mappings from the real port
        number of a container to its virtual IP and portno. Each listing
@@ -30,6 +30,15 @@ To run forwarder:
        will fail.
 
 
+To create a new container running forwarder (assuming docker is installed):
+    
+    1. From the root directory of DeepNF, run:
+            => docker build -t=forwarder -f src/runtime/forwarder/Dockerfile .
+            (Be warned that this takes an extremely long time.)
+            => docker run -d -t -i --name forwarder forwarder:latest /bin/bash
+        
+    2. Enter the containers and follow instructions above to run forwarder inside container
+        
 To run tester:
     1. Compile tester
         => mkdir build; cd build; 

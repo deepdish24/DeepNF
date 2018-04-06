@@ -3,6 +3,9 @@
 #endif
 // #pragma once
 
+#ifndef DEEPNF_PACKET_H
+#define DEEPNF_PACKET_H
+
 #include <net/ethernet.h>
 #include <netinet/tcp.h>   //Provides declarations for tcp header
 #include <netinet/ip.h>    //Provides declarations for ip header
@@ -33,3 +36,5 @@ public:
     void nullify();
     void print_info();
 };
+
+#endif

@@ -1,5 +1,5 @@
 set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-parameter")
 
 set(SOURCE_FILES
     merger.cpp
@@ -20,3 +20,4 @@ add_library(merger_lib ${SOURCE_FILES} ${HEADERS})
 add_executable(merger ${SOURCE_FILES} ${HEADERS})
 
 add_dependencies(merger common)
+target_link_libraries(merger runtime)
