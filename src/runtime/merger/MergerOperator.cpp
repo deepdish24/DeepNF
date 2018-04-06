@@ -141,7 +141,7 @@ packet* MergerOperator::merge_packet(int pkt_id) {
  * @return A map of runtime node ids to a packet_info struct equivalent to the node's
  *         packet in packet_map
  */
-std::map<int, PACKET_INFO*>* MergerOperator::packet_map_to_packet_info_map(std::map<int, packet*>* packet_map) {
+std::map<int, MergerOperator::PACKET_INFO*>* MergerOperator::packet_map_to_packet_info_map(std::map<int, packet*>* packet_map) {
 
 };
 

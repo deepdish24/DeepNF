@@ -24,19 +24,17 @@
 #include "ActionTable.h"
 #include "MergerInfo.h"
 
-typedef struct packet_info
-{
-    packet* pkt;
-    /* list of all fields of the packet that should be considered "written to" during the merging
-     * process */
-    std::set<Field> written_fields;
-} PACKET_INFO;
-
 
 class MergerOperator {
 
 public:
-
+    typedef struct packet_info
+    {
+        packet* pkt;
+        /* list of all fields of the packet that should be considered "written to" during the merging
+         * process */
+        std::set<Field> written_fields;
+    } PACKET_INFO;
 
     MergerOperator();
 
