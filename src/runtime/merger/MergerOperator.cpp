@@ -142,7 +142,7 @@ packet* MergerOperator::merge_packet(int pkt_id) {
  *         packet in packet_map
  */
 std::map<int, MergerOperator::PACKET_INFO*>* MergerOperator::packet_map_to_packet_info_map(std::map<int, packet*>* packet_map) {
-
+    return nullptr;
 };
 
 
