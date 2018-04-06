@@ -1,7 +1,7 @@
 {
     "iptables": {"SIP": "R", "DIP": "R", "SPORT": "R", "DPORT": "R", "Payload": "null", "Add/Rm": "null", "Drop":"T" },
     "NIDScluster": {"SIP": "R", "DIP": "R", "SPORT": "R", "DPORT": "R", "Payload": "R", "Add/Rm": "null", "Drop":"null" },
-    "snort": {"SIP": "R", "DIP": "R", "SPORT": "R", "DPORT": "R", "Payload": "R", "Add/Rm": "null", "Drop":"null" },
+    "snort": {"SIP": "R", "DIP": "R", "SPORT": "R", "DPORT": "R", "Payload": "R", "Add/Rm": "null", "Drop":"T" },
     "CiscoMGX": {"SIP": "R", "DIP": "R", "SPORT": "null", "DPORT": "null", "Payload": "null", "Add/Rm": "null", "Drop":"null" },
     "haproxy": {"SIP": "R/W", "DIP": "R/W", "SPORT": "R", "DPORT": "R", "Payload": "null", "Add/Rm": "null", "Drop":"null" },
     "A10": {"SIP": "R/W", "DIP": "R/W", "SPORT": "R", "DPORT": "R", "Payload": "null", "Add/Rm": "null", "Drop":"null" },
@@ -10,5 +10,7 @@
     "Squid": {"SIP": "R/W", "DIP": "R/W", "SPORT": "null", "DPORT": "null", "Payload": "null", "Add/Rm": "null", "Drop":"null" },
     "CiscoIOS": {"SIP": "null", "DIP": "null", "SPORT": "null", "DPORT": "null", "Payload": "R/W", "Add/Rm": "null", "Drop":"null" },
     "Linuxtc": {"SIP": "null", "DIP": "null", "SPORT": "null", "DPORT": "null", "Payload": "null", "Add/Rm": "null", "Drop":"null" },
-    "NetFlow": {"SIP": "null", "DIP": "R", "SPORT": "R", "DPORT": "R", "Payload": "null", "Add/Rm": "null", "Drop":"null" }
+    "NetFlow": {"SIP": "null", "DIP": "R", "SPORT": "R", "DPORT": "R", "Payload": "null", "Add/Rm": "null", "Drop":"null" },
+    "firewall": {"SIP": "R", "DIP": "R", "SPORT": "R", "DPORT": "R", "Payload": "null", "Add/Rm": "null", "Drop":"null"},
+    "loadbalancer": {"SIP": "R/W", "DIP": "R", "SPORT": "R/W", "DPORT": "R", "Payload": "null", "Add/Rm": "null", "Drop":"null" }
 }
