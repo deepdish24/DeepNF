@@ -10,7 +10,8 @@ app.use(express.static(path.join(__dirname, 'public')))
 // Get the roots
 app.get('/', routes.get_home);
 app.get('/printData', routes.print_Data);
-app.get('/getData', routes.get_Data);
+//app.get('/getDataMachine1', routes.get_data_machine1);
+app.get('/machine1', routes.show_machine1);
 /*app.get('/getAllUser', routes.get_all_user);
 app.get('/getPost', routes.get_post);
 app.get('/showLike', routes.get_like);

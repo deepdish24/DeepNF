@@ -39,6 +39,8 @@ width: 992px) {
 
   <body>
 
+
+
     
 <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
@@ -83,7 +85,7 @@ id="navbarResponsive">
       </div>
     </nav>
 
-    <!-- Page Content -->
+ <!-- Page Content -->
     <div class="container">
       <div 
 class="row">
@@ -100,144 +102,53 @@ Logs</h1>
 scope="col">Function</th>
                 <th scope="col">Action</th>
               </tr>
-            
+           
+
 </thead>
-            <tbody>
-              <tr>
-                <td>1522643595</td>
+
+<tbody>
+   <% for (var key in content_data) { %>
+    <tr>
+      <td><%= content_data[key].time %></td>
+      <td><%= content_data[key].packetID %></td>
+      <td><%= content_data[key].function %></td>
+      <td><%= content_data[key].action %></td>
+    </tr>    
+   <% } %>
+</tbody>
+</table>
+
+
                 
-<td>32767</td>
-                <td>Firewall</td>
-                <td>Forwarded to IDS</td>
-              
-</tr>
-              <tr>
-                <td>1522643595</td>
-                <td>32767</td>
-                
-<td>Firewall</td>
-                <td>Received by Firewall</td>
-              </tr>
-              <tr>
-        
-        <td>1522643590</td>
-                <td>32763</td>
-                <td>IDS</td>
-                
-<td>Forwarded to Merger</td>
-              </tr>
-              <tr>
-                <td>1522643590</td>
-       
-         <td>32759</td>
-                <td>Firewall</td>
-                <td>Dropped Packet</td>
-            
-  </tr>
-              <tr>
-                <td>1522643590</td>
-                <td>32763</td>
-                
-<td>IDS</td>
-                <td>Forwarded to Merger</td>
-              </tr>
-              <tr>
-              
-  <td>1522643595</td>
-                <td>32767</td>
-                <td>Firewall</td>
-                
-<td>Forwarded to IDS</td>
-              </tr>
-              <tr>
-                <td>1522643590</td>
-          
-      <td>32745</td>
-                <td>Firewall</td>
-                <td>Received By Firewall</td>
-         
-     </tr>
-              <tr>
-                <td>1522643590</td>
-                <td>32763</td>
-              
-  <td>IDS</td>
-                <td>Forwarded to Merger</td>
-              </tr>
-              <tr>
-            
-    <td>1522643595</td>
-                <td>32767</td>
-                <td>Firewall</td>
-                
-<td>Forwarded to IDS</td>
-              </tr>
-              <tr>
-                <td>1522643590</td>
-          
-      <td>32750</td>
-                <td>Firewall</td>
-                <td>Received By Firewall</td>
-         
-     </tr>
-              <tr>
-                <td>1522643590</td>
-                <td>32764</td>
-              
-  <td>Firewall</td>
-                <td>Received By Firewall</td>
-              </tr>
-               <tr>
-     
-           <td>1522643590</td>
-                <td>32759</td>
-                <td>Firewall</td>
-              
-  <td>Dropped Packet</td>
-              </tr>
-               <tr>
-                <td>1522643590</td>
-         
-       <td>32759</td>
-                <td>Firewall</td>
-                <td>Dropped Packet</td>
-              
-</tr>
-               <tr>
-                <td>1522643590</td>
-                <td>32759</td>
-                
-<td>Firewall</td>
-                <td>Dropped Packet</td>
-              </tr>
-              <tr>
-              
-  <td>1522643590</td>
-                <td>32772</td>
-                <td>Firewall</td>
-                
-<td>Received By Firewall</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      
-</div>
-    </div>
 
     <!-- Bootstrap core JavaScript -->
     <script 
 src="vendor/jquery/jquery.min.js"></script>
+
     <script 
 src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script 
 src="http://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
-    <script 
-type="text/javascript">
-      $(document).ready( function () {
+
+  <script type="text/javascript"> 
+    var data = <%- JSON.stringify(content_data);%>
+
+  
+</script>
+
+  <script type="text/javascript">
+     $(document).ready( function () {
         $('#myTable').DataTable();
       } );
-  
+
+     setTimeout(function(){
+
+
+    //$.get('/getData', function(data) {
+   //     $('#content_div_id').html(data);    
+  //  });
+   window.location.reload(1);
+}, 10000);
   </script>
   </body>
 
