@@ -163,7 +163,7 @@ MergerOperator::PACKET_INFO* MergerOperator::packet_to_packet_info(packet* pkt, 
     RuntimeNode* rn = this->merger_info->get_node_map().at(node_id);
 
     pi->pkt = pkt;
-    pi->written_fields = this->action_table->get_write_fields(rn->get_nf());
+//    pi->written_fields = this->action_table->get_write_fields(rn->get_nf());
     return pi;
 }
 
