@@ -153,7 +153,7 @@ std::map<int, packet_info*>* MergerOperator::packet_map_to_packet_info_map(std::
  * @param node_id   The id of the runtime node that send the input packet
  * @return Packet_info struct encapsulating the input packet instance
  */
-MergerOperator::packet_info* MergerOperator::packet_to_packet_info(packet* packet, int node_id) {
+MergerOperator::packet_info* MergerOperator::packet_to_packet_info(packet* pkt, int node_id) {
     auto* pi = (PACKET_INFO*) malloc(sizeof(PACKET_INFO));
 
     if (this->merger_info->get_node_map().count(node_id) == 0) {
@@ -162,7 +162,7 @@ MergerOperator::packet_info* MergerOperator::packet_to_packet_info(packet* packe
     }
     RuntimeNode* rn = this->merger_info->get_node_map().at(node_id);
 
-    pi->packet = packet;
+    pi->pkt = pkt;
     pi->written_fields = this->action_table->get_write_fields(rn->get_nf());
     return pi;
 }

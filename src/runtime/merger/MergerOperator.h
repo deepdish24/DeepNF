@@ -50,7 +50,7 @@ private:
 
     typedef struct packet_info
     {
-        packet* packet;
+        packet* pkt;
         /* list of all fields of the packet that should be considered "written to" during the merging
          * process */
         std::set<Field> written_fields;
