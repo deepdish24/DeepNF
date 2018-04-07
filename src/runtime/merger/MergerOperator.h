@@ -82,7 +82,7 @@ private:
      * @param conflict      The ConflictItem describing the conflict between the major and minor packets
      * @return  A merged packet containing both major_p and minor_p's writes
      */
-    packet* resolve_packet_conflict(PACKET_INFO* major_p, PACKET_INFO* minor_p, ConflictItem* conflict);
+    PACKET_INFO* resolve_packet_conflict(PACKET_INFO* major_p, PACKET_INFO* minor_p, ConflictItem* conflict);
 
     /**
      * Retrieves all packets for the given pkt_id stored in packet_map and outputs a merged packet

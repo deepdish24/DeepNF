@@ -116,7 +116,7 @@ void MergerOperator::run_node_thread(int port, int node_id) {
  * @param conflict      The ConflictItem describing the conflict between the major and minor packets
  * @return  A merged packet containing both major_p and minor_p's writes
  */
-packet* MergerOperator::resolve_packet_conflict(
+MergerOperator::PACKET_INFO* MergerOperator::resolve_packet_conflict(
         PACKET_INFO* major_p,
         PACKET_INFO* minor_p,
         ConflictItem* conflict) {
