@@ -36,11 +36,13 @@ int main(int argc, char *argv[]) {
         // prepare packet
         std::string data("null packetto");
         std::string sip = "127.0.0.1";
-        int sp = 8001;
+        int sp = 7777;
         std::string dip(argv[3]);
         int dp = portno;
         srand ( time(NULL) );
         struct packet p(sip, sp, dip, dp, (unsigned short) 17, data);
+        printf("before nullifying buf: %02X\n, p->pkt);
+
         printf("Going to nullify packet now\n");
         p.nullify();
         bool is_null = p.is_null();
