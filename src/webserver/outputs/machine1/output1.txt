@@ -1,0 +1,3 @@
+1, id1,machine1 O1,dropped
+2, id3,machine1 O1,dropped
+3, id4,machine1 O1,dropped
