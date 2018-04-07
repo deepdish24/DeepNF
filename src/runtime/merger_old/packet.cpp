@@ -23,15 +23,16 @@ packet::packet(const u_char *pkt, int pkt_size)
 
 bool packet::is_null()
 {
-	char sourceIp[INET_ADDRSTRLEN];
-	inet_ntop(AF_INET, &(ip_header->ip_src), sourceIp, INET_ADDRSTRLEN);
-	return ntohs(tcp_header->source) == 0 && std::string(sourceIp) == "0.0.0.0";
+//	char sourceIp[INET_ADDRSTRLEN];
+//	inet_ntop(AF_INET, &(ip_header->ip_src), sourceIp, INET_ADDRSTRLEN);
+//	return ntohs(tcp_header->source) == 0 && std::string(sourceIp) == "0.0.0.0";
+	return ntohs(tcp_header->source) == 0;
 }
 
 void packet::nullify()
 {
-	tcp_header->source = 0;
-    memset(&(ip_header->ip_src), 0, sizeof(ip_header->ip_src));
+	tcp_header->source = htons(0);
+//    memset(&(ip_header->ip_src), 0, sizeof(ip_header->ip_src));
 }
 
 packet* packet::copy() {
