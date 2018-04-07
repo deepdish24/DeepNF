@@ -73,14 +73,14 @@ void packet::init_packet(const u_char *pkt, int pkt_size) {
     this->pkt = pkt;
     size = pkt_size;
     ethernet_header = (struct ether_header*)pkt;
-//    if (ntohs(ethernet_header->ether_type) == ETHERTYPE_IP) {
-//        ip_header = (struct ip*)(pkt + sizeof(struct ether_header));
+    if (ntohs(ethernet_header->ether_type) == ETHERTYPE_IP) {
+        ip_header = (struct ip*)(pkt + sizeof(struct ether_header));
 //        if (ip_header->ip_p == IPPROTO_TCP) {
 //            tcp_header = (tcphdr*)(pkt + sizeof(struct ether_header) + sizeof(struct ip));
 //            data = (u_char*)(pkt + sizeof(struct ether_header) + sizeof(struct ip) + sizeof(struct tcphdr));
 //            data_size = pkt_size - (sizeof(struct ether_header) + sizeof(struct ip) + sizeof(struct tcphdr));
 //        }
-//    }
+    }
 }
 
 packet::~packet() {
