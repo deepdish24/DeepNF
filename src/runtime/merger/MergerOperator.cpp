@@ -297,10 +297,6 @@ MergerOperator::PACKET_INFO* MergerOperator::packet_to_packet_info(packet* pkt, 
  */
 void MergerOperator::run() {
     // set up destination address
-    if (this->merger_info->get_dest_ip() == nullptr) {
-        fprintf(stderr, "No destinatino ip address specified by merger_info\n");
-        exit(-1);
-    }
     std::string addr_str = stringify(std::string(this->merger_info->get_dest_ip()), this->merger_info->get_dest_port());
     dest_address = address_from_string(addr_str);
 
