@@ -76,7 +76,6 @@ void MergerOperator::run_node_thread(int port, int node_id) {
 
     // binds socket with given fd to given port */
     bind_socket(sockfd, port);
-    printf("binded socket\n");
 
     std::map<int, packet *>* this_pkt_map;
     while (true) {
@@ -88,8 +87,6 @@ void MergerOperator::run_node_thread(int port, int node_id) {
         printf("Echo: [%s] (%d bytes)\n", p->data, p->data_size);
         char sourceIp[INET_ADDRSTRLEN];
 	    inet_ntop(AF_INET, &(p->ip_header->ip_src), sourceIp, INET_ADDRSTRLEN);
-        printf("ip: %s, ", std::string(sourceIp).c_str());
-        printf("port: %d\n", ntohs(p->tcp_header->source));
 
         // add packet to packet_map
         pthread_mutex_lock(&packet_map_mutex);
@@ -131,7 +128,7 @@ MergerOperator::PACKET_INFO* MergerOperator::resolve_packet_conflict(
         PACKET_INFO* major_p,
         PACKET_INFO* minor_p,
         ConflictItem* conflict) {
-    printf(" MergerOperator::resolve_packet_conflict - major: %d, minor: %d\n", major_p->node_id, minor_p->node_id);
+    printf("MergerOperator::resolve_packet_conflict - major: %d, minor: %d\n", major_p->node_id, minor_p->node_id);
 
     // if either packet is null, drop the packet (ie. return a nullified packet)
     if (major_p->pkt->is_null() || minor_p->pkt->is_null()) {
@@ -141,8 +138,6 @@ MergerOperator::PACKET_INFO* MergerOperator::resolve_packet_conflict(
         pi->node_id = conflict == nullptr ? -1 : conflict->get_parent();
         pi->pkt = new packet(major_p->pkt->pkt, major_p->pkt->size);
         pi->pkt->nullify();
-        printf("pi->pkt->nullify();\n");
-
         return pi;
     }
 
@@ -182,16 +177,15 @@ packet* MergerOperator::merge_packet(int pkt_id) {
     bool was_changed = true; // has at least one merge conflict been resolved in this iteration?
 
     for (auto it = conflicts_list.begin(); it != conflicts_list.end(); ++it) {
-        printf("Iterating through conflicts list: %s\n", (*it)->to_string().c_str());
+//        printf("Iterating through conflicts list: %s\n", (*it)->to_string().c_str());
     }
 
     // at this point, none of the packets should have conflicts any more, just merge them all
     PACKET_INFO* merged_packet = nullptr;
     for (auto it = pkt_info_map->begin(); it != pkt_info_map->end(); ++it) {
-        printf("Iterating through pkt_info_map, %d\n", it->first);
+//        printf("Iterating through pkt_info_map, %d\n", it->first);
 
         if (merged_packet == nullptr) {
-            printf("merged packet is nullptr, setting last encountered pkt_info as ptr\n");
             merged_packet = it->second;
             continue;
         }
@@ -237,13 +231,12 @@ void MergerOperator::run_merge_packet(int pkt_id) {
         exit(-1);
     }
 
-    printf("about to send packet\n");
     if (send_packet(merged_pkt, sockfd, this->dest_address) < 0) {
         fprintf(stderr, "Send packet error: %s", strerror(errno));
         exit(-1);
     }
 
-    printf("Finished merging for id: %d, printing packet_map:\n", pkt_id);
+    printf("Sent merged packet for id: %d, printing packet_map:\n", pkt_id);
     print_packet_map();
 
 }
