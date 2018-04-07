@@ -37,28 +37,28 @@ packet::packet(std::string sip, int sp, std::string dip, int dp, unsigned int id
 	tcp_header_temp->source = htons(sp);
 	tcp_header_temp->dest = htons(dp);
 	printf("tcp_header_temp->dest = htons(dp);\n");
-//
-//	u_char *data_temp = (u_char *)data.c_str();
-//	std::cout << "[" << data_temp << "]\n";
-//	int data_size_temp = data.size();
-//	int size_temp = sizeof(struct ether_header) + sizeof(struct ip) + sizeof(struct tcphdr) + data_size_temp;
-//	ip_header_temp->ip_len = htons(size_temp);
-//	printf("ip_header_temp->ip_len = htons(size_temp);\n");
-//
-//	u_char *pkt_char = (u_char*)malloc(size_temp);
-//	memcpy(pkt_char, (void *)ethernet_header_temp, sizeof(struct ether_header));
-//	memcpy(pkt_char + sizeof(struct ether_header), (void *)ip_header_temp, sizeof(struct ip));
-//	memcpy(pkt_char + sizeof(struct ether_header) + sizeof(struct ip), (void *)tcp_header_temp, sizeof(struct tcphdr));
-//	memcpy(pkt_char + sizeof(struct ether_header) + sizeof(struct ip) + sizeof(struct tcphdr), (void *)data_temp, data_size_temp);
-//	pkt = pkt_char;
-//	printf("pkt = pkt_char;;\n");
-//
-//	printf("free(this->data);\n");
-//
+
+	u_char *data_temp = (u_char *)data.c_str();
+	std::cout << "[" << data_temp << "]\n";
+	int data_size_temp = data.size();
+	int size_temp = sizeof(struct ether_header) + sizeof(struct ip) + sizeof(struct tcphdr) + data_size_temp;
+	ip_header_temp->ip_len = htons(size_temp);
+	printf("ip_header_temp->ip_len = htons(size_temp);\n");
+
+	u_char *pkt_char = (u_char*)malloc(size_temp);
+	memcpy(pkt_char, (void *)ethernet_header_temp, sizeof(struct ether_header));
+	memcpy(pkt_char + sizeof(struct ether_header), (void *)ip_header_temp, sizeof(struct ip));
+	memcpy(pkt_char + sizeof(struct ether_header) + sizeof(struct ip), (void *)tcp_header_temp, sizeof(struct tcphdr));
+	memcpy(pkt_char + sizeof(struct ether_header) + sizeof(struct ip) + sizeof(struct tcphdr), (void *)data_temp, data_size_temp);
+	pkt = pkt_char;
+	printf("pkt = pkt_char;;\n");
+
+	printf("free(this->data);\n");
+
 //	delete ethernet_header_temp;
 //	delete ip_header_temp;
 //	delete tcp_header_temp;
-//
+
 //	size = size_temp;
 //	ethernet_header = (struct ether_header*)pkt;
 //	printf("ethernet_header = (struct ether_header*)pkt;\n");
