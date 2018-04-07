@@ -73,7 +73,7 @@ packet::packet(std::string sip, int sp, std::string dip, int dp, unsigned int id
 //			data_size = size - (sizeof(struct ether_header) + sizeof(struct ip) + sizeof(struct tcphdr));
 //			printf("data_size = size - (sizeof(struct ether_header) + sizeof(struct ip) + sizeof(struct tcphdr));\n");
 //		}
-	}
+//	}
 
 }
 
