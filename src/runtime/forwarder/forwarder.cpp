@@ -60,7 +60,7 @@ void *run_thread(void *arg) {
 
 int main(int argc, char *argv[]) {
     FILE *fp = fopen(argv[1], "r");
-    if (fp < 0) {
+    if ((int) fp < 0) {
         perror("Cannot open file (%s)\n");
         exit(1);
     }
