@@ -217,7 +217,7 @@ packet* MergerOperator::merge_packet(int pkt_id) {
  */
 void MergerOperator::run_merge_packet(int pkt_id) {
     packet* merged_pkt = this->merge_packet(pkt_id);
-    printf("Finished merging packet\n");
+    printf("\nFinished merging packet\n");
     if (merged_pkt->is_null()) {
         printf("Merged packet is null\n");
     } else {
