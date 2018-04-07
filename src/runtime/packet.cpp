@@ -84,9 +84,7 @@ void packet::init_packet(const u_char *pkt, int pkt_size) {
 }
 
 packet::~packet() {
-//	delete this->tcp_header;
-//	delete this->ip_header;
-//	delete this->ethernet_header;
+
 }
 
 bool packet::is_null()
