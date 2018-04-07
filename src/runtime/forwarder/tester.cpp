@@ -73,7 +73,7 @@ int main(int argc, char *argv[]) {
         if (p->is_null()) {
             printf("Received null packet!\n");
         } else {
-            printf("Echo: [%s] (%d bytes)\n", p->data, p->data_size);
+            printf("%d Echo: [%s] (%d bytes)\n", p->ip_header->ip_id, p->data, p->data_size);
         }
         free(p);
         free(pkt_data);

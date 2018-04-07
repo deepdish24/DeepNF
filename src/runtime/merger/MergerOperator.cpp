@@ -206,6 +206,11 @@ packet* MergerOperator::merge_packet(int pkt_id) {
         exit(-1);
     }
 
+    // remove pkt_id from packet_map
+    pthread_mutex_lock(&packet_map_mutex);
+    packet_map.erase(pkt_id);
+    pthread_mutex_unlock(&packet_map_mutex);
+
     return merged_packet->pkt;
 }
 
@@ -237,6 +242,9 @@ void MergerOperator::run_merge_packet(int pkt_id) {
         fprintf(stderr, "Send packet error: %s", strerror(errno));
         exit(-1);
     }
+
+    printf("Finished merging for id: %d, printing packet_map:\n", pkt_id);
+    print_packet_map();
 
 }
 
