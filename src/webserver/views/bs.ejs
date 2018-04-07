@@ -119,7 +119,10 @@ src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 src="http://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
     <script type="text/javascript">
       
+  var loc = window.location.pathname;
+var dir = loc.substring(0, loc.lastIndexOf('/'));
 
+console.log(dir);
       var table = document.getElementById("myTable");
 
 
