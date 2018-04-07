@@ -8,7 +8,7 @@
  * Initialize hardcoded action table
  */
 ActionTable::ActionTable() {
-    std::set<Field> dnf_firewall_write_fields = {  };
+    std::set<Field> dnf_firewall_write_fields = { SIP };
     write_fields_map.insert(std::make_pair(NF::dnf_firewall, dnf_firewall_write_fields));
 }
 
