@@ -225,7 +225,7 @@ void MergerOperator::run_merge_packet(int pkt_id) {
     int dp = 7777;
     srand(time(NULL));
     struct packet merged_pkt(sip, sp, dip, dp, (unsigned short) 17, data);
-    
+
     printf("\nFinished merging packet\n");
     if (merged_pkt.is_null()) {
         printf("Merged packet is null\n");
@@ -280,7 +280,7 @@ MergerOperator::PACKET_INFO* MergerOperator::packet_to_packet_info(packet* pkt, 
     auto* pi = (PACKET_INFO*) malloc(sizeof(PACKET_INFO));
 
     if (this->merger_info->get_node_map().count(node_id) == 0) {
-        fprintf(stderr, "Called packet_to_packet_info on invalid node_id: %d", node_id);
+        fprintf(stderr, "Called packet_to_packet_info on invalid node_id: %d\n", node_id);
         exit(-1);
     }
     RuntimeNode* rn = this->merger_info->get_node_map().at(node_id);
@@ -297,6 +297,10 @@ MergerOperator::PACKET_INFO* MergerOperator::packet_to_packet_info(packet* pkt, 
  */
 void MergerOperator::run() {
     // set up destination address
+    if (this->merger_info->get_dest_ip() == nullptr) {
+        fprintf(stderr, "No destinatino ip address specified by merger_info\n");
+        exit(-1);
+    }
     std::string addr_str = stringify(std::string(this->merger_info->get_dest_ip()), this->merger_info->get_dest_port());
     dest_address = address_from_string(addr_str);
 

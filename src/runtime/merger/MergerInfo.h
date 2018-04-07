@@ -30,7 +30,9 @@ class MergerInfo {
     public:
         MergerInfo(std::map<int, int> port_to_node_map,
                    std::vector<ConflictItem*> conflicts_list,
-                   std::map<int, RuntimeNode*> node_map);
+                   std::map<int, RuntimeNode*> node_map,
+                   std::string dest_ip,
+                   int dest_port);
 
         std::map<int, int> get_port_to_node_map();
 

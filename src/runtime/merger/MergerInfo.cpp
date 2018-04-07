@@ -4,14 +4,19 @@
 
 #include "MergerInfo.h"
 
+#include <utility>
 
 
 MergerInfo::MergerInfo(std::map<int, int> port_to_node_map,
                        std::vector<ConflictItem*> conflicts_list,
-                       std::map<int, RuntimeNode*> node_map) {
-    this->port_to_node_map = port_to_node_map;
-    this->conflicts_list = conflicts_list;
-    this->node_map = node_map;
+                       std::map<int, RuntimeNode*> node_map,
+                       std::string dest_ip,
+                       int dest_port) {
+    this->port_to_node_map = std::move(port_to_node_map);
+    this->conflicts_list = std::move(conflicts_list);
+    this->node_map = std::move(node_map);
+    this->dest_ip = std::move(dest_ip);
+    this->dest_port = dest_port;
 }
 
 std::map<int, int> MergerInfo::get_port_to_node_map() {
@@ -52,6 +57,9 @@ MergerInfo* MergerInfo::get_dummy_merger_info() {
     node_map.insert(std::make_pair(0, rn1));
     node_map.insert(std::make_pair(1, rn2));
 
-    MergerInfo* mi = new MergerInfo(port_to_node_map, conflicts_list, node_map);
+    std::string dest_ip = "127.0.0.1";
+    int dest_port = 7777;
+
+    MergerInfo* mi = new MergerInfo(port_to_node_map, conflicts_list, node_map, dest_ip, dest_port);
     return mi;
 }
