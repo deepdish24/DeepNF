@@ -365,6 +365,9 @@ void start_network_functions(MachineConfigurator c) {
 				exec_nf_cmd += "";
 				break;
 
+			default:
+				break;
+
 //		case snort:
 //			exec_nf_cmd += "snort -N -A console -q -c /etc/snort/snort.conf -Q -i eth1:eth2";
 //			break;
