@@ -51,8 +51,9 @@ int send_data(char *buf, int size, int sockfd, address *addr)
 int send_packet(packet *p, int sockfd, address *addr)
 {
 	std::cout << "packet size = " << p->size << "\n";
-	strcpy ((char*) p->pkt,"hi");
-	return send_data((char*) p->pkt, p->size, sockfd, addr);
+	char txt[100];
+	strcpy ((char*) txt,"hi my dear friend");
+	return send_data((char*) txt, p->size, sockfd, addr);
 }
 
 
