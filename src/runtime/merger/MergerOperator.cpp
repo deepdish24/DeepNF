@@ -120,6 +120,8 @@ MergerOperator::PACKET_INFO* MergerOperator::resolve_packet_conflict(
 
     // if either packet is null, drop the packet (ie. return a nullified packet)
     if (major_p->pkt->is_null() || minor_p->pkt->is_null()) {
+        printf("Null packet detected\n");
+
         auto* pi = (PACKET_INFO*) malloc(sizeof(PACKET_INFO));
         pi->node_id = conflict->get_parent();
         pi->pkt = new packet(major_p->pkt->pkt, major_p->pkt->size);
@@ -182,8 +184,12 @@ packet* MergerOperator::merge_packet(int pkt_id) {
 
     }
 
+    if (merged_packet == nullptr) {
+        fprintf(stderr, "No packets in packet_map to merge for id %d", pkt_id);
+        exit(-1);
+    }
 
-    return nullptr;
+    return merged_packet->pkt;
 }
 
 
