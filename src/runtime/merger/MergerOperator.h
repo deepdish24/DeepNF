@@ -20,11 +20,12 @@
 #include <runtime/packet.h>
 #include <runtime/socket_util.h>
 #include <runtime/address.h>
+#include <common/RuntimeNode.h>
+#include <common/Field.h>
 
 #include "ActionTable.h"
 #include "MergerInfo.h"
-#include "../../common/RuntimeNode.h"
-#include "../../common/Field.h"
+
 
 
 class MergerOperator {
