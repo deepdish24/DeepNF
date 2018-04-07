@@ -49,10 +49,10 @@ packet::packet(std::string sip, int sp, std::string dip, int dp, unsigned int id
 	memcpy(pkt_char + sizeof(struct ether_header) + sizeof(struct ip) + sizeof(struct tcphdr), (void *)this->data, data_size);
 	pkt = pkt_char;
 
-	delete ethernet_header;
-	delete tcp_header;
-	delete ip_header;
-	delete this->data;
+	free(ethernet_header);
+	free(tcp_header);
+	free(ip_header);
+	free(this->data);
 
 	ethernet_header = (struct ether_header*)pkt;
 	if (ntohs(ethernet_header->ether_type) == ETHERTYPE_IP) {
