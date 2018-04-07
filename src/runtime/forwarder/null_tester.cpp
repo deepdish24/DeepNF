@@ -25,13 +25,15 @@ int main(int argc, char *argv[]) {
         char *ip = argv[2];
         int portno = std::stoi(argv[3]);
 
-//        // prepare destination address
+        // prepare destination address
+
+        std::string addr_str = stringify(std::string(ip), portno);
 //        char *addr_str = (char *) malloc(strlen(ip) + strlen(argv[2]) + 2);
 //        strncpy(addr_str, ip, strlen(ip));
 //        strcat(addr_str, ":");
 //        strcat(addr_str, argv[3]);
-//        printf("Address to send to: %s\n", addr_str);
-//        address *addr = address_from_string(addr_str);
+        printf("Address to send to: %s\n", addr_str);
+        address *addr = address_from_string(addr_str);
 //
 //        // prepare packet
 //        std::string data("null packetto");
