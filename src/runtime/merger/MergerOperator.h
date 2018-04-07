@@ -33,6 +33,7 @@ class MergerOperator {
 public:
     typedef struct packet_info
     {
+        int node_id;
         packet* pkt;
         /* list of all fields of the packet that should be considered "written to" during the merging
          * process */
@@ -71,6 +72,17 @@ private:
      * packet id (if such a packet has been received) */
     std::map<int, std::map<int, packet*>*> packet_map;
     pthread_mutex_t packet_map_mutex;
+
+    /**
+     * Given two packets (one with precedence over the another), return a merged packet that merges all written fields
+     * in the two packets, resolving write conflicts appriopriately
+     *
+     * @param major_p       Info corresponding to the packet with precedence
+     * @param minor_p       Info corresponding to the packet without precedence
+     * @param conflict      The ConflictItem describing the conflict between the major and minor packets
+     * @return  A merged packet containing both major_p and minor_p's writes
+     */
+    packet* resolve_packet_conflict(PACKET_INFO* major_p, PACKET_INFO* minor_p, ConflictItem* conflict);
 
     /**
      * Retrieves all packets for the given pkt_id stored in packet_map and outputs a merged packet

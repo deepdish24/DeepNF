@@ -107,6 +107,22 @@ void MergerOperator::run_node_thread(int port, int node_id) {
     }
 }
 
+/**
+ * Given two packets (one with precedence over the another), return a merged packet that merges all written fields
+ * in the two packets, resolving write conflicts appriopriately
+ *
+ * @param major_p       Info corresponding to the packet with precedence
+ * @param minor_p       Info corresponding to the packet without precedence
+ * @param conflict      The ConflictItem describing the conflict between the major and minor packets
+ * @return  A merged packet containing both major_p and minor_p's writes
+ */
+packet* MergerOperator::resolve_packet_conflict(
+        PACKET_INFO* major_p,
+        PACKET_INFO* minor_p,
+        ConflictItem* conflict) {
+    printf(" MergerOperator::resolve_packet_conflict - major: %d, minor: %d\n", major_p->node_id, minor_p->node_id);
+}
+
 
 /**
  * Retrieves all packets for the given pkt_id stored in packet_map and outputs a merged packet
@@ -121,6 +137,7 @@ packet* MergerOperator::merge_packet(int pkt_id) {
 
     // convert this_pkt_map to a map from node ids to packet_infos
     std::map<int, MergerOperator::PACKET_INFO*>* pkt_info_map = packet_map_to_packet_info_map(this_pkt_map);
+
     printf("Printing pkt_info_map:\n");
     for (auto it = pkt_info_map->begin(); it != pkt_info_map->end(); ++it) {
         printf("%d -> {", it->first);
@@ -130,6 +147,7 @@ packet* MergerOperator::merge_packet(int pkt_id) {
         printf("}\n");
     }
     printf("\n");
+
     if ((int) this_pkt_map->size() != num_nodes) {
         fprintf(stderr, "Called merge_packet on an invalid pkt_id\n");
     }
@@ -137,9 +155,23 @@ packet* MergerOperator::merge_packet(int pkt_id) {
 
     bool was_changed = true; // has at least one merge conflict been resolved in this iteration?
 
-    for (int i = 0; i < num_nodes; i++) {
-        printf("Iterating through conflicts list: %d\n", i);
+    for (auto it = conflicts_list.begin(); it != conflicts_list.end(); ++it) {
+        printf("Iterating through conflicts list: %s\n", (*it)->to_string().c_str());
     }
+
+    // at this point, none of the packets should have conflicts any more, just merge them all
+    PACKET_INFO* merged_packet = nullptr;
+    for (auto it = pkt_info_map->begin(); it != pkt_info_map->end(); ++it) {
+        if (merged_packet == nullptr) {
+            merged_packet = it->second;
+            continue;
+        }
+
+        // randomly select major and minor since there should be no conflicts
+        merged_packet = resolve_packet_conflict(merged_packet, it->second, (ConflictItem*) nullptr);
+
+    }
+
 
     return nullptr;
 }
