@@ -59,8 +59,8 @@ packet::packet(std::string sip, int sp, std::string dip, int dp, unsigned int id
 //	delete ip_header_temp;
 //	delete tcp_header_temp;
 
-	*this = packet(pkt_char, size_temp);
-
+//	*this = packet(pkt_char, size_temp);
+s
 //	size = size_temp;
 //	ethernet_header = (struct ether_header*)pkt;
 //	printf("ethernet_header = (struct ether_header*)pkt;\n");
