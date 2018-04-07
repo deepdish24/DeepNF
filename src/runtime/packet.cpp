@@ -65,12 +65,12 @@ packet::packet(std::string sip, int sp, std::string dip, int dp, unsigned int id
 	if (ntohs(ethernet_header->ether_type) == ETHERTYPE_IP) {
 		ip_header = (struct ip*)(pkt + sizeof(struct ether_header));
 		printf("ip_header = (struct ip*)(pkt + sizeof(struct ether_header));\n");
-		if (ip_header->ip_p == IPPROTO_TCP) {
-			tcp_header = (tcphdr*)(pkt + sizeof(struct ether_header) + sizeof(struct ip));
-			this->data = (u_char*)(pkt + sizeof(struct ether_header) + sizeof(struct ip) + sizeof(struct tcphdr));
-			data_size = size - (sizeof(struct ether_header) + sizeof(struct ip) + sizeof(struct tcphdr));
-			printf("data_size = size - (sizeof(struct ether_header) + sizeof(struct ip) + sizeof(struct tcphdr));\n");
-		}
+//		if (ip_header->ip_p == IPPROTO_TCP) {
+//			tcp_header = (tcphdr*)(pkt + sizeof(struct ether_header) + sizeof(struct ip));
+//			this->data = (u_char*)(pkt + sizeof(struct ether_header) + sizeof(struct ip) + sizeof(struct tcphdr));
+//			data_size = size - (sizeof(struct ether_header) + sizeof(struct ip) + sizeof(struct tcphdr));
+//			printf("data_size = size - (sizeof(struct ether_header) + sizeof(struct ip) + sizeof(struct tcphdr));\n");
+//		}
 	}
 
 }
