@@ -62,7 +62,7 @@ packet::packet(std::string sip, int sp, std::string dip, int dp, unsigned int id
 	size = size_temp;
 	ethernet_header = (struct ether_header*)pkt;
 	printf("ethernet_header = (struct ether_header*)pkt;\n");
-//	if (ntohs(ethernet_header->ether_type) == ETHERTYPE_IP) {
+	if (ntohs(ethernet_header->ether_type) == ETHERTYPE_IP) {
 //		ip_header = (struct ip*)(pkt + sizeof(struct ether_header));
 //		printf("ip_header = (struct ip*)(pkt + sizeof(struct ether_header));\n");
 //		if (ip_header->ip_p == IPPROTO_TCP) {
@@ -71,7 +71,7 @@ packet::packet(std::string sip, int sp, std::string dip, int dp, unsigned int id
 //			data_size = size - (sizeof(struct ether_header) + sizeof(struct ip) + sizeof(struct tcphdr));
 //			printf("data_size = size - (sizeof(struct ether_header) + sizeof(struct ip) + sizeof(struct tcphdr));\n");
 //		}
-//	}
+	}
 
 }
 
