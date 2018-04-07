@@ -231,6 +231,7 @@ void MergerOperator::run_merge_packet(int pkt_id) {
         exit(-1);
     }
 
+    printf("about to send packet");
     if (send_packet(merged_pkt, sockfd, this->dest_address) < 0) {
         fprintf(stderr, "Send packet error: %s", strerror(errno));
         exit(-1);
