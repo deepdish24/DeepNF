@@ -40,7 +40,7 @@ int send_data(char *buf, int size, int sockfd, address *addr)
 
 	int num_bytes = sendto(sockfd, buf, size, 0, 
 			(struct sockaddr*)&server_dest, sizeof(struct sockaddr));
-	printf("sending data buf: %s\n", buf);
+	printf("sending data buf: %02X\n", buf);
 	if (num_bytes < 0) {
 		return -1;
 	}
@@ -65,7 +65,7 @@ sockdata *receive_data(int sockfd)
 	if (rlen < 0) {
 		return NULL;
 	}
-	printf("received data: buf: %s\n", buf);
+	printf("received data: buf: %02X\n", buf);
 	std::cout << "received " << rlen << " bytes\n";
 	buf[rlen] = 0;
 
