@@ -121,6 +121,8 @@ MergerOperator::PACKET_INFO* MergerOperator::resolve_packet_conflict(
         PACKET_INFO* minor_p,
         ConflictItem* conflict) {
     printf(" MergerOperator::resolve_packet_conflict - major: %d, minor: %d\n", major_p->node_id, minor_p->node_id);
+
+    return nullptr;
 }
 
 
