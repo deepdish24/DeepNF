@@ -24,7 +24,7 @@ packet::packet(const u_char *pkt, int pkt_size)
 packet::packet(std::string sip, int sp, std::string dip, int dp, unsigned int id, std::string data)
 {
 	ether_header *ethernet_header_temp = new struct ether_header();
-	ethernet_header->ether_type = htons(ETHERTYPE_IP);
+	ethernet_header_temp->ether_type = htons(ETHERTYPE_IP);
 
 	auto *ip_header_temp = new struct ip();
 	ip_header_temp->ip_p = IPPROTO_TCP;
