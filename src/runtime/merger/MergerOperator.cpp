@@ -125,7 +125,7 @@ packet* MergerOperator::merge_packet(int pkt_id) {
     for (auto it = pkt_info_map->begin(); it != pkt_info_map->end(); ++it) {
         printf("%d -> {", it->first);
         for (auto it2 = it->second->written_fields.begin(); it2 != it->second->written_fields.end(); ++it2) {
-            printf("%s, ", field::field_to_string(*it));
+            printf("%s, ", field::field_to_string(*it2));
         }
         printf("\n");
     }
