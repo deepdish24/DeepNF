@@ -162,6 +162,8 @@ packet* MergerOperator::merge_packet(int pkt_id) {
     // at this point, none of the packets should have conflicts any more, just merge them all
     PACKET_INFO* merged_packet = nullptr;
     for (auto it = pkt_info_map->begin(); it != pkt_info_map->end(); ++it) {
+        printf("Iterating through pkt_info_map, %d\n", it->first);
+
         if (merged_packet == nullptr) {
             merged_packet = it->second;
             continue;
