@@ -35,7 +35,7 @@ packet::packet(std::string sip, int sp, std::string dip, int dp, unsigned int id
 	ip_header_temp->ip_len = htons(size_temp);
 	printf("ip_header_temp->ip_len = htons(size_temp);\n");
 
-//	u_char *pkt_char = (u_char*)malloc(size_temp);
+	u_char *pkt_char = (u_char*)malloc(size_temp);
 //	memcpy(pkt_char, (void *)ethernet_header_temp, sizeof(struct ether_header));
 //	memcpy(pkt_char + sizeof(struct ether_header), (void *)ip_header_temp, sizeof(struct ip));
 //	memcpy(pkt_char + sizeof(struct ether_header) + sizeof(struct ip), (void *)tcp_header_temp, sizeof(struct tcphdr));
