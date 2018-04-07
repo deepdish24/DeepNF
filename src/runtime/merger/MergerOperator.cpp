@@ -216,18 +216,10 @@ packet* MergerOperator::merge_packet(int pkt_id) {
  * @param pkt_id    The id of the packet to merge
  */
 void MergerOperator::run_merge_packet(int pkt_id) {
-//    packet* merged_pkt = this->merge_packet(pkt_id);
-
-    std::string data("null packetto");
-    std::string sip = "127.0.0.1";
-    int sp = 7777;
-    std::string dip("127.0.0.1");
-    int dp = 7777;
-    srand(time(NULL));
-    struct packet merged_pkt(sip, sp, dip, dp, (unsigned short) 17, data);
+    packet* merged_pkt = this->merge_packet(pkt_id);
 
     printf("\nFinished merging packet\n");
-    if (merged_pkt.is_null()) {
+    if (merged_pkt->is_null()) {
         printf("Merged packet is null\n");
     } else {
         printf("Merged packet is not null\n");
@@ -241,7 +233,7 @@ void MergerOperator::run_merge_packet(int pkt_id) {
     }
 
     printf("about to send packet\n");
-    if (send_packet(&merged_pkt, sockfd, this->dest_address) < 0) {
+    if (send_packet(merged_pkt, sockfd, this->dest_address) < 0) {
         fprintf(stderr, "Send packet error: %s", strerror(errno));
         exit(-1);
     }

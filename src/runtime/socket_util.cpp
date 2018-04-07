@@ -44,7 +44,6 @@ int send_data(char *buf, int size, int sockfd, address *addr)
 		return -1;
 	}
 
-    printf("sending buf: %02X\n", buf);
 	std::cout << "sent " << num_bytes << " bytes\n";
 	return num_bytes;
 }
@@ -68,8 +67,6 @@ sockdata *receive_data(int sockfd)
 	}
 	std::cout << "received " << rlen << " bytes\n";
 	buf[rlen] = 0;
-
-    printf("receiving buf: %02X\n", buf);
 
 	sockdata *d = new sockdata();
 	d->size = rlen;
