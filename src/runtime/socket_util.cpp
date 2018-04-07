@@ -30,7 +30,7 @@ int bind_socket(int sockfd, int portno)
 }
 
 
-int send_data(char *buf, int size, int sockfd, address *addr)
+int send_data(u_char *buf, int size, int sockfd, address *addr)
 {
 	struct sockaddr_in server_dest;
 	bzero(&server_dest, sizeof(server_dest));
@@ -60,7 +60,7 @@ sockdata *receive_data(int sockfd)
 	struct sockaddr_in src;
 	socklen_t srclen = sizeof(src);
 	
-	char *buf = (char*)malloc(BUFFER_SIZE);
+	u_char *buf = (u_char*)malloc(BUFFER_SIZE);
 	int rlen = recvfrom(sockfd, buf, BUFFER_SIZE - 1, 0, (struct sockaddr*)&src, &srclen);
 	if (rlen < 0) {
 		return NULL;

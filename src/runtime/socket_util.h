@@ -7,7 +7,7 @@
 struct sockdata
 {
     int size;
-    char *buffer;
+    u_char *buffer;
 };
 
 /* opens a datagram socket and returns the fd or -1 */
@@ -17,7 +17,7 @@ int open_socket();
 int bind_socket(int sockfd, int portno);
 
 /* sends data to the specified address over a datagram socket */
-int send_data(char *buf, int size, int sockfd, address *addr);
+int send_data(u_char *buf, int size, int sockfd, address *addr);
 
  /* sends a packet to a specified address 
   * and returns 0 if successful, -1 otherwise */
