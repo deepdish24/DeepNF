@@ -41,26 +41,32 @@ packet::packet(std::string sip, int sp, std::string dip, int dp, unsigned int id
 	data_size = data.size();
 	size = sizeof(struct ether_header) + sizeof(struct ip) + sizeof(struct tcphdr) + data_size;
 	ip_header->ip_len = htons(size);
-	
+
+	printf("ip_header->ip_len = htons(size);\n");
 	u_char *pkt_char = (u_char*)malloc(size);
 	memcpy(pkt_char, (void *)ethernet_header, sizeof(struct ether_header));
 	memcpy(pkt_char + sizeof(struct ether_header), (void *)ip_header, sizeof(struct ip));
 	memcpy(pkt_char + sizeof(struct ether_header) + sizeof(struct ip), (void *)tcp_header, sizeof(struct tcphdr));
 	memcpy(pkt_char + sizeof(struct ether_header) + sizeof(struct ip) + sizeof(struct tcphdr), (void *)this->data, data_size);
 	pkt = pkt_char;
+	printf("pkt = pkt_char;;\n");
 
 	free(ethernet_header);
 	free(tcp_header);
 	free(ip_header);
 	free(this->data);
+	printf("free(this->data);\n");
 
 	ethernet_header = (struct ether_header*)pkt;
+	printf("ethernet_header = (struct ether_header*)pkt;\n");
 	if (ntohs(ethernet_header->ether_type) == ETHERTYPE_IP) {
 		ip_header = (struct ip*)(pkt + sizeof(struct ether_header));
+		printf("ip_header = (struct ip*)(pkt + sizeof(struct ether_header));\n");
 		if (ip_header->ip_p == IPPROTO_TCP) {
 			tcp_header = (tcphdr*)(pkt + sizeof(struct ether_header) + sizeof(struct ip));
 			this->data = (u_char*)(pkt + sizeof(struct ether_header) + sizeof(struct ip) + sizeof(struct tcphdr));
 			data_size = size - (sizeof(struct ether_header) + sizeof(struct ip) + sizeof(struct tcphdr));
+			printf("data_size = size - (sizeof(struct ether_header) + sizeof(struct ip) + sizeof(struct tcphdr));\n");
 		}
 	}
 
