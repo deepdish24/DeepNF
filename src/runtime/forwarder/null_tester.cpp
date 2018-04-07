@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
 
         // prepare destination address
         char* addr_str = (char*) malloc(strlen(ip)+strlen(argv[2])+2);
-        strcpy(addr_str, ip);
+        strncpy(addr_str, ip, strlen(ip));
         strcat(addr_str, ":");
         strcat(addr_str, argv[3]);
         printf("Address to send to: %s\n", addr_str);
@@ -42,8 +42,13 @@ int main(int argc, char *argv[]) {
         srand ( time(NULL) );
         struct packet p(sip, sp, dip, dp, (unsigned short) 17, data);
         printf("Going to nullify packet now\n");
-//        p.nullify();
-//        p.is_null();
+        p.nullify();
+        bool is_null = p.is_null();
+        if (is_null) {
+            printf("null\n");
+        } else {
+            printf("not null\n");
+        }
 
         if (send_packet(&p, sockfd, addr) < 0) {
             fprintf(stderr, "Send packet error: %s", strerror(errno));
