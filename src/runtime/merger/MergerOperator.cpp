@@ -175,7 +175,7 @@ packet* MergerOperator::merge_packet(int pkt_id) {
         printf("Iterating through pkt_info_map, %d\n", it->first);
 
         if (merged_packet == nullptr) {
-            printf("merged packet is nullptr, setting last encountered pkt_info as ptr");
+            printf("merged packet is nullptr, setting last encountered pkt_info as ptr\n");
             merged_packet = it->second;
             continue;
         }
