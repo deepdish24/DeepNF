@@ -45,6 +45,9 @@ int main(int argc, char *argv[]) {
         p.nullify();
         p.is_null();
 
+        struct packet new_p(p.pkt, p.size);
+        p.is_null();
+
         if (send_packet(&p, sockfd, addr) < 0) {
             fprintf(stderr, "Send packet error: %s", strerror(errno));
             exit(-1);

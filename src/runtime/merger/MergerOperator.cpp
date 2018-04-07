@@ -88,8 +88,8 @@ void MergerOperator::run_node_thread(int port, int node_id) {
         printf("Echo: [%s] (%d bytes)\n", p->data, p->data_size);
         char sourceIp[INET_ADDRSTRLEN];
 	    inet_ntop(AF_INET, &(p->ip_header->ip_src), sourceIp, INET_ADDRSTRLEN);
-        printf("ip: std::string(sourceIp) %s", std::string(sourceIp).c_str());
-        printf("ntohs(tcp_header->source): %d\n", ntohs(p->tcp_header->source));
+        printf("ip: %s, ", std::string(sourceIp).c_str());
+        printf("port: %d\n", ntohs(p->tcp_header->source));
 
         // add packet to packet_map
         pthread_mutex_lock(&packet_map_mutex);
