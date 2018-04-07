@@ -17,6 +17,10 @@
 #include <vector>
 #include <pthread.h>
 
+#include <net/ethernet.h>
+#include <netinet/tcp.h>   //Provides declarations for tcp header
+#include <netinet/ip.h>    //Provides declarations for ip header
+
 #include <runtime/packet.h>
 #include <runtime/socket_util.h>
 #include <runtime/address.h>
