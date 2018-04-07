@@ -120,7 +120,16 @@ packet* MergerOperator::merge_packet(int pkt_id) {
     std::map<int, packet*>* this_pkt_map = packet_map.at(pkt_id);
 
     // convert this_pkt_map to a map from node ids to packet_infos
-
+    std::map<int, MergerOperator::PACKET_INFO*>* pkt_info_map = packet_map_to_packet_info_map(this_pkt_map);
+    printf("Printing pkt_info_map:\n");
+    for (auto it = pkt_info_map->begin(); it != pkt_info_map->end(); ++it) {
+        printf("%d -> {", it->first);
+        for (auto it = it->second->written_fields.begin(); it != it->second->written_fields.end(); ++it) {
+            printf("%s, ", field::field_to_string(*it));
+        }
+        printf("\n");
+    }
+    printf("\n");
     if ((int) this_pkt_map->size() != num_nodes) {
         fprintf(stderr, "Called merge_packet on an invalid pkt_id\n");
     }
@@ -142,7 +151,17 @@ packet* MergerOperator::merge_packet(int pkt_id) {
  *         packet in packet_map
  */
 std::map<int, MergerOperator::PACKET_INFO*>* MergerOperator::packet_map_to_packet_info_map(std::map<int, packet*>* packet_map) {
-    return nullptr;
+
+    auto ret_map = new std::map<int, MergerOperator::PACKET_INFO*>();
+
+    for (auto it = packet_map->begin(); it != packet_map->end(); ++it) {
+        int node_id = it->first;
+        packet* pkt = it->second;
+
+        ret_map->insert(std::make_pair(node_id, packet_to_packet_info(pkt, node_id)));
+    }
+
+    return ret_map;
 };
 
 
@@ -163,7 +182,7 @@ MergerOperator::PACKET_INFO* MergerOperator::packet_to_packet_info(packet* pkt, 
     RuntimeNode* rn = this->merger_info->get_node_map().at(node_id);
 
     pi->pkt = pkt;
-//    pi->written_fields = this->action_table->get_write_fields(rn->get_nf());
+    pi->written_fields = this->action_table->get_write_fields(rn->get_nf());
     return pi;
 }
 

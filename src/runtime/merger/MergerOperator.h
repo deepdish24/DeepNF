@@ -23,6 +23,7 @@
 
 #include "ActionTable.h"
 #include "MergerInfo.h"
+#include "../../common/RuntimeNode.h"
 
 
 class MergerOperator {
