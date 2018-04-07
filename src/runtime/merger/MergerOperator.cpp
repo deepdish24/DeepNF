@@ -15,8 +15,6 @@ typedef struct node_thread_params {
 
 
 MergerOperator::MergerOperator() {
-    printf("MergerOperator::MergerOperator \n");
-
     this->action_table = new ActionTable();
     this->merger_info = MergerInfo::get_dummy_merger_info();
     this->num_nodes = this->merger_info->get_port_to_node_map().size();
@@ -57,8 +55,6 @@ void* MergerOperator::run_node_thread_wrapper(void *arg) {
  * @param node_id    The id of the runtime node leaf
  */
 void MergerOperator::run_node_thread(int port, int node_id) {
-    printf("Calling run_node_thread with port: %d, node_id: %d\n", port, node_id);
-
     // opens a datagram socket and returns the fd or -1 */
     int sockfd = open_socket();
     if (sockfd < 0) {
@@ -218,6 +214,7 @@ MergerOperator::PACKET_INFO* MergerOperator::packet_to_packet_info(packet* pkt, 
     RuntimeNode* rn = this->merger_info->get_node_map().at(node_id);
 
     pi->pkt = pkt;
+    pi->node_id = node_id;
     pi->written_fields = this->action_table->get_write_fields(rn->get_nf());
     return pi;
 }
@@ -227,8 +224,6 @@ MergerOperator::PACKET_INFO* MergerOperator::packet_to_packet_info(packet* pkt, 
  * Setup MergerOperator to start listening and merging packets
  */
 void MergerOperator::run() {
-    printf("MergerOperator::run() \n");
-
     // send up one thread to handle each leaf node
     std::map<int, int> port_to_node_map = this->merger_info->get_port_to_node_map();
 
