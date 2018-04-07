@@ -50,11 +50,7 @@ packet::packet(std::string sip, int sp, std::string dip, int dp, unsigned int id
 	memcpy(pkt_char + sizeof(struct ether_header) + sizeof(struct ip) + sizeof(struct tcphdr), (void *)this->data, data_size);
 	pkt = pkt_char;
 	printf("pkt = pkt_char;;\n");
-
-	free(ethernet_header);
-	free(tcp_header);
-	free(ip_header);
-	free(this->data);
+	
 	printf("free(this->data);\n");
 
 	ethernet_header = (struct ether_header*)pkt;
