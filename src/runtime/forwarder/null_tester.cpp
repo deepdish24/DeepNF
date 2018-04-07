@@ -42,8 +42,8 @@ int main(int argc, char *argv[]) {
         srand ( time(NULL) );
         struct packet p(sip, sp, dip, dp, (unsigned short) 17, data);
         printf("Going to nullify packet now\n");
-        p.nullify();
-        p.is_null();
+//        p.nullify();
+//        p.is_null();
 
         if (send_packet(&p, sockfd, addr) < 0) {
             fprintf(stderr, "Send packet error: %s", strerror(errno));
