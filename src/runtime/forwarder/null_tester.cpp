@@ -41,7 +41,6 @@ int main(int argc, char *argv[]) {
 //        int dp = portno;
 //        srand(time(NULL));
 //        struct packet p(sip, sp, dip, dp, (unsigned short) 17, data);
-//    }
 //        printf("before nullifying buf: %02X\n", p.pkt);
 //
 //        printf("Going to nullify packet now\n");
@@ -58,7 +57,7 @@ int main(int argc, char *argv[]) {
 //            exit(-1);
 //        }
 //        printf("Sent null packet\n");
-//    }
+    }
 
     else {
         printf("Invalid 1st argument, should be 1 for receiver or 0 for sender\n");
