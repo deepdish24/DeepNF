@@ -41,8 +41,8 @@ MergerInfo* MergerInfo::get_dummy_merger_info() {
     std::map<int, RuntimeNode*> node_map;
     RuntimeNode* rn1 = new RuntimeNode(0, dnf_firewall);
     RuntimeNode* rn2 = new RuntimeNode(1, dnf_firewall);
-    node_map.insert(std::make_pair(1, rn1));
-    node_map.insert(std::make_pair(2, rn2));
+    node_map.insert(std::make_pair(0, rn1));
+    node_map.insert(std::make_pair(1, rn2));
 
     MergerInfo* mi = new MergerInfo(port_to_node_map, conflicts_list, node_map);
     return mi;
