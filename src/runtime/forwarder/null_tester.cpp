@@ -40,16 +40,9 @@ int main(int argc, char *argv[]) {
         int dp = portno;
         srand(time(NULL));
         struct packet p(sip, sp, dip, dp, (unsigned short) 17, data);
-        printf("before nullifying buf: %02X\n", p.pkt);
 
-        printf("Going to nullify packet now\n");
         p.nullify();
         bool is_null = p.is_null();
-        if (is_null) {
-            printf("null\n");
-        } else {
-            printf("not null\n");
-        }
 
         if (send_packet(&p, sockfd, addr) < 0) {
             fprintf(stderr, "Send packet error: %s", strerror(errno));
