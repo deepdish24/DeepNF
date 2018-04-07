@@ -138,7 +138,7 @@ MergerOperator::PACKET_INFO* MergerOperator::resolve_packet_conflict(
         printf("Null packet detected\n");
 
         auto* pi = (PACKET_INFO*) malloc(sizeof(PACKET_INFO));
-        pi->node_id = conflict->get_parent();
+        pi->node_id = conflict == nullptr ? -1 : conflict->get_parent();
         pi->pkt = new packet(major_p->pkt->pkt, major_p->pkt->size);
         pi->pkt->nullify();
         printf("pi->pkt->nullify();\n");
