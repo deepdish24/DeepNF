@@ -4,6 +4,17 @@
 
 #include "MergerOperator.h"
 
+#include <arpa/inet.h>
+#include <cstring>
+#include <iostream>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <net/ethernet.h>
+#include <netinet/tcp.h>   //Provides declarations for tcp header
+#include <netinet/ip.h>    //Provides declarations for ip header
+#include <string>
+
+
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
 
