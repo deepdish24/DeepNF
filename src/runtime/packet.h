@@ -31,7 +31,8 @@ public:
     struct tcphdr* tcp_header;
     u_char *data;
     int data_size;
-    
+
+	void init_packet(const u_char *pkt, int pkt_size);
     bool is_null();
     void nullify();
     void print_info();

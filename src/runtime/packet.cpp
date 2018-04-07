@@ -8,17 +8,7 @@
 
 packet::packet(const u_char *pkt, int pkt_size)
 {
-	this->pkt = pkt;
-	size = pkt_size;
-	ethernet_header = (struct ether_header*)pkt;
-	if (ntohs(ethernet_header->ether_type) == ETHERTYPE_IP) {
-	    ip_header = (struct ip*)(pkt + sizeof(struct ether_header));
-	    if (ip_header->ip_p == IPPROTO_TCP) {
-	        tcp_header = (tcphdr*)(pkt + sizeof(struct ether_header) + sizeof(struct ip));
-	        data = (u_char*)(pkt + sizeof(struct ether_header) + sizeof(struct ip) + sizeof(struct tcphdr));
-	        data_size = pkt_size - (sizeof(struct ether_header) + sizeof(struct ip) + sizeof(struct tcphdr));
-	    }
-	}
+    this->init_packet(pkt, pkt_size);
 }
 
 packet::packet(std::string sip, int sp, std::string dip, int dp, unsigned int id, std::string data)
@@ -46,10 +36,12 @@ packet::packet(std::string sip, int sp, std::string dip, int dp, unsigned int id
 	printf("ip_header_temp->ip_len = htons(size_temp);\n");
 
 	u_char *pkt_char = (u_char*)malloc(size_temp);
-//	memcpy(pkt_char, (void *)ethernet_header_temp, sizeof(struct ether_header));
-//	memcpy(pkt_char + sizeof(struct ether_header), (void *)ip_header_temp, sizeof(struct ip));
-//	memcpy(pkt_char + sizeof(struct ether_header) + sizeof(struct ip), (void *)tcp_header_temp, sizeof(struct tcphdr));
-//	memcpy(pkt_char + sizeof(struct ether_header) + sizeof(struct ip) + sizeof(struct tcphdr), (void *)data_temp, data_size_temp);
+	memcpy(pkt_char, (void *)ethernet_header_temp, sizeof(struct ether_header));
+	memcpy(pkt_char + sizeof(struct ether_header), (void *)ip_header_temp, sizeof(struct ip));
+	memcpy(pkt_char + sizeof(struct ether_header) + sizeof(struct ip), (void *)tcp_header_temp, sizeof(struct tcphdr));
+	memcpy(pkt_char + sizeof(struct ether_header) + sizeof(struct ip) + sizeof(struct tcphdr), (void *)data_temp, data_size_temp);
+
+    this->init_packet(pkt_char, size_temp);
 	//pkt = pkt_char;
 	printf("pkt = pkt_char;;\n");
 
@@ -75,6 +67,20 @@ packet::packet(std::string sip, int sp, std::string dip, int dp, unsigned int id
 //		}
 //	}
 
+}
+
+void packet::init_packet(const u_char *pkt, int pkt_size) {
+    this->pkt = pkt;
+    size = pkt_size;
+    ethernet_header = (struct ether_header*)pkt;
+    if (ntohs(ethernet_header->ether_type) == ETHERTYPE_IP) {
+        ip_header = (struct ip*)(pkt + sizeof(struct ether_header));
+        if (ip_header->ip_p == IPPROTO_TCP) {
+            tcp_header = (tcphdr*)(pkt + sizeof(struct ether_header) + sizeof(struct ip));
+            data = (u_char*)(pkt + sizeof(struct ether_header) + sizeof(struct ip) + sizeof(struct tcphdr));
+            data_size = pkt_size - (sizeof(struct ether_header) + sizeof(struct ip) + sizeof(struct tcphdr));
+        }
+    }
 }
 
 packet::~packet() {
