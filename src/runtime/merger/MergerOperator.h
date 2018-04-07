@@ -24,6 +24,7 @@
 #include "ActionTable.h"
 #include "MergerInfo.h"
 #include "../../common/RuntimeNode.h"
+#include "../../common/Field.h"
 
 
 class MergerOperator {
