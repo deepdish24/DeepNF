@@ -10,6 +10,7 @@
 #include <runtime/socket_util.h>
 #include <runtime/address_util.h>
 #include <time.h>
+#include <iostream>
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
@@ -32,7 +33,7 @@ int main(int argc, char *argv[]) {
 //        strncpy(addr_str, ip, strlen(ip));
 //        strcat(addr_str, ":");
 //        strcat(addr_str, argv[3]);
-        printf("Address to send to: %s\n", addr_str);
+        std::cout << "address to send to " << addr_str << "\n";
         address *addr = address_from_string(addr_str);
 //
 //        // prepare packet
