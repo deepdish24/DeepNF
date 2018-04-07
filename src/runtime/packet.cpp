@@ -58,15 +58,18 @@ packet::~packet() {
 
 bool packet::is_null()
 {
-	char sourceIp[INET_ADDRSTRLEN];
-	inet_ntop(AF_INET, &(ip_header->ip_src), sourceIp, INET_ADDRSTRLEN);
-	return ntohs(tcp_header->source) == 0 && std::string(sourceIp) == "0.0.0.0";
+	printf("is_null called, ntohs(tcp_header->source): %d\n", ntohs(tcp_header->source));
+//	char sourceIp[INET_ADDRSTRLEN];
+//	inet_ntop(AF_INET, &(ip_header->ip_src), sourceIp, INET_ADDRSTRLEN);
+//	return ntohs(tcp_header->source) == 0 && std::string(sourceIp) == "0.0.0.0";
+	return ntohs(tcp_header->source) == 0;
 }
 
 void packet::nullify()
 {
+	printf("nullify() called, packet is null now\n");
 	tcp_header->source = 0;
-    memset(&(ip_header->ip_src), 0, sizeof(ip_header->ip_src));
+//    memset(&(ip_header->ip_src), 0, sizeof(ip_header->ip_src));
 }
 
 void packet::print_info()

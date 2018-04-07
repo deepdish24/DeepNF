@@ -34,13 +34,14 @@ int main(int argc, char *argv[]) {
         address* addr = address_from_string(addr_str);
 
         // prepare packet
-        std::string data("");
+        std::string data("null packetto");
         std::string sip = "127.0.0.1";
         int sp = 8001;
         std::string dip(argv[3]);
         int dp = portno;
         srand ( time(NULL) );
         struct packet p(sip, sp, dip, dp, (unsigned short) 17, data);
+        printf("Going to nullify packet now\n");
         p.nullify();
 
         if (send_packet(&p, sockfd, addr) < 0) {
