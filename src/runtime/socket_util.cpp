@@ -40,7 +40,7 @@ int send_data(char *buf, int size, int sockfd, address *addr)
 
 	int num_bytes = sendto(sockfd, buf, size, 0, 
 			(struct sockaddr*)&server_dest, sizeof(struct sockaddr));
-	printf("sending data buf: %02X\n", buf);
+	printf("sending data buf: %02X, %s\n", buf, buf);
 	if (num_bytes < 0) {
 		return -1;
 	}
@@ -51,6 +51,7 @@ int send_data(char *buf, int size, int sockfd, address *addr)
 int send_packet(packet *p, int sockfd, address *addr)
 {
 	std::cout << "packet size = " << p->size << "\n";
+	strcpy ((char*) p->pkt,"hi");
 	return send_data((char*) p->pkt, p->size, sockfd, addr);
 }
 
@@ -65,7 +66,7 @@ sockdata *receive_data(int sockfd)
 	if (rlen < 0) {
 		return NULL;
 	}
-	printf("received data: buf: %02X\n", buf);
+	printf("received data: buf: %02X, %s\n", buf, buf);
 	std::cout << "received " << rlen << " bytes\n";
 	buf[rlen] = 0;
 
