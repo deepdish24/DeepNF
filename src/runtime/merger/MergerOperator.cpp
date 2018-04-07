@@ -141,6 +141,7 @@ MergerOperator::PACKET_INFO* MergerOperator::resolve_packet_conflict(
         pi->node_id = conflict->get_parent();
         pi->pkt = new packet(major_p->pkt->pkt, major_p->pkt->size);
         pi->pkt->nullify();
+        printf("pi->pkt->nullify();\n");
 
         return pi;
     }
