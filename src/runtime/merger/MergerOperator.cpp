@@ -211,6 +211,17 @@ packet* MergerOperator::merge_packet(int pkt_id) {
 
 
 /**
+ * Merges all received packets for the given pkt_id, then sends merged packet to receive address
+ *
+ * @param pkt_id    The id of the packet to merge
+ */
+void MergerOperator::run_merge_packet(int pkt_id) {
+    packet* merged_pkt = this->merge_packet(pkt_id);
+
+}
+
+
+/**
  * Converts a map from node ids to packets to a map from node ids to equivalent packet_infos
  * @return A map of runtime node ids to a packet_info struct equivalent to the node's
  *         packet in packet_map
@@ -257,6 +268,10 @@ MergerOperator::PACKET_INFO* MergerOperator::packet_to_packet_info(packet* pkt, 
  * Setup MergerOperator to start listening and merging packets
  */
 void MergerOperator::run() {
+    // set up destination address
+    std::string addr_str = stringify(std::string(this->merger_info->get_dest_ip()), this->merger_info->get_dest_port());
+    dest_address = address_from_string(addr_str);
+
     // send up one thread to handle each leaf node
     std::map<int, int> port_to_node_map = this->merger_info->get_port_to_node_map();
 

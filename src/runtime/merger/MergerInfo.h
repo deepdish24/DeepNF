@@ -24,6 +24,9 @@ class MergerInfo {
         // maps node id to node
         std::map<int, RuntimeNode*> node_map;
 
+        std::string dest_ip; // ip address to send merged packets to
+        int dest_port; // port to send merged packets to
+
     public:
         MergerInfo(std::map<int, int> port_to_node_map,
                    std::vector<ConflictItem*> conflicts_list,
@@ -34,6 +37,10 @@ class MergerInfo {
         std::vector<ConflictItem*> get_conflicts_list();
 
         std::map<int, RuntimeNode*> get_node_map();
+
+        std::string get_dest_ip();
+
+        int get_dest_port();
 
         /**
          *

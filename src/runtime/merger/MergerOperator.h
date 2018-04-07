@@ -22,6 +22,7 @@
 #include <runtime/address.h>
 #include <common/RuntimeNode.h>
 #include <common/Field.h>
+#include <runtime/address_util.h>
 
 #include "ActionTable.h"
 #include "MergerInfo.h"
@@ -65,6 +66,9 @@ private:
     // the total number of leaf runtime nodes that merger should listen for
     int num_nodes;
 
+    // address to send merged packets to
+    address* dest_address;
+
     // contains information about the NF action table
     ActionTable* action_table;
 
@@ -92,6 +96,13 @@ private:
      * @return Pointer to a packet with all changes merged
      */
     packet* merge_packet(int pkt_id);
+
+    /**
+     * Merges all received packets for the given pkt_id, then sends merged packet to receive address
+     *
+     * @param pkt_id    The id of the packet to merge
+     */
+    void run_merge_packet(int pkt_id);
 
     /**
      * Converts a map from node ids to packets to a map from node ids to equivalent packet_infos

@@ -26,6 +26,14 @@ std::map<int, RuntimeNode*> MergerInfo::get_node_map() {
     return node_map;
 }
 
+std::string MergerInfo::get_dest_ip() {
+    return dest_ip;
+}
+
+int MergerInfo::get_dest_port() {
+    return dest_port;
+}
+
 
 /**
  *
