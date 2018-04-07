@@ -38,7 +38,8 @@ int send_data(char *buf, int size, int sockfd, address *addr)
 	server_dest.sin_port = htons(addr->port);
 	inet_pton(AF_INET, addr->ip.c_str(), &(server_dest.sin_addr));
 
-	ssize_t num_bytes = send(sockfd, buf, size, 0);
+	int num_bytes = sendto(sockfd, buf, size, 0,
+			(struct sockaddr*)&server_dest, sizeof(struct sockaddr));
 	printf("sending data buf: %02X, %s\n", buf, buf);
 	if (num_bytes < 0) {
 		return -1;
@@ -50,9 +51,7 @@ int send_data(char *buf, int size, int sockfd, address *addr)
 int send_packet(packet *p, int sockfd, address *addr)
 {
 	std::cout << "packet size = " << p->size << "\n";
-	char txt[100];
-	strcpy ((char*) txt,"hi my dear friend");
-	return send_data((char*) txt, p->size, sockfd, addr);
+	return send_data((char*) p->pkt, p->size, sockfd, addr);
 }
 
 
@@ -62,7 +61,7 @@ sockdata *receive_data(int sockfd)
 	socklen_t srclen = sizeof(src);
 	
 	char *buf = (char*)malloc(BUFFER_SIZE);
-	ssize_t rlen = recv(sockfd, buf, BUFFER_SIZE - 1, 0);
+	int rlen = recvfrom(sockfd, buf, BUFFER_SIZE - 1, 0, (struct sockaddr*)&src, &srclen);
 	if (rlen < 0) {
 		return NULL;
 	}
