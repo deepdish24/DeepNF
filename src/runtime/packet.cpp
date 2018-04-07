@@ -55,9 +55,9 @@ packet::packet(std::string sip, int sp, std::string dip, int dp, unsigned int id
 
 	printf("free(this->data);\n");
 
-//	delete ethernet_header_temp;
-//	delete ip_header_temp;
-//	delete tcp_header_temp;
+	delete ethernet_header_temp;
+	delete ip_header_temp;
+	delete tcp_header_temp;
 
 //	size = size_temp;
 //	ethernet_header = (struct ether_header*)pkt;
