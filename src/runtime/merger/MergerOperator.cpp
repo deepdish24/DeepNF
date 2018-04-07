@@ -224,6 +224,18 @@ void MergerOperator::run_merge_packet(int pkt_id) {
         printf("Merged packet is not null\n");
     }
 
+    // send merged packet to destination address
+    int sockfd = open_socket();
+    if (sockfd < 0) {
+        fprintf(stderr, "Cannot open socket: %s", strerror(errno));
+        exit(-1);
+    }
+
+    if (send_packet(merged_pkt, sockfd, this->dest_address) < 0) {
+        fprintf(stderr, "Send packet error: %s", strerror(errno));
+        exit(-1);
+    }
+
 }
 
 
