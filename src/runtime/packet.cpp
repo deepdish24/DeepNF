@@ -41,7 +41,7 @@ packet::packet(std::string sip, int sp, std::string dip, int dp, unsigned int id
 //	memcpy(pkt_char + sizeof(struct ether_header) + sizeof(struct ip), (void *)tcp_header_temp, sizeof(struct tcphdr));
 //	memcpy(pkt_char + sizeof(struct ether_header) + sizeof(struct ip) + sizeof(struct tcphdr), (void *)data_temp, data_size_temp);
 
-    this->init_packet(pkt_char, size_temp);
+//    this->init_packet(pkt_char, size_temp);
 	//pkt = pkt_char;
 	printf("pkt = pkt_char;;\n");
 
