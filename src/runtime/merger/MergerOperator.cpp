@@ -154,11 +154,9 @@ MergerOperator::PACKET_INFO* MergerOperator::resolve_packet_conflict(
     // add writes from minor packet
     std::set<Field>* major_fields = major_p->written_fields;
     std::set<Field>* minor_fields = minor_p->written_fields;
-    printf("Begin iterating through minor's fields\n");
 
     for (std::set<Field>::iterator it = minor_fields->begin(); it != minor_fields->end(); ++it) {
         Field field = *it;
-        printf("Writing minor's field: %s\n", field::field_to_string(field).c_str());
 
         // write the minor's field changes as long as the change does NOT conflict with major
         if (major_fields->count(field) == 0) {
@@ -174,11 +172,9 @@ MergerOperator::PACKET_INFO* MergerOperator::resolve_packet_conflict(
 
                 case Field::PAYLOAD:
                     pi->pkt->write_payload(minor_p->pkt->get_payload());
-                    printf("wrote PAYLOAD\n");
                     break;
 
                 default:
-                    printf("Overwriting field is not supported\n");
                     break;
             }
         }
@@ -231,9 +227,6 @@ packet* MergerOperator::merge_packet(int pkt_id) {
             ConflictItem *ci = *it;
             printf("Iterating through conflicts list: ");
             printf("(maj=%d, min=%d, par=%d)\n", ci->get_major(), ci->get_minor(), ci->get_parent());
-
-            PACKET_INFO* major = pkt_info_map->at(ci->get_major());
-            printf("Got major packet: node_id: %d, \n", major->node_id);
 
             // begin merging if both packets of the conflict conflict are available
             if (pkt_info_map->count(ci->get_major()) != 0 && pkt_info_map->count(ci->get_minor()) != 0) {
