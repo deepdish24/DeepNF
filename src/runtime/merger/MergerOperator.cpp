@@ -254,7 +254,9 @@ packet* MergerOperator::merge_packet(int pkt_id) {
                 pkt_info_map->erase(ci->get_major());
                 pkt_info_map->erase(ci->get_minor());
                 pkt_info_map->insert(std::make_pair(ci->get_parent(), new_packet));
-        }
+
+                was_changed = true;
+            }
         }
     }
 
