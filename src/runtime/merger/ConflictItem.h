@@ -23,7 +23,6 @@ class ConflictItem {
         std::vector<Field> get_conflicts();
 
         void add_conflict(Field conflict);
-        std::string to_string();
 
     private:
         int major; // id of the runtime node containing the NF with precedence in the conflict
