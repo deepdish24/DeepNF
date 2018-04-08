@@ -153,7 +153,7 @@ MergerOperator::PACKET_INFO* MergerOperator::resolve_packet_conflict(
 
         // write the minor's field changes as long as the change does NOT conflict with major
         if (major_fields.find(field) == major_fields.end()) {
-            printf("Writing minor's field: %s\n", field::field_to_string(field));
+            printf("Writing minor's field: %s\n", field::field_to_string(field).c_str());
             switch (field) {
 
                 case Field::DIP:
@@ -211,8 +211,8 @@ packet* MergerOperator::merge_packet(int pkt_id) {
     }
     std::vector<ConflictItem*> conflicts_list = merger_info->get_conflicts_list();
 
-    bool was_changed = true; // has at least one merge conflict been resolved in this iteration?
-
+//    bool was_changed = true; // has at least one merge conflict been resolved in this iteration?
+//
 //    for (auto it = conflicts_list.begin(); it != conflicts_list.end(); ++it) {
 //        printf("Iterating through conflicts list: %s\n", (*it)->to_string().c_str());
 //    }
