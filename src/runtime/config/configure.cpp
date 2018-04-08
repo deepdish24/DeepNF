@@ -130,8 +130,8 @@ void setup_nodes(MachineConfigurator conf) {
     // function assumes ./src/runtime/config/configure is run 
     // from build directory
 
-	/*std::string to_root = "../../";
-	std::string path_to_merger_dockerfile = to_root + "DeepNF/src/runtime/merger/Dockerfile";
+	std::string to_root = "../../";
+	/*std::string path_to_merger_dockerfile = to_root + "DeepNF/src/runtime/merger/Dockerfile";
     std::string path_to_fwd_dockerfile = to_root + "DeepnNF/src/runtime/forwarder/Dockerfile";
     std::string fwd_config_dir = to_root + "fwd_config";
 	std::string merger_config_dir = to_root + "merger_config";*/
@@ -159,7 +159,7 @@ void setup_nodes(MachineConfigurator conf) {
         std::string container_name = conf.get_config_dir(node->get_id());
 
         make_config_dir(func_config_dir);
-        copy_dockerfile(path_to_dockerfile, func_config_dir, to_root, dependencies);
+        copy_dockerfile(path_to_dockerfile, func_config_dir, to_root, path_to_dependencies);
         build_docker_image(image_name, func_config_dir);
         start_docker_container(container_name, "base_img");
     }
@@ -277,7 +277,7 @@ std::unordered_map<int, int> setup_bridge_ports(MachineConfigurator &conf) {
         Machine* mac = it->second;
         std::vector<RuntimeNode*> nodes_for_mac = conf.get_nodes_for_machine(mac->get_id());
         for (RuntimeNode* n : nodes_for_mac) {
-            std::string func_ip = mac->get_ip() + 
+            std::string func_ip = mac->get_ip();
         }
     }
 }
@@ -416,7 +416,7 @@ int main(int argc, char *argv[]) {
 				break;
 		}
 	}
-    merger_ip_port = std::string merger_info(argv[c]);
+    //merger_ip_port = std::string merger_info(argv[c]);
 	MachineConfigurator conf = get_machine_configurator(port);
 
     
