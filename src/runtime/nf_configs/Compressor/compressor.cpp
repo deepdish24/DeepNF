@@ -67,11 +67,12 @@ int main(int argc,char **argv)
         p->print_info();
 
         // overwrite received packet to have new payload
-//        p->write_payload(new_msg);
+        p->write_payload(new_msg);
 
         printf("Sending modified packet:\n");
         p->print_info();
 
+        printf("Sending to address: %s", address_to_string(dest_addr));
         // forward packet
         if (send_packet(p, sockfd, dest_addr) < 0) {
             fprintf(stderr, "Send packet error: %s", strerror(errno));
