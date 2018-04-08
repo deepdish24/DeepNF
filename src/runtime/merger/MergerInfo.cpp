@@ -56,12 +56,6 @@ MergerInfo* MergerInfo::get_dummy_merger_info() {
     conflicts_list.push_back(ci1);
     conflicts_list.push_back(ci2);
 
-    for (auto it = conflicts_list.begin(); it != conflicts_list.end(); ++it) {
-        ConflictItem *ci = *it;
-        printf("INITIALIZING CONFLICT LIST ");
-        printf("(maj=%d, min=%d, par=%d)\n", ci->get_major(), ci->get_minor(), ci->get_parent());
-    }
-
     std::map<int, RuntimeNode*> node_map;
     RuntimeNode* rn0 = new RuntimeNode(0, compressor);
     RuntimeNode* rn1 = new RuntimeNode(1, proxy);

@@ -30,12 +30,6 @@ MergerOperator::MergerOperator() {
     this->merger_info = MergerInfo::get_dummy_merger_info();
     this->num_nodes = (int) this->merger_info->get_port_to_node_map().size();
     std::vector<ConflictItem*> conflicts_list = this->merger_info->get_conflicts_list();
-    for (auto it = conflicts_list.begin(); it != conflicts_list.end(); ++it) {
-        ConflictItem *ci = *it;
-        printf("GOT DUMMY MERGER INFO ");
-        printf("(maj=%d, min=%d, par=%d)\n", ci->get_major(), ci->get_minor(), ci->get_parent());
-    }
-
 
     // set up mutexes
     packet_map_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -225,8 +219,6 @@ packet* MergerOperator::merge_packet(int pkt_id) {
         was_changed = false;
         for (auto it = conflicts_list.begin(); it != conflicts_list.end(); ++it) {
             ConflictItem *ci = *it;
-            printf("Iterating through conflicts list: ");
-            printf("(maj=%d, min=%d, par=%d)\n", ci->get_major(), ci->get_minor(), ci->get_parent());
 
             // begin merging if both packets of the conflict conflict are available
             if (pkt_info_map->count(ci->get_major()) != 0 && pkt_info_map->count(ci->get_minor()) != 0) {
