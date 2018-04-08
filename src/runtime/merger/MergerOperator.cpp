@@ -145,16 +145,16 @@ MergerOperator::PACKET_INFO* MergerOperator::resolve_packet_conflict(
     printf("Neither packet is null\n");
 
     // add writes from minor packet
-    std::set<Field> major_fields = major_p->written_fields;
-    std::set<Field> minor_fields = minor_p->written_fields;
+    std::set<Field>* major_fields = major_p->written_fields;
+    std::set<Field>* minor_fields = minor_p->written_fields;
     printf("Begin iterating through minor's fields\n");
 
-    for (std::set<Field>::iterator it = minor_fields.begin(); it != minor_fields.end(); ++it) {
+    for (std::set<Field>::iterator it = minor_fields->begin(); it != minor_fields->end(); ++it) {
         Field field = *it;
         printf("Writing minor's field: %s\n", field::field_to_string(field).c_str());
 
         // write the minor's field changes as long as the change does NOT conflict with major
-        if (major_fields.count(field) == 0) {
+        if (major_fields->count(field) == 0) {
             switch (field) {
 
                 case Field::DIP:
@@ -180,17 +180,17 @@ MergerOperator::PACKET_INFO* MergerOperator::resolve_packet_conflict(
     printf("Merging is done at this point\n");
 
     // add major and minor fields to pi's written_fields
-    for (auto it = minor_fields.begin(); it != minor_fields.end(); ++it) {
+    for (auto it = minor_fields->begin(); it != minor_fields->end(); ++it) {
         Field f = *it;
-        printf("adding minor field: %s\n", field::field_to_string(f));
-        pi->written_fields.insert(f);
+        printf("adding minor field: %s\n", field::field_to_string(f).c_str());
+        pi->written_fields->insert(f);
     }
 
-    for (auto it = major_fields.begin(); it != major_fields.end(); ++it) {
+    for (auto it = major_fields->begin(); it != major_fields->end(); ++it) {
         Field f = *it;
-        printf("adding major field: %s\n", field::field_to_string(f));
+        printf("adding major field: %s\n", field::field_to_string(f).c_str());
 
-        pi->written_fields.insert(f);
+        pi->written_fields->insert(f);
     }
 
     return pi;
@@ -214,7 +214,7 @@ packet* MergerOperator::merge_packet(int pkt_id) {
     printf("Printing pkt_info_map:\n");
     for (auto it = pkt_info_map->begin(); it != pkt_info_map->end(); ++it) {
         printf("%d -> {", it->first);
-        for (auto it2 = it->second->written_fields.begin(); it2 != it->second->written_fields.end(); ++it2) {
+        for (auto it2 = it->second->written_fields->begin(); it2 != it->second->written_fields->end(); ++it2) {
             printf("%s, ", field::field_to_string(*it2).c_str());
         }
         printf("}\n");
@@ -242,7 +242,7 @@ packet* MergerOperator::merge_packet(int pkt_id) {
                 std::set<Field> new_write_fields = this->action_table->get_write_fields(rn->get_nf());
 
                 for (auto it = new_write_fields.begin(); it != new_write_fields.end(); ++it) {
-                    new_packet->written_fields.insert(*it);
+                    new_packet->written_fields->insert(*it);
                 }
             }
 
@@ -351,7 +351,7 @@ MergerOperator::PACKET_INFO* MergerOperator::packet_to_packet_info(packet* pkt, 
 
     pi->pkt = pkt;
     pi->node_id = node_id;
-    pi->written_fields = std::set(this->action_table->get_write_fields(rn->get_nf()));
+    pi->written_fields = new std::set(this->action_table->get_write_fields(rn->get_nf()));
     return pi;
 }
 
