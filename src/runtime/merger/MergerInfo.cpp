@@ -46,8 +46,8 @@ int MergerInfo::get_dest_port() {
  */
 MergerInfo* MergerInfo::get_dummy_merger_info() {
     std::map<int, int> port_to_node_map;
-    port_to_node_map.insert(std::make_pair(8000, 0));
-    port_to_node_map.insert(std::make_pair(8001, 1));
+    port_to_node_map.insert(std::make_pair(8000, 1));
+    port_to_node_map.insert(std::make_pair(8001, 2));
 //    port_to_node_map.insert(std::make_pair(8002, 2));
 
     std::vector<ConflictItem*> conflicts_list;
@@ -57,11 +57,11 @@ MergerInfo* MergerInfo::get_dummy_merger_info() {
     std::map<int, RuntimeNode*> node_map;
     RuntimeNode* rn1 = new RuntimeNode(0, compressor);
     RuntimeNode* rn2 = new RuntimeNode(1, compressor);
-//    RuntimeNode* rn3 = new RuntimeNode(2, dnf_firewall);
+    RuntimeNode* rn3 = new RuntimeNode(2, proxy);
 
     node_map.insert(std::make_pair(0, rn1));
     node_map.insert(std::make_pair(1, rn2));
-//    node_map.insert(std::make_pair(2, rn3));
+    node_map.insert(std::make_pair(2, rn3));
 
     std::string dest_ip = "127.0.0.1";
     int dest_port = 9999;
