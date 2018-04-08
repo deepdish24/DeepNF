@@ -39,8 +39,8 @@ int main(int argc, char *argv[]) {
         std::string data(msg);
         std::string sip = "127.0.0.1";
         int sp = 8001;
-        std::string dip(argv[3]);
-        printf("dip: %s %s\n", argv[3], dip);
+        std::string dip(argv[2]);
+        printf("dip: %s %s\n", argv[2], dip);
         int dp = portno;
         srand ( time(NULL) );
         struct packet p(sip, sp, dip, dp, (unsigned short) pkt_id, data);
