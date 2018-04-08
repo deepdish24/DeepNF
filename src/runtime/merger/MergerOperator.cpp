@@ -135,6 +135,7 @@ MergerOperator::PACKET_INFO* MergerOperator::resolve_packet_conflict(
 
     // create new packet based on changes in major packet
     pi->pkt = new packet(major_p->pkt->pkt, major_p->pkt->size);
+    pi->written_fields = new std::set<Field>;
 
     // if either packet is null, drop the packet (ie. return a nullified packet)
     if (major_p->pkt->is_null() || minor_p->pkt->is_null()) {
