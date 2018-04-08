@@ -28,7 +28,8 @@ typedef struct node_thread_params {
 MergerOperator::MergerOperator() {
     this->action_table = new ActionTable();
     this->merger_info = MergerInfo::get_dummy_merger_info();
-    this->num_nodes = this->merger_info->get_port_to_node_map().size();
+    this->num_nodes = (int) this->merger_info->get_port_to_node_map().size();
+    std::vector<ConflictItem*> conflicts_list = this->merger_info->get_conflicts_list();
 
     // set up mutexes
     packet_map_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -84,7 +85,7 @@ void MergerOperator::run_node_thread(int port, int node_id) {
         sockdata *pkt_data = receive_data(sockfd);
         packet* p = packet_from_data(pkt_data);
 
-        printf("Echo: [%s] (%d bytes)\n", p->data, p->data_size);
+        p->print_info();
         char sourceIp[INET_ADDRSTRLEN];
 	    inet_ntop(AF_INET, &(p->ip_header->ip_src), sourceIp, INET_ADDRSTRLEN);
 
@@ -130,18 +131,56 @@ MergerOperator::PACKET_INFO* MergerOperator::resolve_packet_conflict(
         ConflictItem* conflict) {
     printf("MergerOperator::resolve_packet_conflict - major: %d, minor: %d\n", major_p->node_id, minor_p->node_id);
 
+    auto* pi = (PACKET_INFO*) malloc(sizeof(PACKET_INFO));
+    pi->node_id = conflict == nullptr ? -1 : conflict->get_parent();
+
+    // create new packet based on changes in major packet
+    pi->pkt = new packet(major_p->pkt->pkt, major_p->pkt->size);
+    pi->written_fields = new std::set<Field>;
+
     // if either packet is null, drop the packet (ie. return a nullified packet)
     if (major_p->pkt->is_null() || minor_p->pkt->is_null()) {
         printf("Null packet detected\n");
-
-        auto* pi = (PACKET_INFO*) malloc(sizeof(PACKET_INFO));
-        pi->node_id = conflict == nullptr ? -1 : conflict->get_parent();
-        pi->pkt = new packet(major_p->pkt->pkt, major_p->pkt->size);
         pi->pkt->nullify();
         return pi;
     }
 
-    return nullptr;
+    // add writes from minor packet
+    std::set<Field>* major_fields = major_p->written_fields;
+    std::set<Field>* minor_fields = minor_p->written_fields;
+
+    for (std::set<Field>::iterator it = minor_fields->begin(); it != minor_fields->end(); ++it) {
+        Field field = *it;
+
+        // write the minor's field changes as long as the change does NOT conflict with major
+        if (major_fields->count(field) == 0) {
+            switch (field) {
+
+                case Field::DIP:
+                    pi->pkt->write_dest_ip(minor_p->pkt->get_dest_ip());
+                    break;
+
+                case Field::DPORT:
+                    pi->pkt->write_dest_port(minor_p->pkt->get_dest_port());
+                    break;
+
+                case Field::PAYLOAD:
+                    pi->pkt->write_payload(minor_p->pkt->get_payload());
+                    break;
+
+                default:
+                    break;
+            }
+        }
+    }
+
+    // add major and minor fields to pi's written_fields
+    pi->written_fields->insert(minor_fields->begin(), minor_fields->end());
+    pi->written_fields->insert(major_fields->begin(), major_fields->end());
+
+    printf("Returning merged packet\n");
+
+    return pi;
 }
 
 
@@ -162,7 +201,7 @@ packet* MergerOperator::merge_packet(int pkt_id) {
     printf("Printing pkt_info_map:\n");
     for (auto it = pkt_info_map->begin(); it != pkt_info_map->end(); ++it) {
         printf("%d -> {", it->first);
-        for (auto it2 = it->second->written_fields.begin(); it2 != it->second->written_fields.end(); ++it2) {
+        for (auto it2 = it->second->written_fields->begin(); it2 != it->second->written_fields->end(); ++it2) {
             printf("%s, ", field::field_to_string(*it2).c_str());
         }
         printf("}\n");
@@ -176,14 +215,40 @@ packet* MergerOperator::merge_packet(int pkt_id) {
 
     bool was_changed = true; // has at least one merge conflict been resolved in this iteration?
 
-    for (auto it = conflicts_list.begin(); it != conflicts_list.end(); ++it) {
-//        printf("Iterating through conflicts list: %s\n", (*it)->to_string().c_str());
+    while (was_changed) {
+        was_changed = false;
+        for (auto it = conflicts_list.begin(); it != conflicts_list.end(); ++it) {
+            ConflictItem *ci = *it;
+
+            // begin merging if both packets of the conflict conflict are available
+            if (pkt_info_map->count(ci->get_major()) != 0 && pkt_info_map->count(ci->get_minor()) != 0) {
+                PACKET_INFO *new_packet = resolve_packet_conflict(
+                        pkt_info_map->at(ci->get_major()), pkt_info_map->at(ci->get_minor()), ci);
+
+                // add merged packet's NF's written fields
+                if (this->merger_info->get_node_map().count(new_packet->node_id) > 0) {
+                    RuntimeNode *rn = this->merger_info->get_node_map().at(new_packet->node_id);
+                    std::set<Field> new_write_fields = this->action_table->get_write_fields(rn->get_nf());
+
+                    for (auto it = new_write_fields.begin(); it != new_write_fields.end(); ++it) {
+                        new_packet->written_fields->insert(*it);
+                    }
+                }
+
+                // remove major and minor, then add merged packet to pkt_map
+                pkt_info_map->erase(ci->get_major());
+                pkt_info_map->erase(ci->get_minor());
+                pkt_info_map->insert(std::make_pair(ci->get_parent(), new_packet));
+
+                was_changed = true;
+            }
+        }
     }
 
     // at this point, none of the packets should have conflicts any more, just merge them all
     PACKET_INFO* merged_packet = nullptr;
     for (auto it = pkt_info_map->begin(); it != pkt_info_map->end(); ++it) {
-//        printf("Iterating through pkt_info_map, %d\n", it->first);
+        printf("Iterating through pkt_info_map, %d\n", it->first);
 
         if (merged_packet == nullptr) {
             merged_packet = it->second;
@@ -192,6 +257,9 @@ packet* MergerOperator::merge_packet(int pkt_id) {
 
         // randomly select major and minor since there should be no conflicts
         merged_packet = resolve_packet_conflict(merged_packet, it->second, (ConflictItem*) nullptr);
+
+        printf("Merged packet:\n");
+        merged_packet->pkt->print_info();
 
     }
 
@@ -218,11 +286,6 @@ void MergerOperator::run_merge_packet(int pkt_id) {
     packet* merged_pkt = this->merge_packet(pkt_id);
 
     printf("\nFinished merging packet\n");
-    if (merged_pkt->is_null()) {
-        printf("Merged packet is null\n");
-    } else {
-        printf("Merged packet is not null\n");
-    }
 
     // send merged packet to destination address
     int sockfd = open_socket();
@@ -236,7 +299,7 @@ void MergerOperator::run_merge_packet(int pkt_id) {
         exit(-1);
     }
 
-    printf("Sent merged packet for id: %d, printing packet_map:\n", pkt_id);
+    printf("Sent merged packet for id: %d, printing packet_map:\n\n", pkt_id);
     print_packet_map();
 
 }
@@ -254,6 +317,7 @@ std::map<int, MergerOperator::PACKET_INFO*>* MergerOperator::packet_map_to_packe
     for (auto it = packet_map->begin(); it != packet_map->end(); ++it) {
         int node_id = it->first;
         packet* pkt = it->second;
+        printf("Iterating through packet_map_to_packet_info_map: id: %d, pkt: %s\n", node_id, pkt->get_payload().c_str());
 
         ret_map->insert(std::make_pair(node_id, packet_to_packet_info(pkt, node_id)));
     }
@@ -280,7 +344,7 @@ MergerOperator::PACKET_INFO* MergerOperator::packet_to_packet_info(packet* pkt, 
 
     pi->pkt = pkt;
     pi->node_id = node_id;
-    pi->written_fields = this->action_table->get_write_fields(rn->get_nf());
+    pi->written_fields = new std::set<Field>(this->action_table->get_write_fields(rn->get_nf()));
     return pi;
 }
 

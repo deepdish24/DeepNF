@@ -25,28 +25,31 @@ void int_handler(int signo);
 int sockfd;
 std::vector<address*> addresses;
 
+/**
+ * The proxy takes in a server ip and port. For any packets that the proxy receives, it changes the ip and port of
+ * the packet to that of the server ip and port.
+ *
+ * @return
+ */
 int main(int argc,char **argv)
-{   
+{
     signal(SIGINT, int_handler);
 
-    if (argc < 3) {
-        std::cerr << "./fw my_port destIP:port [destIP2:port2] .......\n";
-        return -1;
-    }
-
     // get this server's bind port
-    int bind_port = atoi(argv[1]);
-   
-    for (int i = 2; i < argc; i++) {
+    int bind_port = std::stoi(argv[1]);
+    char* server_ip = argv[2];
+    int server_port = std::stoi(argv[3]);
+
+    for (int i = 4; i < argc; i++) {
         address *addr = address_from_string(argv[i]);
         if (addr != NULL) {
             addresses.push_back(addr);
         }
     }
 
-    if (addresses.size() == 0) { 
+    if (addresses.size() == 0) {
         std::cerr << "No valid destination addresses\n";
-        return -1; 
+        return -1;
     }
 
     // create socket
@@ -57,13 +60,13 @@ int main(int argc,char **argv)
         std::cerr << "bind failure: " << strerror(errno) << std::endl;
         return -1;
     }
-    printf("Firewall listening for packets on port: %d\n", bind_port);
-    
-    
-    while (true) {
+    printf("Proxy listening for packets on port: %d\n", bind_port);
 
+
+    // listen for packets
+    while (true) {
         sockdata *pkt_data = receive_data(sockfd);
-        if (pkt_data == NULL || pkt_data->size == 0) { 
+        if (pkt_data == NULL || pkt_data->size == 0) {
             std::cerr << "packet receive error: " << strerror(errno) << std::endl;
             continue;
         }
@@ -74,8 +77,9 @@ int main(int argc,char **argv)
         printf("\nReceived packet:\n");
         p->print_info();
 
-        // drops input packet
-        p->nullify();
+        // overwrite received packet to point to server ip and port
+        p->write_dest_ip(std::string(server_ip));
+        p->write_dest_port(server_port);
 
         printf("\nSending modified packet:\n");
         p->print_info();
@@ -87,7 +91,7 @@ int main(int argc,char **argv)
                 exit(-1);
             }
         }
-        
+
     }
 
     return 0;
@@ -98,17 +102,6 @@ void int_handler(int signo)
     close(sockfd);
     exit(0);
 }
-
-
-
-// void run_firewall(struct packet *pkt_info)
-// {
-//     /* if dip = 80, send a null packet (drop packet) */
-//     if (htons(pkt_info->tcp_header->dest) == 8000) {
-//         pkt_info->nullify();
-//     }
-//     forward_packet(pkt_info->pkt, pkt_info->size);
-// }
 
 
 #pragma clang diagnostic pop

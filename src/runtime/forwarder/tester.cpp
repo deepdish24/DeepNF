@@ -10,6 +10,7 @@
 #include <runtime/socket_util.h>
 #include <runtime/address_util.h>
 #include <time.h>
+#include <vector>
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
@@ -26,29 +27,41 @@ int main(int argc, char *argv[]) {
         char* ip = argv[2];
         int portno = std::stoi(argv[3]);
         char* msg = argv[4];
+        int pkt_id = std::stoi(argv[5]);
+
+        std::vector<address*> addresses;
 
         // prepare destination address
-        char* addr_str = (char*) malloc(strlen(ip)+strlen(argv[2])+2);
-        strcpy(addr_str, ip);
-        strcat(addr_str, ":");
-        strcat(addr_str, argv[3]);
-        printf("Address to send to: %s\n", addr_str);
-        address* addr = address_from_string(addr_str);
+        for (int i = 2; i < argc; i++) {
+            address *addr = address_from_string(argv[i]);
+            if (addr != NULL) {
+                addresses.push_back(addr);
+            }
+        }
+
+        if (addresses.size() == 0) {
+            fprintf(stderr, "No valid destination addresses\n");
+            exit(-1);
+        }
 
         // prepare packet
         std::string data(msg);
         std::string sip = "127.0.0.1";
         int sp = 8001;
-        std::string dip(argv[3]);
+        std::string dip(argv[2]);
+        printf("dip: %s\n", dip.c_str());
         int dp = portno;
         srand ( time(NULL) );
-        struct packet p(sip, sp, dip, dp, (unsigned short) 17, data);
+        struct packet p(sip, sp, dip, dp, (unsigned short) pkt_id, data);
 
-        if (send_packet(&p, sockfd, addr) < 0) {
-            fprintf(stderr, "Send packet error: %s", strerror(errno));
-            exit(-1);
+        for (address *addr : addresses) {
+            if (send_packet(&p, sockfd, addr) < 0) {
+                fprintf(stderr, "Send packet error: %s", strerror(errno));
+                exit(-1);
+            }
+            printf("Sent packet to address %s\n", address_to_string(addr).c_str());
         }
-        printf("Sent packet\n");
+        p.print_info();
     }
 
     // argc[1] == "1" is a receiver
@@ -70,11 +83,10 @@ int main(int argc, char *argv[]) {
         printf("\nlistening for data...\n");
         sockdata *pkt_data = receive_data(sockfd);
         packet* p = packet_from_data(pkt_data);
-        if (p->is_null()) {
-            printf("Received null packet!\n");
-        } else {
-            printf("%d Echo: [%s] (%d bytes)\n", p->ip_header->ip_id, p->data, p->data_size);
-        }
+
+        printf("Received packet, printing info: \n");
+        p->print_info();
+
         free(p);
         free(pkt_data);
     }

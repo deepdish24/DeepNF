@@ -38,7 +38,7 @@ public:
         packet* pkt;
         /* list of all fields of the packet that should be considered "written to" during the merging
          * process */
-        std::set<Field> written_fields;
+        std::set<Field>* written_fields;
     } PACKET_INFO;
 
     MergerOperator();

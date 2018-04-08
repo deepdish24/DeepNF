@@ -9,7 +9,6 @@ enum Field {
     SPORT,
     DPORT,
     PAYLOAD,
-    field_end // used only for iterating over the FIELD enums; not an actual FIELD
 };
 
 namespace field

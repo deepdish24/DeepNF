@@ -59,6 +59,7 @@ packet::~packet() {
 
 }
 
+
 bool packet::is_null()
 {
 	char sourceIp[INET_ADDRSTRLEN];
@@ -78,6 +79,7 @@ void packet::print_info()
 
 	char source_ip[INET_ADDRSTRLEN];
 	inet_ntop(AF_INET, &(ip_header->ip_src), source_ip, INET_ADDRSTRLEN);
+
 	std::cout << "sip = " << source_ip << "\n";
 	std::cout << "sport = " << ntohs(tcp_header->source) << "\n";
 
@@ -91,4 +93,53 @@ void packet::print_info()
 
 }
 
+std::string packet::get_src_ip() {
+    char source_ip[INET_ADDRSTRLEN];
+    inet_ntop(AF_INET, &(ip_header->ip_src), source_ip, INET_ADDRSTRLEN);
+    return std::string(reinterpret_cast<char*>(source_ip));
+}
+int packet::get_src_port() {
+    return ntohs(tcp_header->source);
+}
+std::string packet::get_dest_ip() {
+    char dest_ip[INET_ADDRSTRLEN];
+    inet_ntop(AF_INET, &(ip_header->ip_dst), dest_ip, INET_ADDRSTRLEN);
+    return std::string(reinterpret_cast<char*>(dest_ip));
+}
 
+int packet::get_dest_port() {
+    return ntohs(tcp_header->dest);
+}
+
+std::string packet::get_payload() {
+    return std::string(reinterpret_cast<char*>(data));
+}
+
+int packet::get_pkt_id() {
+    return ntohs(ip_header->ip_id);
+}
+
+
+void packet::write_dest_ip(std::string dest_ip) {
+    inet_pton(AF_INET, dest_ip.c_str(), &(ip_header->ip_dst));
+}
+
+void packet::write_dest_port(int dest_port) {
+    tcp_header->dest = htons(dest_port);
+}
+
+void packet::write_payload(std::string payload) {
+
+    packet* old_pkt = this;
+
+    struct packet new_packet(
+            this->get_src_ip(),
+            this->get_src_port(),
+            this->get_dest_ip(),
+            this->get_dest_port(),
+            (unsigned int) this->get_pkt_id(),
+            std::move(payload)
+    );
+
+    init_packet(new_packet.pkt, new_packet.size);
+}

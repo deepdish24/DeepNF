@@ -46,22 +46,30 @@ int MergerInfo::get_dest_port() {
  */
 MergerInfo* MergerInfo::get_dummy_merger_info() {
     std::map<int, int> port_to_node_map;
-    port_to_node_map.insert(std::make_pair(8000, 0));
     port_to_node_map.insert(std::make_pair(8001, 1));
     port_to_node_map.insert(std::make_pair(8002, 2));
+    port_to_node_map.insert(std::make_pair(8003, 3));
 
     std::vector<ConflictItem*> conflicts_list;
+    ConflictItem* ci1 = new ConflictItem(3, 0, -1);
+    ConflictItem* ci2 = new ConflictItem(1, 2, 0);
+    conflicts_list.push_back(ci1);
+    conflicts_list.push_back(ci2);
 
     std::map<int, RuntimeNode*> node_map;
-    RuntimeNode* rn1 = new RuntimeNode(0, dnf_firewall);
-    RuntimeNode* rn2 = new RuntimeNode(1, dnf_firewall);
-    RuntimeNode* rn3 = new RuntimeNode(2, dnf_firewall);
-    node_map.insert(std::make_pair(0, rn1));
-    node_map.insert(std::make_pair(1, rn2));
+    RuntimeNode* rn0 = new RuntimeNode(0, compressor);
+    RuntimeNode* rn1 = new RuntimeNode(1, proxy);
+    RuntimeNode* rn2 = new RuntimeNode(2, proxy);
+    RuntimeNode* rn3 = new RuntimeNode(3, compressor);
+
+
+    node_map.insert(std::make_pair(0, rn0));
+    node_map.insert(std::make_pair(1, rn1));
     node_map.insert(std::make_pair(2, rn2));
+    node_map.insert(std::make_pair(3, rn3));
 
     std::string dest_ip = "127.0.0.1";
-    int dest_port = 7777;
+    int dest_port = 9999;
 
     MergerInfo* mi = new MergerInfo(port_to_node_map, conflicts_list, node_map, dest_ip, dest_port);
     return mi;

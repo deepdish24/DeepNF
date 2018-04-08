@@ -25,6 +25,7 @@ int main(int argc, char *argv[]) {
         }
         char *ip = argv[2];
         int portno = std::stoi(argv[3]);
+        int pkt_id = std::stoi(argv[4]);
 
         // prepare destination address
 
@@ -39,10 +40,9 @@ int main(int argc, char *argv[]) {
         std::string dip(argv[3]);
         int dp = portno;
         srand(time(NULL));
-        struct packet p(sip, sp, dip, dp, (unsigned short) 17, data);
+        struct packet p(sip, sp, dip, dp, (unsigned short) pkt_id, data);
 
         p.nullify();
-        bool is_null = p.is_null();
 
         if (send_packet(&p, sockfd, addr) < 0) {
             fprintf(stderr, "Send packet error: %s", strerror(errno));
