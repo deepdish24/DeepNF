@@ -152,8 +152,10 @@ void setup_nodes(MachineConfigurator conf) {
 
     // list of nodes on this machine
 	std::vector<RuntimeNode*> nodes = get_internal_nodes(conf);
+    std::cout << "Number of Nodes: " << nodes.size() << std::endl;
 
     for (RuntimeNode* node : nodes) {
+        std::cout << "curr node id: " << node->get_id() << std::endl;
         std::string func_name = node->get_name();
         std::string func_config_dir = to_root + conf.get_config_dir(node->get_id()) + "_config";
         std::string path_to_dockerfile = to_root + conf.get_dockerfile(node->get_nf()) + "Dockerfile";
@@ -269,7 +271,6 @@ std::unordered_map<int, int> setup_bridge_ports(MachineConfigurator &conf) {
 		std::string command1 = add_port_command + " eth1 --ipaddress=" + func_ip + " " + container_name;
 		std::cout << "command: " << command1 << std::endl;
 		system(command1.c_str());
-		//n->inport = eth_inx++;
 		ip_inx++;
 	}
 
