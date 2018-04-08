@@ -32,7 +32,6 @@ int main(int argc, char *argv[]) {
         strcpy(addr_str, ip);
         strcat(addr_str, ":");
         strcat(addr_str, argv[3]);
-        printf("Address to send to: %s\n", addr_str);
         address* addr = address_from_string(addr_str);
 
         // prepare packet
@@ -48,7 +47,8 @@ int main(int argc, char *argv[]) {
             fprintf(stderr, "Send packet error: %s", strerror(errno));
             exit(-1);
         }
-        printf("Sent packet\n");
+        printf("Sent packet with info:\n");
+        p->print_info();
     }
 
     // argc[1] == "1" is a receiver
@@ -73,7 +73,8 @@ int main(int argc, char *argv[]) {
         if (p->is_null()) {
             printf("Received null packet!\n");
         } else {
-            printf("%d Echo: [%s] (%d bytes)\n", p->ip_header->ip_id, p->data, p->data_size);
+            printf("Received packet, printing info: \n");
+            p->print_info();
         }
         free(p);
         free(pkt_data);
