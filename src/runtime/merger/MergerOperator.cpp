@@ -219,25 +219,29 @@ packet* MergerOperator::merge_packet(int pkt_id) {
     while (was_changed) {
         was_changed = false;
         for (auto it = conflicts_list.begin(); it != conflicts_list.end(); ++it) {
-            ConflictItem* ci = *it;
+            ConflictItem *ci = *it;
             printf("Iterating through conflicts list: %s\n", ci->to_string().c_str());
-            PACKET_INFO* new_packet = resolve_packet_conflict(
-                    pkt_info_map->at(ci->get_major()), pkt_info_map->at(ci->get_minor()), ci);
 
-            // add merged packet's NF's written fields
-            if (this->merger_info->get_node_map().count(new_packet->node_id) > 0) {
-                RuntimeNode* rn = this->merger_info->get_node_map().at(new_packet->node_id);
-                std::set<Field> new_write_fields = this->action_table->get_write_fields(rn->get_nf());
+            // begin merging if both packets of the conflict conflict are available
+            if (pkt_info_map->count(ci->get_major()) != 0 && pkt_info_map->count(ci->get_minor())) {
+                PACKET_INFO *new_packet = resolve_packet_conflict(
+                        pkt_info_map->at(ci->get_major()), pkt_info_map->at(ci->get_minor()), ci);
 
-                for (auto it = new_write_fields.begin(); it != new_write_fields.end(); ++it) {
-                    new_packet->written_fields->insert(*it);
+                // add merged packet's NF's written fields
+                if (this->merger_info->get_node_map().count(new_packet->node_id) > 0) {
+                    RuntimeNode *rn = this->merger_info->get_node_map().at(new_packet->node_id);
+                    std::set<Field> new_write_fields = this->action_table->get_write_fields(rn->get_nf());
+
+                    for (auto it = new_write_fields.begin(); it != new_write_fields.end(); ++it) {
+                        new_packet->written_fields->insert(*it);
+                    }
                 }
-            }
 
-            // remove major and minor, then add merged packet to pkt_map
-            pkt_info_map->erase(ci->get_major());
-            pkt_info_map->erase(ci->get_minor());
-            pkt_info_map->insert(std::make_pair(ci->get_parent(), new_packet));
+                // remove major and minor, then add merged packet to pkt_map
+                pkt_info_map->erase(ci->get_major());
+                pkt_info_map->erase(ci->get_minor());
+                pkt_info_map->insert(std::make_pair(ci->get_parent(), new_packet));
+        }
         }
     }
 
