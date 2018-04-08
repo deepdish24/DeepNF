@@ -82,7 +82,7 @@ int main(int argc,char **argv)
 
         // forward packet
         for (address *addr : addresses) {
-            if (send_packet(p, sockfd, dest_addr) < 0) {
+            if (send_packet(p, sockfd, addr) < 0) {
                 fprintf(stderr, "Send packet error: %s", strerror(errno));
                 exit(-1);
             }
