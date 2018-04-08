@@ -66,9 +66,16 @@ int main(int argc,char **argv)
             std::cerr << "packet receive error: " << strerror(errno) << std::endl;
             continue;
         }
-        
-        // TODO: process packet
+        packet* p = packet_from_data(pkt_data);
 
+        // process packet
+        printf("\nReceived packet:\n");
+        p->print_info();
+
+        // drops input packet
+        p->nullify();
+
+        p->print_info();
         // forward packet
         for (address *addr : addresses) {
             send_data(pkt_data->buffer, pkt_data->size, sockfd, addr);
