@@ -83,12 +83,10 @@ int main(int argc, char *argv[]) {
         printf("\nlistening for data...\n");
         sockdata *pkt_data = receive_data(sockfd);
         packet* p = packet_from_data(pkt_data);
-        if (p->is_null()) {
-            printf("Received null packet!\n");
-        } else {
-            printf("Received packet, printing info: \n");
-            p->print_info();
-        }
+
+        printf("Received packet, printing info: \n");
+        p->print_info();
+
         free(p);
         free(pkt_data);
     }
