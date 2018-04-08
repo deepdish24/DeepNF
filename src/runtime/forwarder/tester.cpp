@@ -26,6 +26,7 @@ int main(int argc, char *argv[]) {
         char* ip = argv[2];
         int portno = std::stoi(argv[3]);
         char* msg = argv[4];
+        int pkt_id = std::stoi(argv[5]);
 
         // prepare destination address
         char* addr_str = (char*) malloc(strlen(ip)+strlen(argv[2])+2);
@@ -41,7 +42,7 @@ int main(int argc, char *argv[]) {
         std::string dip(argv[3]);
         int dp = portno;
         srand ( time(NULL) );
-        struct packet p(sip, sp, dip, dp, (unsigned short) 17, data);
+        struct packet p(sip, sp, dip, dp, (unsigned short) pkt_id, data);
 
         if (send_packet(&p, sockfd, addr) < 0) {
             fprintf(stderr, "Send packet error: %s", strerror(errno));

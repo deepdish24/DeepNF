@@ -48,7 +48,6 @@ MergerInfo* MergerInfo::get_dummy_merger_info() {
     std::map<int, int> port_to_node_map;
     port_to_node_map.insert(std::make_pair(8000, 0));
     port_to_node_map.insert(std::make_pair(8001, 1));
-    port_to_node_map.insert(std::make_pair(8002, 2));
 
     std::vector<ConflictItem*> conflicts_list;
 
