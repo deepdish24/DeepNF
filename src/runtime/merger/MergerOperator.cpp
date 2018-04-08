@@ -130,16 +130,57 @@ MergerOperator::PACKET_INFO* MergerOperator::resolve_packet_conflict(
         ConflictItem* conflict) {
     printf("MergerOperator::resolve_packet_conflict - major: %d, minor: %d\n", major_p->node_id, minor_p->node_id);
 
+    auto* pi = (PACKET_INFO*) malloc(sizeof(PACKET_INFO));
+    pi->node_id = conflict == nullptr ? -1 : conflict->get_parent();
+
+    // create new packet based on changes in major packet
+    pi->pkt = new packet(major_p->pkt->pkt, major_p->pkt->size);
+
     // if either packet is null, drop the packet (ie. return a nullified packet)
     if (major_p->pkt->is_null() || minor_p->pkt->is_null()) {
         printf("Null packet detected\n");
-
-        auto* pi = (PACKET_INFO*) malloc(sizeof(PACKET_INFO));
-        pi->node_id = conflict == nullptr ? -1 : conflict->get_parent();
-        pi->pkt = new packet(major_p->pkt->pkt, major_p->pkt->size);
         pi->pkt->nullify();
         return pi;
     }
+    printf("Neither packet is null\n");
+
+    // add writes from minor packet
+    std::set<Field> major_fields = major_p->written_fields;
+    std::set<Field> minor_fields = minor_p->written_fields;
+
+    for (std::set<Field>::iterator it = minor_fields.begin(); it != minor_fields.end(); ++it) {
+        Field field = *it;
+
+        // write the minor's field changes as long as the change does NOT conflict with major
+        if (major_fields.find(field) == major_fields.end()) {
+            switch (field) {
+                case Field::SIP:
+                    pi->pkt->ip_header->ip_src = minor_p->pkt->ip_header->ip_src;
+                    break;
+
+                case Field::DIP:
+                    pi->pkt->ip_header->ip_dst = minor_p->pkt->ip_header->ip_dst;
+                    break;
+
+                case Field::SPORT:
+                    pi->pkt->tcp_header->th_sport = minor_p->pkt->tcp_header->th_sport;
+                    break;
+
+                case Field::DPORT:
+                    pi->pkt->tcp_header->th_dport = minor_p->pkt->tcp_header->th_dport;
+                    break;
+
+                case Field::PAYLOAD:
+                    pi->pkt->data = minor_p->pkt->data;
+                    pi->pkt->data_size = minor_p->pkt->data_size;
+                    break;
+            }
+        }
+    }
+
+
+
+
 
     return nullptr;
 }
@@ -176,9 +217,9 @@ packet* MergerOperator::merge_packet(int pkt_id) {
 
     bool was_changed = true; // has at least one merge conflict been resolved in this iteration?
 
-    for (auto it = conflicts_list.begin(); it != conflicts_list.end(); ++it) {
+//    for (auto it = conflicts_list.begin(); it != conflicts_list.end(); ++it) {
 //        printf("Iterating through conflicts list: %s\n", (*it)->to_string().c_str());
-    }
+//    }
 
     // at this point, none of the packets should have conflicts any more, just merge them all
     PACKET_INFO* merged_packet = nullptr;
