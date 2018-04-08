@@ -351,7 +351,7 @@ MergerOperator::PACKET_INFO* MergerOperator::packet_to_packet_info(packet* pkt, 
 
     pi->pkt = pkt;
     pi->node_id = node_id;
-    pi->written_fields = new std::set(this->action_table->get_write_fields(rn->get_nf()));
+    pi->written_fields = new std::set<Field>(this->action_table->get_write_fields(rn->get_nf()));
     return pi;
 }
 
