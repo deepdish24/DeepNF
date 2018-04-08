@@ -420,14 +420,15 @@ int main(int argc, char *argv[]) {
 				break;
 		}
 	}
-    merger_ip_port = argv[c];
+    merger_ip_port = argv[optind];
+    std::cout << "Merger IP:PORT = " << merger_ip_port << std::endl;
 	MachineConfigurator conf = get_machine_configurator(port);
 
     
 
-	/*int machineId = conf.get_machine_id();
+	int machineId = conf.get_machine_id();
 	Machine* mac = conf.get_machine_with_id(machineId);
-	std::cout << mac->get_bridge_ip() << std::endl;*/
+	std::cout << mac->get_bridge_ip() << std::endl;
 
 	if (needReset) {
 		reset(conf);
