@@ -233,7 +233,7 @@ packet* MergerOperator::merge_packet(int pkt_id) {
             printf("(maj=%d, min=%d, par=%d)\n", ci->get_major(), ci->get_minor(), ci->get_parent());
 
             PACKET_INFO* major = pkt_info_map->at(ci->get_major());
-            printf("Got major packet: node_id: %d, ");
+            printf("Got major packet: node_id: %d, \n", major->node_id);
 
             // begin merging if both packets of the conflict conflict are available
             if (pkt_info_map->count(ci->get_major()) != 0 && pkt_info_map->count(ci->get_minor()) != 0) {
