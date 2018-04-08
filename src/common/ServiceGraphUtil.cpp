@@ -63,6 +63,10 @@ namespace service_graph_util
                     nf = dnf_firewall;
                     break;
 
+                case RuntimeNodeMsg::DNF_LOADBALANCER:
+                    nf = dnf_loadbalancer;
+                    break;
+
                 default:
                     throw std::invalid_argument("Message has unknown NF type");
             }
@@ -94,6 +98,10 @@ namespace service_graph_util
             switch(rn->get_nf()) {
                 case dnf_firewall:
                     message.set_nf(RuntimeNodeMsg::DNF_FIREWALL);
+                    break;
+
+                case dnf_loadbalancer:
+                    message.set_nf(RuntimeNodeMsg::DNF_LOADBALANCER);
                     break;
 
                 default:

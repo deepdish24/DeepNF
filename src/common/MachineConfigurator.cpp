@@ -29,6 +29,7 @@ std::string MachineConfigurator::get_config_dir(int node_id) {
 std::string MachineConfigurator::get_docker_image_name(int node_id, NF nf) {
 	switch(nf) {
 		case dnf_firewall: return std::to_string(node_id) + "_dnf_firewall";
+		case dnf_loadbalancer: return std::to_string(node_id) + "_dnf_loadbalancer";
 		break;
 		default: return "";
 	}
@@ -38,12 +39,10 @@ std::string MachineConfigurator::get_dockerfile(NF nf) {
 	std::string path = "DeepNF/src/runtime/nf_configs/";
 	switch(nf) {
 		case dnf_firewall: path += "DnfFirewall/";
+		case dnf_loadbalancer: path += "DnfLoadBalancer/";
 		break;
 		default: return "";
 	}
-
-	//path += "/Docke";
-
 	return path;
 }
 
