@@ -57,6 +57,7 @@ int main(int argc,char **argv)
         std::cerr << "bind failure: " << strerror(errno) << std::endl;
         return -1;
     }
+    printf("Firewall listening for packets on port: %d\n", bind_port);
     
     
     while (true) {
@@ -78,7 +79,10 @@ int main(int argc,char **argv)
         p->print_info();
         // forward packet
         for (address *addr : addresses) {
-            send_data(pkt_data->buffer, pkt_data->size, sockfd, addr);
+            if (send_packet(p, sockfd, addr) < 0) {
+                fprintf(stderr, "Send packet error: %s", strerror(errno));
+                exit(-1);
+            }
         }
         
     }
