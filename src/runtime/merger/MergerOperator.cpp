@@ -180,16 +180,21 @@ MergerOperator::PACKET_INFO* MergerOperator::resolve_packet_conflict(
     printf("Merging is done at this point\n");
 
     // add major and minor fields to pi's written_fields
-    for (auto f : *minor_fields) {
-        printf("adding minor field: %s\n", field::field_to_string(f).c_str());
-        pi->written_fields->insert(f);
-    }
+    pi->written_fields->insert(minor_fields->begin(), minor_fields->end());
+    pi->written_fields->insert(major_fields->begin(), major_fields->end());
 
-    for (auto f : *major_fields) {
-        printf("adding major field: %s\n", field::field_to_string(f).c_str());
+    printf("Done adding to pi's written_fields\n");
 
-        pi->written_fields->insert(f);
-    }
+//    for (auto f : *minor_fields) {
+//        printf("adding minor field: %s\n", field::field_to_string(f).c_str());
+//        pi->written_fields->insert(f);
+//    }
+//
+//    for (auto f : *major_fields) {
+//        printf("adding major field: %s\n", field::field_to_string(f).c_str());
+//
+//        pi->written_fields->insert(f);
+//    }
 
     return pi;
 }
