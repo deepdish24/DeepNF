@@ -5,7 +5,7 @@
 		<Option title="DeepNF"/>
 		<Option makefile_is_custom="1"/>
 		<Option compiler="clang"/>
-		<Option virtualFolders="CMake Files\;CMake Files\cmake-build-debug\;CMake Files\cmake-build-debug\google_protobuf-prefix\;CMake Files\cmake-build-debug\google_protobuf-prefix\tmp\;CMake Files\src\;CMake Files\src\common\;CMake Files\src\setup\;CMake Files\src\listener\;CMake Files\src\runtime\;CMake Files\src\runtime\merger\;CMake Files\src\runtime\config\;CMake Files\src\runtime\forwarder\;CMake Files\src\runtime\nf_configs\;CMake Files\src\runtime\nf_configs\DnfFirewall\;CMake Files\src\runtime\nf_configs\Proxy\;CMake Files\src\runtime\nf_configs\pktgen\;"/>
+		<Option virtualFolders="CMake Files\;CMake Files\cmake-build-debug\;CMake Files\cmake-build-debug\google_protobuf-prefix\;CMake Files\cmake-build-debug\google_protobuf-prefix\tmp\;CMake Files\src\;CMake Files\src\common\;CMake Files\src\setup\;CMake Files\src\listener\;CMake Files\src\runtime\;CMake Files\src\runtime\merger\;CMake Files\src\runtime\config\;CMake Files\src\runtime\forwarder\;CMake Files\src\runtime\nf_configs\;CMake Files\src\runtime\nf_configs\DnfFirewall\;CMake Files\src\runtime\nf_configs\Proxy\;CMake Files\src\runtime\nf_configs\Compressor\;CMake Files\src\runtime\nf_configs\pktgen\;"/>
 		<Build>
 			<Target title="all">
 				<Option working_dir="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug"/>
@@ -681,6 +681,58 @@
 					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/runtime/nf_configs/Proxy/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
+			<Target title="compressor">
+				<Option output="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/runtime/nf_configs/Compressor/compressor" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/runtime/nf_configs/Compressor"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="clang"/>
+				<Compiler>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/generated"/>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/include"/>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src"/>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/usr/local/include/google/protobuf"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/9.0.0/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/runtime/nf_configs/Compressor/Makefile&quot;  VERBOSE=1 compressor"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/runtime/nf_configs/Compressor/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/runtime/nf_configs/Compressor/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/runtime/nf_configs/Compressor/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="compressor/fast">
+				<Option output="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/runtime/nf_configs/Compressor/compressor" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/runtime/nf_configs/Compressor"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="clang"/>
+				<Compiler>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/generated"/>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/include"/>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src"/>
+					<Add directory="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/usr/local/include/google/protobuf"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/9.0.0/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/runtime/nf_configs/Compressor/Makefile&quot;  VERBOSE=1 compressor/fast"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/runtime/nf_configs/Compressor/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/runtime/nf_configs/Compressor/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/runtime/nf_configs/Compressor/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
 			<Target title="receiver">
 				<Option output="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/runtime/nf_configs/pktgen/receiver" prefix_auto="0" extension_auto="0"/>
 				<Option working_dir="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/cmake-build-debug/src/runtime/nf_configs/pktgen"/>
@@ -888,6 +940,9 @@
 			<Option target="merger"/>
 			<Option target="merger_lib"/>
 		</Unit>
+		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/runtime/nf_configs/Compressor/compressor.cpp">
+			<Option target="compressor"/>
+		</Unit>
 		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/runtime/nf_configs/DnfFirewall/dnf_firewall.cpp">
 			<Option target="fw"/>
 		</Unit>
@@ -962,6 +1017,9 @@
 		</Unit>
 		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/runtime/nf_configs/Proxy/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\src\runtime\nf_configs\Proxy\"/>
+		</Unit>
+		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/runtime/nf_configs/Compressor/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\src\runtime\nf_configs\Compressor\"/>
 		</Unit>
 		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/runtime/nf_configs/pktgen/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\src\runtime\nf_configs\pktgen\"/>
