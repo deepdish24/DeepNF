@@ -39,6 +39,7 @@ std::string MachineConfigurator::get_dockerfile(NF nf) {
 	std::string path = "DeepNF/src/runtime/nf_configs/";
 	switch(nf) {
 		case dnf_firewall: path += "DnfFirewall/";
+		break;
 		case dnf_loadbalancer: path += "DnfLoadBalancer/";
 		break;
 		default: return "";
