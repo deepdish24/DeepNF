@@ -72,8 +72,11 @@ int main(int argc,char **argv)
         p->write_dest_ip(std::string(server_ip));
         p->write_dest_port(dest_port);
 
+        printf("Sending modified packet:\n");
+        p->print_info();
+
         // forward packet
-        if (send_data(pkt_data->buffer, pkt_data->size, sockfd, dest_addr) < 0) {
+        if (send_data(p, p->size, sockfd, dest_addr) < 0) {
             fprintf(stderr, "Send packet error: %s", strerror(errno));
             exit(-1);
         }
