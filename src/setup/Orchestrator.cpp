@@ -298,6 +298,8 @@ NF Orchestrator::stringToNF(std::string function) {
     NF nf = dnf_firewall;
     if (function.compare("dnf_firewall") == 0) {
         nf = dnf_firewall;
+    } if (function.compare("dnf_loadbalancer") == 0) {
+        nf = dnf_loadbalancer;
     } else {
         perror("stringToNf called on unknown function");
     }

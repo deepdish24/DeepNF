@@ -161,7 +161,7 @@ void setup_nodes(MachineConfigurator conf) {
         make_config_dir(func_config_dir);
         copy_dockerfile(path_to_dockerfile, func_config_dir, to_root, path_to_dependencies);
         build_docker_image(image_name, func_config_dir);
-        start_docker_container(container_name, "base_img");
+        start_docker_container(container_name, image_name);
     }
 
 
