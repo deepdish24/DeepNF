@@ -142,5 +142,5 @@ void packet::write_payload(std::string payload) {
     );
 
     init_packet(new_packet.pkt, new_packet.size);
-    free(old_pkt);
+//    free(old_pkt);
 }

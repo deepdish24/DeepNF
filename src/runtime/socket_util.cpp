@@ -41,6 +41,7 @@ int send_data(char *buf, int size, int sockfd, address *addr)
 	int num_bytes = sendto(sockfd, buf, size, 0,
 			(struct sockaddr*)&server_dest, sizeof(struct sockaddr));
 	if (num_bytes < 0) {
+		fprintf(stderr, "send_data error\n");
 		return -1;
 	}
 
