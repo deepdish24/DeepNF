@@ -387,7 +387,7 @@ void reset(MachineConfigurator conf) {
 	system((del_ports_cmd + "merger_old").c_str());
 	system("docker stop classifier merger_old; docker rm classifier merger_old");*/
 
-	std::vector<RuntimeNode*> nodes = get_internal_nodes(c);
+	std::vector<RuntimeNode*> nodes = get_internal_nodes(conf);
 	for (RuntimeNode* n : nodes) {
 		// remove all veth pairs for this node
         std::string container_name = conf.get_config_dir(n->get_id());
