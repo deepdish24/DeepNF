@@ -327,7 +327,7 @@ std::map<int, MergerOperator::PACKET_INFO*>* MergerOperator::packet_map_to_packe
     for (auto it = packet_map->begin(); it != packet_map->end(); ++it) {
         int node_id = it->first;
         packet* pkt = it->second;
-        printf("Iterating through packet_map_to_packet_info_map: id: %d, pkt: %s\n", node_id, pkt->get_payload());
+        printf("Iterating through packet_map_to_packet_info_map: id: %d, pkt: %s\n", node_id, pkt->get_payload().c_str());
 
         ret_map->insert(std::make_pair(node_id, packet_to_packet_info(pkt, node_id)));
     }
