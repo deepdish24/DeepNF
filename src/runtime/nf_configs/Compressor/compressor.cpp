@@ -67,7 +67,7 @@ int main(int argc,char **argv)
         p->print_info();
 
         // overwrite received packet to have new payload
-        p->write_payload(new_msg);
+//        p->write_payload(new_msg);
 
         printf("Sending modified packet:\n");
         p->print_info();
