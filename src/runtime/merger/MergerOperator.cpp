@@ -220,7 +220,7 @@ packet* MergerOperator::merge_packet(int pkt_id) {
         was_changed = false;
         for (auto it = conflicts_list.begin(); it != conflicts_list.end(); ++it) {
             ConflictItem *ci = *it;
-            printf("Iterating through conflicts list: %s\n", ci->to_string().c_str());
+            printf("Iterating through conflicts list: ");
             printf("(maj=%d, min=%d, par=%d)", ci->get_major(), ci->get_minor(), ci->get_parent());
 
             // begin merging if both packets of the conflict conflict are available
