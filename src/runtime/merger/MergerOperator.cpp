@@ -147,13 +147,14 @@ MergerOperator::PACKET_INFO* MergerOperator::resolve_packet_conflict(
     // add writes from minor packet
     std::set<Field> major_fields = major_p->written_fields;
     std::set<Field> minor_fields = minor_p->written_fields;
+    printf("Begin iterating through minor's fields\n");
 
     for (std::set<Field>::iterator it = minor_fields.begin(); it != minor_fields.end(); ++it) {
         Field field = *it;
+        printf("Writing minor's field: %s\n", field::field_to_string(field).c_str());
 
         // write the minor's field changes as long as the change does NOT conflict with major
         if (major_fields.find(field) == major_fields.end()) {
-            printf("Writing minor's field: %s\n", field::field_to_string(field).c_str());
             switch (field) {
 
                 case Field::DIP:
