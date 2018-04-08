@@ -52,6 +52,7 @@ int main(int argc,char **argv)
         std::cerr << "bind failure: " << strerror(errno) << std::endl;
         return -1;
     }
+    printf("Proxy listening for packets on port: %d\n", bind_port);
 
 
     // listen for packets

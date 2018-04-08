@@ -79,6 +79,7 @@ void packet::print_info()
 
 	char source_ip[INET_ADDRSTRLEN];
 	inet_ntop(AF_INET, &(ip_header->ip_src), source_ip, INET_ADDRSTRLEN);
+
 	std::cout << "sip = " << source_ip << "\n";
 	std::cout << "sport = " << ntohs(tcp_header->source) << "\n";
 
