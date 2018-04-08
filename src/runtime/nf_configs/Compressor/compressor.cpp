@@ -50,7 +50,7 @@ int main(int argc,char **argv)
         std::cerr << "bind failure: " << strerror(errno) << std::endl;
         return -1;
     }
-    printf("Compressorlistening for packets on port: %d\n", bind_port);
+    printf("Compressor listening for packets on port: %d\n", bind_port);
 
 
     // listen for packets
@@ -69,7 +69,7 @@ int main(int argc,char **argv)
         p->print_info();
 
         // overwrite received packet to have new payload
-        p->write_payload(new_msg);
+//        p->write_payload(new_msg);
 
         printf("Sending modified packet:\n");
         p->print_info();
