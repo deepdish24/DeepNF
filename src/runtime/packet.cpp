@@ -59,6 +59,7 @@ packet::~packet() {
 
 }
 
+
 bool packet::is_null()
 {
 	char sourceIp[INET_ADDRSTRLEN];
@@ -91,4 +92,21 @@ void packet::print_info()
 
 }
 
+void packet::write_dest_ip(std::string dest_ip) {
+    inet_pton(AF_INET, dest_ip.c_str(), &(ip_header->ip_dst));
+}
 
+void packet::write_dest_port(int dest_port) {
+    tcp_header->dest = htons(dest_port);
+}
+
+void packet::write_payload(std::string payload) {
+    u_char *data_temp = (u_char*) payload.c_str();
+    int data_size_temp = payload.size();
+
+    memcpy(
+        (void*) this->pkt + sizeof(struct ether_header) + sizeof(struct ip) + sizeof(struct tcphdr),
+        (void *)data_temp,
+        data_size_temp
+    );
+}

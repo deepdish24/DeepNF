@@ -43,7 +43,6 @@ int main(int argc, char *argv[]) {
         struct packet p(sip, sp, dip, dp, (unsigned short) pkt_id, data);
 
         p.nullify();
-        bool is_null = p.is_null();
 
         if (send_packet(&p, sockfd, addr) < 0) {
             fprintf(stderr, "Send packet error: %s", strerror(errno));

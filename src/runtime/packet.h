@@ -36,6 +36,10 @@ public:
     bool is_null();
     void nullify();
     void print_info();
+
+	void write_dest_ip(std::string dest_ip);
+	void write_dest_port(int dest_port);
+	void write_payload(std::string payload);
 };
 
 #endif
