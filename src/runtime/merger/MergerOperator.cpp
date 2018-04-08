@@ -4,6 +4,17 @@
 
 #include "MergerOperator.h"
 
+#include <arpa/inet.h>
+#include <cstring>
+#include <iostream>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <net/ethernet.h>
+#include <netinet/tcp.h>   //Provides declarations for tcp header
+#include <netinet/ip.h>    //Provides declarations for ip header
+#include <string>
+
+
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
 
@@ -15,8 +26,6 @@ typedef struct node_thread_params {
 
 
 MergerOperator::MergerOperator() {
-    printf("MergerOperator::MergerOperator \n");
-
     this->action_table = new ActionTable();
     this->merger_info = MergerInfo::get_dummy_merger_info();
     this->num_nodes = this->merger_info->get_port_to_node_map().size();
@@ -35,7 +44,7 @@ typedef struct merge_thread_params {
 void* MergerOperator::merge_packet_wrapper(void *arg) {
     auto *tp = (MERGE_THREAD_PARAMS*) arg;
     MergerOperator *this_mo = tp->inst;
-    this_mo->merge_packet(tp->packet_id);
+    this_mo->run_merge_packet(tp->packet_id);
 
     return nullptr;
 }
@@ -57,8 +66,6 @@ void* MergerOperator::run_node_thread_wrapper(void *arg) {
  * @param node_id    The id of the runtime node leaf
  */
 void MergerOperator::run_node_thread(int port, int node_id) {
-    printf("Calling run_node_thread with port: %d, node_id: %d\n", port, node_id);
-
     // opens a datagram socket and returns the fd or -1 */
     int sockfd = open_socket();
     if (sockfd < 0) {
@@ -69,7 +76,6 @@ void MergerOperator::run_node_thread(int port, int node_id) {
 
     // binds socket with given fd to given port */
     bind_socket(sockfd, port);
-    printf("binded socket\n");
 
     std::map<int, packet *>* this_pkt_map;
     while (true) {
@@ -79,6 +85,8 @@ void MergerOperator::run_node_thread(int port, int node_id) {
         packet* p = packet_from_data(pkt_data);
 
         printf("Echo: [%s] (%d bytes)\n", p->data, p->data_size);
+        char sourceIp[INET_ADDRSTRLEN];
+	    inet_ntop(AF_INET, &(p->ip_header->ip_src), sourceIp, INET_ADDRSTRLEN);
 
         // add packet to packet_map
         pthread_mutex_lock(&packet_map_mutex);
@@ -107,6 +115,35 @@ void MergerOperator::run_node_thread(int port, int node_id) {
     }
 }
 
+/**
+ * Given two packets (one with precedence over the another), return a merged packet that merges all written fields
+ * in the two packets, resolving write conflicts appriopriately
+ *
+ * @param major_p       Info corresponding to the packet with precedence
+ * @param minor_p       Info corresponding to the packet without precedence
+ * @param conflict      The ConflictItem describing the conflict between the major and minor packets
+ * @return  A merged packet containing both major_p and minor_p's writes
+ */
+MergerOperator::PACKET_INFO* MergerOperator::resolve_packet_conflict(
+        PACKET_INFO* major_p,
+        PACKET_INFO* minor_p,
+        ConflictItem* conflict) {
+    printf("MergerOperator::resolve_packet_conflict - major: %d, minor: %d\n", major_p->node_id, minor_p->node_id);
+
+    // if either packet is null, drop the packet (ie. return a nullified packet)
+    if (major_p->pkt->is_null() || minor_p->pkt->is_null()) {
+        printf("Null packet detected\n");
+
+        auto* pi = (PACKET_INFO*) malloc(sizeof(PACKET_INFO));
+        pi->node_id = conflict == nullptr ? -1 : conflict->get_parent();
+        pi->pkt = new packet(major_p->pkt->pkt, major_p->pkt->size);
+        pi->pkt->nullify();
+        return pi;
+    }
+
+    return nullptr;
+}
+
 
 /**
  * Retrieves all packets for the given pkt_id stored in packet_map and outputs a merged packet
@@ -120,6 +157,17 @@ packet* MergerOperator::merge_packet(int pkt_id) {
     std::map<int, packet*>* this_pkt_map = packet_map.at(pkt_id);
 
     // convert this_pkt_map to a map from node ids to packet_infos
+    std::map<int, MergerOperator::PACKET_INFO*>* pkt_info_map = packet_map_to_packet_info_map(this_pkt_map);
+
+    printf("Printing pkt_info_map:\n");
+    for (auto it = pkt_info_map->begin(); it != pkt_info_map->end(); ++it) {
+        printf("%d -> {", it->first);
+        for (auto it2 = it->second->written_fields.begin(); it2 != it->second->written_fields.end(); ++it2) {
+            printf("%s, ", field::field_to_string(*it2).c_str());
+        }
+        printf("}\n");
+    }
+    printf("\n");
 
     if ((int) this_pkt_map->size() != num_nodes) {
         fprintf(stderr, "Called merge_packet on an invalid pkt_id\n");
@@ -128,11 +176,69 @@ packet* MergerOperator::merge_packet(int pkt_id) {
 
     bool was_changed = true; // has at least one merge conflict been resolved in this iteration?
 
-    for (int i = 0; i < num_nodes; i++) {
-        printf("Iterating through conflicts list: %d\n", i);
+    for (auto it = conflicts_list.begin(); it != conflicts_list.end(); ++it) {
+//        printf("Iterating through conflicts list: %s\n", (*it)->to_string().c_str());
     }
 
-    return nullptr;
+    // at this point, none of the packets should have conflicts any more, just merge them all
+    PACKET_INFO* merged_packet = nullptr;
+    for (auto it = pkt_info_map->begin(); it != pkt_info_map->end(); ++it) {
+//        printf("Iterating through pkt_info_map, %d\n", it->first);
+
+        if (merged_packet == nullptr) {
+            merged_packet = it->second;
+            continue;
+        }
+
+        // randomly select major and minor since there should be no conflicts
+        merged_packet = resolve_packet_conflict(merged_packet, it->second, (ConflictItem*) nullptr);
+
+    }
+
+    if (merged_packet == nullptr) {
+        fprintf(stderr, "No packets in packet_map to merge for id %d", pkt_id);
+        exit(-1);
+    }
+
+    // remove pkt_id from packet_map
+    pthread_mutex_lock(&packet_map_mutex);
+    packet_map.erase(pkt_id);
+    pthread_mutex_unlock(&packet_map_mutex);
+
+    return merged_packet->pkt;
+}
+
+
+/**
+ * Merges all received packets for the given pkt_id, then sends merged packet to receive address
+ *
+ * @param pkt_id    The id of the packet to merge
+ */
+void MergerOperator::run_merge_packet(int pkt_id) {
+    packet* merged_pkt = this->merge_packet(pkt_id);
+
+    printf("\nFinished merging packet\n");
+    if (merged_pkt->is_null()) {
+        printf("Merged packet is null\n");
+    } else {
+        printf("Merged packet is not null\n");
+    }
+
+    // send merged packet to destination address
+    int sockfd = open_socket();
+    if (sockfd < 0) {
+        fprintf(stderr, "Cannot open socket: %s", strerror(errno));
+        exit(-1);
+    }
+
+    if (send_packet(merged_pkt, sockfd, this->dest_address) < 0) {
+        fprintf(stderr, "Send packet error: %s", strerror(errno));
+        exit(-1);
+    }
+
+    printf("Sent merged packet for id: %d, printing packet_map:\n", pkt_id);
+    print_packet_map();
+
 }
 
 
@@ -142,7 +248,17 @@ packet* MergerOperator::merge_packet(int pkt_id) {
  *         packet in packet_map
  */
 std::map<int, MergerOperator::PACKET_INFO*>* MergerOperator::packet_map_to_packet_info_map(std::map<int, packet*>* packet_map) {
-    return nullptr;
+
+    auto ret_map = new std::map<int, MergerOperator::PACKET_INFO*>();
+
+    for (auto it = packet_map->begin(); it != packet_map->end(); ++it) {
+        int node_id = it->first;
+        packet* pkt = it->second;
+
+        ret_map->insert(std::make_pair(node_id, packet_to_packet_info(pkt, node_id)));
+    }
+
+    return ret_map;
 };
 
 
@@ -157,13 +273,14 @@ MergerOperator::PACKET_INFO* MergerOperator::packet_to_packet_info(packet* pkt, 
     auto* pi = (PACKET_INFO*) malloc(sizeof(PACKET_INFO));
 
     if (this->merger_info->get_node_map().count(node_id) == 0) {
-        fprintf(stderr, "Called packet_to_packet_info on invalid node_id: %d", node_id);
+        fprintf(stderr, "Called packet_to_packet_info on invalid node_id: %d\n", node_id);
         exit(-1);
     }
     RuntimeNode* rn = this->merger_info->get_node_map().at(node_id);
 
     pi->pkt = pkt;
-//    pi->written_fields = this->action_table->get_write_fields(rn->get_nf());
+    pi->node_id = node_id;
+    pi->written_fields = this->action_table->get_write_fields(rn->get_nf());
     return pi;
 }
 
@@ -172,7 +289,13 @@ MergerOperator::PACKET_INFO* MergerOperator::packet_to_packet_info(packet* pkt, 
  * Setup MergerOperator to start listening and merging packets
  */
 void MergerOperator::run() {
-    printf("MergerOperator::run() \n");
+    // set up destination address
+    if (this->merger_info->get_dest_ip().empty()) {
+        fprintf(stderr, "No destinatino ip address specified by merger_info\n");
+        exit(-1);
+    }
+    std::string addr_str = stringify(std::string(this->merger_info->get_dest_ip()), this->merger_info->get_dest_port());
+    dest_address = address_from_string(addr_str);
 
     // send up one thread to handle each leaf node
     std::map<int, int> port_to_node_map = this->merger_info->get_port_to_node_map();

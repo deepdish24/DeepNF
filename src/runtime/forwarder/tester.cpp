@@ -13,6 +13,7 @@
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
+#pragma clang diagnostic ignored "-Wunused-parameter"
 int main(int argc, char *argv[]) {
 
     // argc[1] == "0" is a sender
@@ -69,8 +70,11 @@ int main(int argc, char *argv[]) {
         printf("\nlistening for data...\n");
         sockdata *pkt_data = receive_data(sockfd);
         packet* p = packet_from_data(pkt_data);
-
-        printf("Echo: [%s] (%d bytes)\n", p->data, p->data_size);
+        if (p->is_null()) {
+            printf("Received null packet!\n");
+        } else {
+            printf("%d Echo: [%s] (%d bytes)\n", p->ip_header->ip_id, p->data, p->data_size);
+        }
         free(p);
         free(pkt_data);
     }

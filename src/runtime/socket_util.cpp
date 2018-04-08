@@ -38,11 +38,12 @@ int send_data(char *buf, int size, int sockfd, address *addr)
 	server_dest.sin_port = htons(addr->port);
 	inet_pton(AF_INET, addr->ip.c_str(), &(server_dest.sin_addr));
 
-	int num_bytes = sendto(sockfd, buf, size, 0, 
+	int num_bytes = sendto(sockfd, buf, size, 0,
 			(struct sockaddr*)&server_dest, sizeof(struct sockaddr));
 	if (num_bytes < 0) {
 		return -1;
 	}
+
 	std::cout << "sent " << num_bytes << " bytes\n";
 	return num_bytes;
 }

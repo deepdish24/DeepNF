@@ -49,3 +49,6 @@ To run tester:
         
     3. To run packet sender from /build
         => ./src/runtime/forwarder/tester 0 [ip to send to] [port to send to] [msg to send]
+        
+    4. To run null packet sender from /build
+        => ./src/runtime/forwarder/null_tester 0 [ip to send to] [port to send to]

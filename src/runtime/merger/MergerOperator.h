@@ -20,9 +20,13 @@
 #include <runtime/packet.h>
 #include <runtime/socket_util.h>
 #include <runtime/address.h>
+#include <common/RuntimeNode.h>
+#include <common/Field.h>
+#include <runtime/address_util.h>
 
 #include "ActionTable.h"
 #include "MergerInfo.h"
+
 
 
 class MergerOperator {
@@ -30,6 +34,7 @@ class MergerOperator {
 public:
     typedef struct packet_info
     {
+        int node_id;
         packet* pkt;
         /* list of all fields of the packet that should be considered "written to" during the merging
          * process */
@@ -61,6 +66,9 @@ private:
     // the total number of leaf runtime nodes that merger should listen for
     int num_nodes;
 
+    // address to send merged packets to
+    address* dest_address;
+
     // contains information about the NF action table
     ActionTable* action_table;
 
@@ -70,6 +78,17 @@ private:
     pthread_mutex_t packet_map_mutex;
 
     /**
+     * Given two packets (one with precedence over the another), return a merged packet that merges all written fields
+     * in the two packets, resolving write conflicts appriopriately
+     *
+     * @param major_p       Info corresponding to the packet with precedence
+     * @param minor_p       Info corresponding to the packet without precedence
+     * @param conflict      The ConflictItem describing the conflict between the major and minor packets
+     * @return  A merged packet containing both major_p and minor_p's writes
+     */
+    PACKET_INFO* resolve_packet_conflict(PACKET_INFO* major_p, PACKET_INFO* minor_p, ConflictItem* conflict);
+
+    /**
      * Retrieves all packets for the given pkt_id stored in packet_map and outputs a merged packet
      * based on the conflict items in merger_info
      *
@@ -77,6 +96,13 @@ private:
      * @return Pointer to a packet with all changes merged
      */
     packet* merge_packet(int pkt_id);
+
+    /**
+     * Merges all received packets for the given pkt_id, then sends merged packet to receive address
+     *
+     * @param pkt_id    The id of the packet to merge
+     */
+    void run_merge_packet(int pkt_id);
 
     /**
      * Converts a map from node ids to packets to a map from node ids to equivalent packet_infos
