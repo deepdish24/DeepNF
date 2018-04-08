@@ -230,13 +230,13 @@ packet* MergerOperator::merge_packet(int pkt_id) {
             // add merged packet's NF's written fields
             if (this->merger_info->get_node_map().count(new_packet->node_id) > 0) {
                 RuntimeNode* rn = this->merger_info->get_node_map().at(new_packet->node_id);
-                std::set new_write_fields = this->action_table->get_write_fields(rn->get_nf());
+                std::set<Field> new_write_fields = this->action_table->get_write_fields(rn->get_nf());
 
                 for (auto it = new_write_fields.begin(); it != new_write_fields.end(); ++it) {
                     new_packet->written_fields.insert(*it);
                 }
             }
-            
+
             // remove major and minor, then add merged packet to pkt_map
             pkt_info_map->erase(ci->get_major());
             pkt_info_map->erase(ci->get_minor());
