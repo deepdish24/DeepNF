@@ -221,9 +221,10 @@ packet* MergerOperator::merge_packet(int pkt_id) {
         for (auto it = conflicts_list.begin(); it != conflicts_list.end(); ++it) {
             ConflictItem *ci = *it;
             printf("Iterating through conflicts list: %s\n", ci->to_string().c_str());
+            printf("(maj=%d, min=%d, par=%d)", ci->get_major(), ci->get_minor(), ci->get_parent());
 
             // begin merging if both packets of the conflict conflict are available
-            if (pkt_info_map->count(ci->get_major()) != 0 && pkt_info_map->count(ci->get_minor())) {
+            if (pkt_info_map->count(ci->get_major()) != 0 && pkt_info_map->count(ci->get_minor()) != 0) {
                 PACKET_INFO *new_packet = resolve_packet_conflict(
                         pkt_info_map->at(ci->get_major()), pkt_info_map->at(ci->get_minor()), ci);
 
