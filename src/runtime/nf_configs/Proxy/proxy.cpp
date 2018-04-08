@@ -76,7 +76,7 @@ int main(int argc,char **argv)
         p->print_info();
 
         // forward packet
-        if (send_data(p, p->size, sockfd, dest_addr) < 0) {
+        if (send_packet(p, sockfd, dest_addr) < 0) {
             fprintf(stderr, "Send packet error: %s", strerror(errno));
             exit(-1);
         }
