@@ -153,36 +153,32 @@ MergerOperator::PACKET_INFO* MergerOperator::resolve_packet_conflict(
 
         // write the minor's field changes as long as the change does NOT conflict with major
         if (major_fields.find(field) == major_fields.end()) {
+            printf("Writing minor's field: %s\n", field::field_to_string(field));
             switch (field) {
-                case Field::SIP:
-                    pi->pkt->ip_header->ip_src = minor_p->pkt->ip_header->ip_src;
-                    break;
 
                 case Field::DIP:
-                    pi->pkt->ip_header->ip_dst = minor_p->pkt->ip_header->ip_dst;
-                    break;
-
-                case Field::SPORT:
-                    pi->pkt->tcp_header->th_sport = minor_p->pkt->tcp_header->th_sport;
+                    pi->pkt->write_dest_ip(minor_p->pkt->get_dest_ip());
                     break;
 
                 case Field::DPORT:
-                    pi->pkt->tcp_header->th_dport = minor_p->pkt->tcp_header->th_dport;
+                    pi->pkt->write_dest_port(minor_p->pkt->get_dest_port());
                     break;
 
                 case Field::PAYLOAD:
-                    pi->pkt->data = minor_p->pkt->data;
-                    pi->pkt->data_size = minor_p->pkt->data_size;
+                    pi->pkt->write_payload(minor_p->pkt->get_payload());
+                    break;
+
+                default:
+                    printf("Overwriting field is not supported\n");
                     break;
             }
         }
     }
 
+    printf("Merged packet:\n");
+    pi->pkt->print_info();
 
-
-
-
-    return nullptr;
+    return pi;
 }
 
 
