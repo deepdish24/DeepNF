@@ -16,6 +16,9 @@
 using json = nlohmann::json;
 
 std::string merger_ip_port;
+
+// port associated with each NF (leaf -> port to forward packet to in merger)
+// (non-leaf node -> port of current function)
 std::unordered_map<int, int> nodeid_to_port;
 std::unordered_map<int, std::string> nodeid_to_network;
 
@@ -380,16 +383,17 @@ void reset(MachineConfigurator c) {
 	std::string del_ports_cmd = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker del-ports ovs-br ";
 
 	// clean up merger_old and classifier
-	system((del_ports_cmd + "classifier").c_str());
+	/*system((del_ports_cmd + "classifier").c_str());
 	system((del_ports_cmd + "merger_old").c_str());
-	system("docker stop classifier merger_old; docker rm classifier merger_old");
+	system("docker stop classifier merger_old; docker rm classifier merger_old");*/
 
 	std::vector<RuntimeNode*> nodes = get_internal_nodes(c);
 	for (RuntimeNode* n : nodes) {
 		// remove all veth pairs for this node
-		system((del_ports_cmd + n->get_name()).c_str());
+        std::string container_name = conf.get_config_dir(n->get_id());
+		system((del_ports_cmd + container_name).c_str());
 		// stop and remove the docker container for this node
-		system(("docker stop " + n->get_name() + "; docker rm " + n->get_name()).c_str());
+		system(("docker stop " + container_name + "; docker rm " + container_name).c_str());
 	}
 
 	// delete the bridge
@@ -416,7 +420,7 @@ int main(int argc, char *argv[]) {
 				break;
 		}
 	}
-    //merger_ip_port = std::string merger_info(argv[c]);
+    merger_ip_port = argv[c];
 	MachineConfigurator conf = get_machine_configurator(port);
 
     
