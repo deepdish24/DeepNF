@@ -73,6 +73,7 @@ int main(int argc,char **argv)
         packet* p = packet_from_data(pkt_data);
 
         // process packet
+        printf("\n-------------------------------------\n");
         printf("\nReceived packet:\n");
         p->print_info();
 
@@ -80,7 +81,7 @@ int main(int argc,char **argv)
         p->write_dest_ip(std::string(server_ip));
         p->write_dest_port(server_port);
 
-        printf("Sending modified packet:\n");
+        printf("\nSending modified packet:\n");
         p->print_info();
 
         // forward packet

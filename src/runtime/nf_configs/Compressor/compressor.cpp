@@ -71,13 +71,14 @@ int main(int argc,char **argv)
         packet* p = packet_from_data(pkt_data);
 
         // process packet
+        printf("\n-------------------------------------\n");
         printf("\nReceived packet:\n");
         p->print_info();
 
         // overwrite received packet to have new payload
         p->write_payload(new_msg);
 
-        printf("Sending modified packet:\n");
+        printf("\nSending modified packet:\n");
         p->print_info();
 
         // forward packet

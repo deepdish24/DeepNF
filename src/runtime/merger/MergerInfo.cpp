@@ -55,7 +55,7 @@ MergerInfo* MergerInfo::get_dummy_merger_info() {
     conflicts_list.push_back(ci1);
 
     std::map<int, RuntimeNode*> node_map;
-    RuntimeNode* rn1 = new RuntimeNode(0, compressor);
+    RuntimeNode* rn1 = new RuntimeNode(0, dnf_firewall);
     RuntimeNode* rn2 = new RuntimeNode(1, compressor);
     RuntimeNode* rn3 = new RuntimeNode(2, proxy);
 

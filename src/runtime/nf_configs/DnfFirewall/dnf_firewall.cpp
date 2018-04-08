@@ -70,13 +70,16 @@ int main(int argc,char **argv)
         packet* p = packet_from_data(pkt_data);
 
         // process packet
+        printf("\n-------------------------------------\n");
         printf("\nReceived packet:\n");
         p->print_info();
 
         // drops input packet
         p->nullify();
 
+        printf("\nSending modified packet:\n");
         p->print_info();
+
         // forward packet
         for (address *addr : addresses) {
             if (send_packet(p, sockfd, addr) < 0) {
