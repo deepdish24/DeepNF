@@ -23,6 +23,7 @@ void int_handler(int signo);
 
 
 int sockfd;
+std::vector<address*> addresses;
 
 /**
  * The proxy takes in a server ip and port. For any packets that the proxy receives, it changes the ip and port of
@@ -36,11 +37,18 @@ int main(int argc,char **argv)
 
     int bind_port = std::stoi(argv[1]);
     std::string new_msg(argv[2]); // will overwrite payloads of any packets with this message
-    char* dest_ip = argv[3];
-    int dest_port = std::stoi(argv[4]);
 
-    std::string dest_str = stringify(std::string(dest_ip), dest_port);
-    address *dest_addr = address_from_string(dest_str);
+    for (int i = 2; i < argc; i++) {
+        address *addr = address_from_string(argv[i]);
+        if (addr != NULL) {
+            addresses.push_back(addr);
+        }
+    }
+
+    if (addresses.size() == 0) {
+        std::cerr << "No valid destination addresses\n";
+        return -1;
+    }
 
     // create socket
     int sockfd = open_socket();
@@ -62,8 +70,6 @@ int main(int argc,char **argv)
         }
         packet* p = packet_from_data(pkt_data);
 
-        printf("Dest address: %s", address_to_string(dest_addr).c_str());
-
         // process packet
         printf("\nReceived packet:\n");
         p->print_info();
@@ -74,11 +80,12 @@ int main(int argc,char **argv)
         printf("Sending modified packet:\n");
         p->print_info();
 
-        printf("Sending to address: %s", address_to_string(dest_addr).c_str());
         // forward packet
-        if (send_packet(p, sockfd, dest_addr) < 0) {
-            fprintf(stderr, "Send packet error: %s", strerror(errno));
-            exit(-1);
+        for (address *addr : addresses) {
+            if (send_packet(p, sockfd, dest_addr) < 0) {
+                fprintf(stderr, "Send packet error: %s", strerror(errno));
+                exit(-1);
+            }
         }
 
     }
