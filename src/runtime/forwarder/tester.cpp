@@ -10,6 +10,7 @@
 #include <runtime/socket_util.h>
 #include <runtime/address_util.h>
 #include <time.h>
+#include <vector>
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
@@ -28,12 +29,20 @@ int main(int argc, char *argv[]) {
         char* msg = argv[4];
         int pkt_id = std::stoi(argv[5]);
 
+        std::vector<address*> addresses;
+
         // prepare destination address
-        char* addr_str = (char*) malloc(strlen(ip)+strlen(argv[2])+2);
-        strcpy(addr_str, ip);
-        strcat(addr_str, ":");
-        strcat(addr_str, argv[3]);
-        address* addr = address_from_string(addr_str);
+        for (int i = 2; i < argc; i++) {
+            address *addr = address_from_string(argv[i]);
+            if (addr != NULL) {
+                addresses.push_back(addr);
+            }
+        }
+
+        if (addresses.size() == 0) {
+            fprintf(stderr, "No valid destination addresses\n");
+            exit(-1);
+        }
 
         // prepare packet
         std::string data(msg);
@@ -45,11 +54,13 @@ int main(int argc, char *argv[]) {
         srand ( time(NULL) );
         struct packet p(sip, sp, dip, dp, (unsigned short) pkt_id, data);
 
-        if (send_packet(&p, sockfd, addr) < 0) {
-            fprintf(stderr, "Send packet error: %s", strerror(errno));
-            exit(-1);
+        for (address *addr : addresses) {
+            if (send_packet(&p, sockfd, addr) < 0) {
+                fprintf(stderr, "Send packet error: %s", strerror(errno));
+                exit(-1);
+            }
+            printf("Sent packet to address %s\n", address_to_string(addr));
         }
-        printf("Sent packet with info:\n");
         p.print_info();
     }
 

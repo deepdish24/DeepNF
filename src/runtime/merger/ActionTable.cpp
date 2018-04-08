@@ -10,9 +10,11 @@
 ActionTable::ActionTable() {
     std::set<Field> dnf_firewall_write_fields = { };
     std::set<Field> proxy_write_fields = { DIP, DPORT };
+    std::set<Field> compressor_write_fields = { PAYLOAD };
 
     write_fields_map.insert(std::make_pair(NF::dnf_firewall, dnf_firewall_write_fields));
     write_fields_map.insert(std::make_pair(NF::proxy, proxy_write_fields));
+    write_fields_map.insert(std::make_pair(NF::compressor, compressor_write_fields));
 }
 
 /**
