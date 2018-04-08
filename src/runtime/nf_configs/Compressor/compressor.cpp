@@ -62,6 +62,8 @@ int main(int argc,char **argv)
         }
         packet* p = packet_from_data(pkt_data);
 
+        printf("Dest address: %s", address_to_string(dest_addr));
+
         // process packet
         printf("\nReceived packet:\n");
         p->print_info();
