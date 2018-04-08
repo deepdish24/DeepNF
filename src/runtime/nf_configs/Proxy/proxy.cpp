@@ -70,7 +70,7 @@ int main(int argc,char **argv)
 
         // overwrite received packet to point to server ip and port
         p->write_dest_ip(std::string(server_ip));
-        p->write_dest_port(dest_port);
+        p->write_dest_port(server_port);
 
         printf("Sending modified packet:\n");
         p->print_info();
