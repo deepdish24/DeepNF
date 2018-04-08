@@ -10,6 +10,7 @@ message MachineMsg {
 message RuntimeNodeMsg {
     enum NFMsg {
         DNF_FIREWALL = 0;
+        DNF_LOADBALANCER = 1;
     }
 
     uint64 id = 1;
