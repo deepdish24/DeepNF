@@ -96,7 +96,7 @@ void packet::print_info()
 std::string packet::get_src_ip() {
     char source_ip[INET_ADDRSTRLEN];
     inet_ntop(AF_INET, &(ip_header->ip_src), source_ip, INET_ADDRSTRLEN);
-    return std::string(source_ip);
+    return std::string(reinterpret_cast<char*>(source_ip));
 }
 int packet::get_src_port() {
     return ntohs(tcp_header->source);
@@ -104,15 +104,15 @@ int packet::get_src_port() {
 std::string packet::get_dest_ip() {
     char dest_ip[INET_ADDRSTRLEN];
     inet_ntop(AF_INET, &(ip_header->ip_dst), dest_ip, INET_ADDRSTRLEN);
-    return std::string(dest_ip);
+    return std::string(reinterpret_cast<char*>(dest_ip));
 }
 
 int packet::get_dest_port() {
-    ntohs(tcp_header->dest);
+    return ntohs(tcp_header->dest);
 }
 
 std::string packet::get_payload() {
-    return std::string(data);
+    return std::string(reinterpret_cast<char*>(data));
 }
 
 
