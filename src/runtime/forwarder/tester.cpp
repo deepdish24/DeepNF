@@ -40,7 +40,7 @@ int main(int argc, char *argv[]) {
         std::string sip = "127.0.0.1";
         int sp = 8001;
         std::string dip(argv[2]);
-        printf("dip: %s %s\n", argv[2], dip);
+        printf("dip: %s\n", dip.c_str());
         int dp = portno;
         srand ( time(NULL) );
         struct packet p(sip, sp, dip, dp, (unsigned short) pkt_id, data);
