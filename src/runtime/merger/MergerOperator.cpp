@@ -154,7 +154,7 @@ MergerOperator::PACKET_INFO* MergerOperator::resolve_packet_conflict(
         printf("Writing minor's field: %s\n", field::field_to_string(field).c_str());
 
         // write the minor's field changes as long as the change does NOT conflict with major
-        if (major_fields.find(field) == major_fields.end()) {
+        if (major_fields.count(field) > 0) {
             switch (field) {
 
                 case Field::DIP:
@@ -167,6 +167,7 @@ MergerOperator::PACKET_INFO* MergerOperator::resolve_packet_conflict(
 
                 case Field::PAYLOAD:
                     pi->pkt->write_payload(minor_p->pkt->get_payload());
+                    printf("wrote PAYLOAD\n");
                     break;
 
                 default:
@@ -176,13 +177,18 @@ MergerOperator::PACKET_INFO* MergerOperator::resolve_packet_conflict(
         }
     }
 
+    printf("Merging is done at this point\n");
+
     // add major and minor fields to pi's written_fields
     for (std::set<Field>::iterator it = minor_fields.begin(); it != minor_fields.end(); ++it) {
         pi->written_fields.insert(*it);
     }
+    printf("Added minor fields \n");
+
     for (std::set<Field>::iterator it = major_fields.begin(); it != major_fields.end(); ++it) {
         pi->written_fields.insert(*it);
     }
+    printf("Added major fields \n");
 
     return pi;
 }
