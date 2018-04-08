@@ -48,7 +48,7 @@ int main(int argc, char *argv[]) {
             exit(-1);
         }
         printf("Sent packet with info:\n");
-        p->print_info();
+        p.print_info();
     }
 
     // argc[1] == "1" is a receiver
