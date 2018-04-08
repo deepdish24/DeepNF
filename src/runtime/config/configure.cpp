@@ -379,7 +379,7 @@ void start_network_functions(MachineConfigurator c) {
 	}
 }
 
-void reset(MachineConfigurator c) {
+void reset(MachineConfigurator conf) {
 	std::string del_ports_cmd = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker del-ports ovs-br ";
 
 	// clean up merger_old and classifier
