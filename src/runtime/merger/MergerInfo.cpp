@@ -58,7 +58,7 @@ MergerInfo* MergerInfo::get_dummy_merger_info() {
     node_map.insert(std::make_pair(1, rn2));
 
     std::string dest_ip = "127.0.0.1";
-    int dest_port = 7777;
+    int dest_port = 9999;
 
     MergerInfo* mi = new MergerInfo(port_to_node_map, conflicts_list, node_map, dest_ip, dest_port);
     return mi;
