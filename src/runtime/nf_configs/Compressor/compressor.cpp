@@ -62,19 +62,19 @@ int main(int argc,char **argv)
         }
         packet* p = packet_from_data(pkt_data);
 
-        printf("Dest address: %s", address_to_string(dest_addr));
+        printf("Dest address: %s", address_to_string(dest_addr).c_str());
 
         // process packet
         printf("\nReceived packet:\n");
         p->print_info();
 
         // overwrite received packet to have new payload
-//        p->write_payload(new_msg);
+        p->write_payload(new_msg);
 
         printf("Sending modified packet:\n");
         p->print_info();
 
-        printf("Sending to address: %s", address_to_string(dest_addr));
+        printf("Sending to address: %s", address_to_string(dest_addr).c_str());
         // forward packet
         if (send_packet(p, sockfd, dest_addr) < 0) {
             fprintf(stderr, "Send packet error: %s", strerror(errno));
