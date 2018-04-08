@@ -115,6 +115,10 @@ std::string packet::get_payload() {
     return std::string(reinterpret_cast<char*>(data));
 }
 
+int packet::get_pkt_id() {
+    return ntohs(ip_header->ip_id);
+}
+
 
 void packet::write_dest_ip(std::string dest_ip) {
     inet_pton(AF_INET, dest_ip.c_str(), &(ip_header->ip_dst));
@@ -125,12 +129,18 @@ void packet::write_dest_port(int dest_port) {
 }
 
 void packet::write_payload(std::string payload) {
-    u_char *data_temp = (u_char*) payload.c_str();
-    int data_size_temp = payload.size();
 
-    memcpy(
-        (void*) this->pkt + sizeof(struct ether_header) + sizeof(struct ip) + sizeof(struct tcphdr),
-        (void *)data_temp,
-        data_size_temp
+    packet* old_pkt = this;
+
+    struct packet new_packet(
+            this->get_src_ip(),
+            this->get_src_port(),
+            this->get_dest_ip(),
+            this->get_dest_port(),
+            (unsigned int) this->get_pkt_id(),
+            std::move(payload)
     );
+
+    init_packet(new_packet.pkt, new_packet.size);
+    free(old_pkt);
 }

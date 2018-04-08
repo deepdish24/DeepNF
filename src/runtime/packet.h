@@ -13,6 +13,8 @@
 
 #include "address.h"
 
+
+
 struct packet
 {
 
@@ -42,6 +44,7 @@ public:
 	std::string get_dest_ip();
 	int get_dest_port();
 	std::string get_payload();
+    int get_pkt_id();
 
 	void write_dest_ip(std::string dest_ip);
 	void write_dest_port(int dest_port);
