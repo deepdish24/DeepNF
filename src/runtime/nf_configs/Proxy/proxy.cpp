@@ -23,7 +23,6 @@ void int_handler(int signo);
 
 
 int sockfd;
-std::vector<address*> addresses;
 
 /**
  * The proxy takes in a server ip and port. For any packets that the proxy receives, it changes the ip and port of
@@ -68,11 +67,14 @@ int main(int argc,char **argv)
         printf("\nReceived packet:\n");
         p->print_info();
 
-
+        // overwrite received packet to point to server ip and port
+        p->write_dest_ip(std::string(server_ip));
+        p->write_dest_port(dest_port);
 
         // forward packet
-        for (address *addr : addresses) {
-            send_data(pkt_data->buffer, pkt_data->size, sockfd, addr);
+        if (send_data(pkt_data->buffer, pkt_data->size, sockfd, dest_addr) < 0) {
+            fprintf(stderr, "Send packet error: %s", strerror(errno));
+            exit(-1);
         }
 
     }
