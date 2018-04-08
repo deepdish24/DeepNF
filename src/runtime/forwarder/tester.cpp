@@ -59,7 +59,7 @@ int main(int argc, char *argv[]) {
                 fprintf(stderr, "Send packet error: %s", strerror(errno));
                 exit(-1);
             }
-            printf("Sent packet to address %s\n", address_to_string(addr));
+            printf("Sent packet to address %s\n", address_to_string(addr).c_str());
         }
         p.print_info();
     }
