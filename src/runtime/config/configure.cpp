@@ -15,6 +15,10 @@
 
 using json = nlohmann::json;
 
+std::string merger_ip_port;
+std::unordered_map<int, int> nodeid_to_port;
+std::unordered_map<int, std::string> nodeid_to_network;
+
 MachineConfigurator get_machine_configurator(int port) {
 	std::cout << "get machine config called with port: " << port << std::endl;
 	int sockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -59,32 +63,8 @@ MachineConfigurator get_machine_configurator(int port) {
 	}
 
 	std::string config(buffer, sizeof(buffer));
-	//std::cout << "buffer: " << config << std::endl;
 	MachineConfigurator *mc = service_graph_util::string_to_machine_configurator(config);
 	return *(mc);
-
-	/*RuntimeNode n1 (1, snort);
-	RuntimeNode n2 (2, haproxy);
-	RuntimeNode n3 (3, snort);
-	n1.ip = "173.16.1.2";
-	n2.ip = "173.16.1.3";
-	n3.ip = "173.16.1.4";
-	n1.add_neighbor(2);
-	n2.add_neighbor(3);
-
-	Machine m (0);
-	m.set_bridge_ip("173.16.1.1");
-	m.add_node_id(1);
-	m.add_node_id(2);
-	m.add_node_id(3);
-
-	MachineConfigurator c (&m);
-	
-	c.add_node(&n1);
-	c.add_node(&n2);
-	c.add_node(&n3);
-
-	return c;*/
 }
 
 /**
@@ -116,9 +96,15 @@ void make_config_dir(std::string config_dir) {
 * Function copies specified file into config_dir
 * (assuming such a directory exists)
 */
-void copy_dockerfile(std::string file, std::string config_dir, std::string to_root) {
-    system(("cp -R " + to_root + "DeepNF/" + " " + config_dir).c_str());
+void copy_dockerfile(std::string file, std::string config_dir, std::string to_root, std::string dependencies) {
+   // system(("cp -R " + to_root + "DeepNF/" + " " + config_dir).c_str());
     system(("cp " + file + " " + config_dir).c_str());
+    std::string line;
+    std::ifstream in(dependencies);
+    while (std::getline(in, line)) {
+        system(("cp " + to_root + line + " " + config_dir).c_str());
+    }
+    in.close();
 }
 
 /**
@@ -144,22 +130,22 @@ void setup_nodes(MachineConfigurator conf) {
     // function assumes ./src/runtime/config/configure is run 
     // from build directory
 
-	std::string to_root = "../../";
+	/*std::string to_root = "../../";
 	std::string path_to_merger_dockerfile = to_root + "DeepNF/src/runtime/merger/Dockerfile";
     std::string path_to_fwd_dockerfile = to_root + "DeepnNF/src/runtime/forwarder/Dockerfile";
     std::string fwd_config_dir = to_root + "fwd_config";
-	std::string merger_config_dir = to_root + "merger_config";
+	std::string merger_config_dir = to_root + "merger_config";*/
 
     /* Forwarder Container Setup */
-    make_config_dir(merger_config_dir);
+    /*make_config_dir(merger_config_dir);
     copy_dockerfile(path_to_fwd_dockerfile, fwd_config_dir, to_root);
-    start_docker_container("forwarder", "base_img");
+    start_docker_container("forwarder", "base_img");*/
 
     /* Merger Container Setup */
-    make_config_dir(merger_config_dir);
+   /* make_config_dir(merger_config_dir);
     copy_dockerfile(path_to_merger_dockerfile, merger_config_dir, to_root);
     //build_docker_image("merger_image", merger_config_dir);
-    start_docker_container("merger", "base_img");
+    start_docker_container("merger", "base_img");*/
 
     // list of nodes on this machine
 	std::vector<RuntimeNode*> nodes = get_internal_nodes(conf);
@@ -168,12 +154,13 @@ void setup_nodes(MachineConfigurator conf) {
         std::string func_name = node->get_name();
         std::string func_config_dir = to_root + conf.get_config_dir(node->get_id()) + "_config";
         std::string path_to_dockerfile = to_root + conf.get_dockerfile(node->get_nf()) + "Dockerfile";
+        std::string path_to_dependencies = to_root + conf.get_dockerfile(node->get_nf()) + "dependencies.txt";
         std::string image_name = conf.get_config_dir(node->get_id()) + "_img";
         std::string container_name = conf.get_config_dir(node->get_id());
 
         make_config_dir(func_config_dir);
-        copy_dockerfile(path_to_dockerfile, func_config_dir, to_root);
-        //build_docker_image(image_name, func_config_dir);
+        copy_dockerfile(path_to_dockerfile, func_config_dir, to_root, dependencies);
+        build_docker_image(image_name, func_config_dir);
         start_docker_container(container_name, "base_img");
     }
 
@@ -236,9 +223,9 @@ std::unordered_map<int, int> setup_bridge_ports(MachineConfigurator &conf) {
 	//system(add_port_merger.c_str());
 
     /* Connect Forwarder to Bridge (with one ETH) */
-    std::string add_ip_port_forwarder = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br eth1 --ipaddress=" + ip_assign + std::to_string(ip_inx) +  " forwarder ";
+    /*std::string add_ip_port_forwarder = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br eth1 --ipaddress=" + ip_assign + std::to_string(ip_inx) +  " forwarder ";
     system(add_ip_port_forwarder.c_str());
-    ip_inx++;
+    ip_inx++;*/
 
 	std::vector<RuntimeNode*> nodes = get_internal_nodes(conf);
 
@@ -267,22 +254,32 @@ std::unordered_map<int, int> setup_bridge_ports(MachineConfigurator &conf) {
 	std::ofstream out(path_to_json);
     out << j;
     out.close();*/
-    int eth_inx = 1;
-    std::unordered_map<int, int> nodeid_to_eth;
+   // int eth_inx = 1;
+    int port  = 8000;
 	std::string add_port_command = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br";
 	for (RuntimeNode* n : nodes) {
-		//NOTE: Docker containers must be named the same as functions
+        int nodeid = n->get_id();
         std::string container_name = conf.get_config_dir(n->get_id());
-
-		std::string command1 = add_port_command + " eth1 --ipaddress=" + ip_assign + std::to_string(ip_inx) + 
-            " " + container_name;
+        std::string func_ip = ip_assign + std::to_string(ip_inx);
+        nodeid_to_network[n->get_id()] = func_ip;
+        nodeid_to_port[n->get_id()] = nodeid + port;
+		std::string command1 = add_port_command + " eth1 --ipaddress=" + func_ip + " " + container_name;
 		std::cout << "command: " << command1 << std::endl;
 		system(command1.c_str());
-		n->inport = eth_inx++;
+		//n->inport = eth_inx++;
 		ip_inx++;
 	}
 
-	return nodeid_to_eth;
+    //Assign Machine IP and PORT for all other Functions
+    int currMachine = conf.get_machine_id();
+    std::map<int, Machine*> machineMap = conf.get_machine_map();
+    for (auto it = machineMap.begin(); it != machineMap.end(); ++it) {
+        Machine* mac = it->second;
+        std::vector<RuntimeNode*> nodes_for_mac = conf.get_nodes_for_machine(mac->get_id());
+        for (RuntimeNode* n : nodes_for_mac) {
+            std::string func_ip = mac->get_ip() + 
+        }
+    }
 }
 
 /**
@@ -416,8 +413,11 @@ int main(int argc, char *argv[]) {
 				break;
 		}
 	}
-
+    merger_ip_port = std::string merger_info(argv[c]);
 	MachineConfigurator conf = get_machine_configurator(port);
+
+    
+
 	/*int machineId = conf.get_machine_id();
 	Machine* mac = conf.get_machine_with_id(machineId);
 	std::cout << mac->get_bridge_ip() << std::endl;*/
