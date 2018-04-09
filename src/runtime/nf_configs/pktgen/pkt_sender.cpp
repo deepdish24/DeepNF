@@ -9,8 +9,8 @@
 #include <math.h>  
 #include <vector>
 
-#include <runtime/address_util.h>
-#include <runtime/socket_util.h>
+#include "../../address_util.h"
+#include "../../socket_util.h"
 
 // list of addresses to forward packets to
 std::vector<address*> addresses;
