@@ -267,7 +267,7 @@ void make_flow_rules(MachineConfigurator conf) {
         std::string cmd = "echo \"" + fwd_port + ";" + node_ip + ":" + container_port + "\" >> ../../forwarder.txt";
         std::cout << cmd << std::endl;
         system(cmd.c_str());
-        std::cout << "line appended to fowarder.txt" << std::endl;
+        //std::cout << "line appended to fowarder.txt" << std::endl;
     }
 
     //start forwarder here!
@@ -337,21 +337,24 @@ void make_flow_rules(MachineConfigurator conf) {
             cmdArguments += " " + neighbor_ip + ":" + neighbor_port;
         }
         std::cout << "COMMAND RUN: " << cmdArguments << " (on container with ip: " << node_ip << ")" << std::endl;
-        run_docker_command(container_name, cmdArguments);
+        //run_docker_command(container_name, cmdArguments);
     }
 
     //Set up pktgen container
     std::cout << "SHOULD BE PKTGEN NODE: " << pktgenNode->get_name() << std::endl;
     std::string pktgen_container_name = conf.get_config_dir(pktgenNode->get_id());
     std::string pktgenArgs = "./sender -n 10 ";
-    for (int neighbor : pktgenNode->get_neighbors()) {
+    /*for (int neighbor : pktgenNode->get_neighbors()) {
         std::string neighbor_ip = nodeid_to_network[neighbor];
         std::string neighbor_port = std::to_string(nodeid_to_port[neighbor]);
         pktgenArgs += " " + neighbor_ip + ":" + neighbor_port;
-    }
-
+    }*/
+    pktgenArgs += merger_ip + ":8001";
     std::cout << "COMMADN FOR PKTGEN: " << pktgenArgs << std::endl;
     run_lst_docker_cmd(pktgen_container_name, pktgenArgs);
+
+    /* ============================================= */
+
     /* for each node in machine set its outputs properly
         RULES FOR SETTING output
             1. if neighbor is within machine -> then set give container ip
@@ -404,7 +407,7 @@ void reset(MachineConfigurator conf) {
 	std::string del_ports_cmd = "sudo \"PATH=$PATH\" /home/ubuntu/ovs/utilities/ovs-docker del-ports ovs-br ";
 
     std::cout << "deleting config directories" << std::endl;
-    std::string remove_config_folders = "rm -rf ../../*_config forwarder.txt";
+    std::string remove_config_folders = "rm -rf ../../*_config ../../forwarder.txt";
     system(remove_config_folders.c_str());
 	// clean up merger_old and classifier
 	/*system((del_ports_cmd + "classifier").c_str());
