@@ -189,7 +189,7 @@ namespace service_graph_util
             }
 
             google::protobuf::Map<google::protobuf::uint64, RuntimeNodeMsg> node_msg_map2 = message.node_map();
-            for (auto it = node_msg_map->begin(); it != node_msg_map->end(); ++it) {
+            for (auto it = node_msg_map2->begin(); it != node_msg_map2->end(); ++it) {
                 printf("Reading node_map, %lu\n", it->first);
             }
 
