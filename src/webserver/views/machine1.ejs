@@ -60,6 +60,9 @@ styles for this template -->
             <li>
               <a class="nav-link" href="/machine3">Machine 3</a>
             </li>
+                        <li>
+              <a class="nav-link" href="/visualization">Visualization</a>
+            </li>
           </ul>
         </div>
       </div>
@@ -73,7 +76,7 @@ styles for this template -->
 
  <!-- Page Content -->
         <% var counter = 0 %>
-    <% if (content_data != {}) { %>
+    <% if (content_data != {} && content_data.length > 0) { %>
     <% for (var filename in content_data) { %>
       <div class="container">
         <div class="row">
