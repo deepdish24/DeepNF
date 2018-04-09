@@ -266,8 +266,15 @@ void make_flow_rules(MachineConfigurator conf) {
 
     //start forwarder here!
 
+    RuntimeNode* pktgenNode = NULL;
+
     /* Function setup */
     for (RuntimeNode* node : nodes) {
+        std::string function_name = node->get_name();
+        if (function_name.compare("pktgen") == 0) {
+            pktgenNode = node;
+            continue;
+        }
         std::string container_name = conf.get_config_dir(node->get_id());
         std::string cmdArguments = "";
         NF func = node->get_nf();
@@ -323,6 +330,18 @@ void make_flow_rules(MachineConfigurator conf) {
         std::cout << "COMMAND RUN: " << cmdArguments << std::endl;
         //run_docker_command(container_name, cmdArguments);
     }
+
+    //Set up pktgen container
+    std::cout << "SHOULD BE PKTGEN NODE: " << pktgenNode->get_name() << std::endl;
+    std::string pktgenArgs = "./sender -n 10000 ";
+    for (int neighbor : pktgenNode->get_neighbors()) {
+        std::string neighbor_ip = nodeid_to_network[neighbor];
+        std::string neighbor_port = std::to_string(nodeid_to_port[neighbor]);
+        pktgenArgs += " " + neighbor_ip + ":" + neighbor_port;
+    }
+
+    std::cout << "COMMADN FOR PKTGEN: " << pktgenArgs << std::endl;
+
     /* for each node in machine set its outputs properly
         RULES FOR SETTING output
             1. if neighbor is within machine -> then set give container ip
