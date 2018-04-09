@@ -478,6 +478,7 @@ int main(int argc, char *argv[]) {
 				port = atoi(optarg);
 				break;
 			case 'r':
+                std::cout << "resetting after getting graph\n";
 				needReset = true;
 				break;
 		}
