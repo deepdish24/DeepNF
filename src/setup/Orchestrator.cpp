@@ -313,6 +313,10 @@ NF Orchestrator::stringToNF(std::string function) {
         nf = dnf_firewall;
     } if (function.compare("dnf_loadbalancer") == 0) {
         nf = dnf_loadbalancer;
+    } if (function.compare("proxy") == 0) {
+        nf = proxy;
+    } if (function.compare("compressor") == 0) {
+        nf = compressor;
     } else {
         perror("stringToNf called on unknown function");
     }
