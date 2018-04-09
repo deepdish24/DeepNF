@@ -124,6 +124,7 @@ namespace service_graph_util
                     throw std::invalid_argument("RuntimeNode has unknown NF type");
             }
 
+            message.set_id(rn->get_id());
             message.set_inport(rn->inport);
             message.set_outport(rn->outport);
             message.set_machine_id(rn->machine_id);
@@ -187,7 +188,6 @@ namespace service_graph_util
             MachineConfiguratorMsg message;
 
             message.set_machine_id(mc->get_machine_id());
-            printf(" message->set_machine_id(mc->get_machine_id());\n");
 
             // add machines to message
             google::protobuf::Map<google::protobuf::uint64, MachineMsg>* machine_msg_map =
@@ -234,6 +234,11 @@ namespace service_graph_util
     MachineConfigurator* string_to_machine_configurator(std::string msg) {
         MachineConfiguratorMsg message;
         message.ParseFromString(msg);
+
+//        google::protobuf::Map<google::protobuf::uint64, RuntimeNodeMsg> node_msg_map2 = message.node_map();
+//        for (auto it = node_msg_map2.begin(); it != node_msg_map2.end(); ++it) {
+//            printf("Reading node_map, %lu\n", it->first);
+//        }
         MachineConfigurator* mc = machine_configurator_from_message(&message);
 
         return mc;

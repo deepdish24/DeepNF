@@ -15,7 +15,7 @@
 
 using json = nlohmann::json;
 
-std::string merger_ip_port;
+std::string merger_ip;
 
 // port associated with each NF (leaf -> port to forward packet to in merger)
 // (non-leaf node -> port of current function)
@@ -202,12 +202,12 @@ void setup_nodes(MachineConfigurator conf) {
 	}*/
 }
 
-std::unordered_map<int, int> setup_bridge_ports(MachineConfigurator &conf) {
+void setup_bridge_ports(MachineConfigurator &conf) {
     system("sudo “PATH=$PATH” /home/ubuntu/ovs/utilities/ovs-ctl --system-id=random --no-ovs-vswitchd start");
     system("sudo “PATH=$PATH” /home/ubuntu/ovs/utilities/ovs-ctl --no-ovsdb-server start");
 
 	// create a bridge
-	system("sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-vsctl add-br ovs-br");
+	system("sudo \"PATH=$PATH\" /home/ubuntu/ovs/utilities/ovs-vsctl add-br ovs-br");
 	
 	// get bridge ip
 	Machine* cur_machine = conf.get_machine_with_id(conf.get_machine_id());
@@ -222,13 +222,13 @@ std::unordered_map<int, int> setup_bridge_ports(MachineConfigurator &conf) {
 	int ip_inx = ofport_inx + 1;
 
 	// connect containers to the bridge
-	// std::string add_port_classifier = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br eth1 classifier";
-	//std::string add_port_merger = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br eth1 merger_old";
+	// std::string add_port_classifier = "sudo \"PATH=$PATH\" /home/ubuntu/ovs/utilities/ovs-docker add-port ovs-br eth1 classifier";
+	//std::string add_port_merger = "sudo \"PATH=$PATH\" /home/ubuntu/ovs/utilities/ovs-docker add-port ovs-br eth1 merger_old";
 	//system(add_port_classifier.c_str());
 	//system(add_port_merger.c_str());
 
     /* Connect Forwarder to Bridge (with one ETH) */
-    /*std::string add_ip_port_forwarder = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br eth1 --ipaddress=" + ip_assign + std::to_string(ip_inx) +  " forwarder ";
+    /*std::string add_ip_port_forwarder = "sudo \"PATH=$PATH\" /home/ubuntu/ovs/utilities/ovs-docker add-port ovs-br eth1 --ipaddress=" + ip_assign + std::to_string(ip_inx) +  " forwarder ";
     system(add_ip_port_forwarder.c_str());
     ip_inx++;*/
 
@@ -238,7 +238,7 @@ std::unordered_map<int, int> setup_bridge_ports(MachineConfigurator &conf) {
 
 	// node id to eth setup map
 	/*std::unordered_map<int, int> nodeid_to_eth;
-	std::string add_port_merger = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br eth";
+	std::string add_port_merger = "sudo \"PATH=$PATH\" /home/ubuntu/ovs/utilities/ovs-docker add-port ovs-br eth";
     // inx of virtual ethernet port
 	int eth_inx = 1;
 	auto j = json::object();
@@ -261,29 +261,30 @@ std::unordered_map<int, int> setup_bridge_ports(MachineConfigurator &conf) {
     out.close();*/
    // int eth_inx = 1;
     int port  = 8000;
-	std::string add_port_command = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br";
+	std::string add_port_command = "sudo \"PATH=$PATH\" /home/ubuntu/ovs/utilities/ovs-docker add-port ovs-br";
 	for (RuntimeNode* n : nodes) {
         int nodeid = n->get_id();
         std::string container_name = conf.get_config_dir(n->get_id());
         std::string func_ip = ip_assign + std::to_string(ip_inx);
         nodeid_to_network[n->get_id()] = func_ip;
         nodeid_to_port[n->get_id()] = nodeid + port;
-		std::string command1 = add_port_command + " eth1 --ipaddress=" + func_ip + " " + container_name;
+		std::string command1 = add_port_command + " eth1 " + container_name +  " --ipaddress=" + func_ip + "/24";
 		std::cout << "command: " << command1 << std::endl;
 		system(command1.c_str());
 		ip_inx++;
 	}
 
     //Assign Machine IP and PORT for all other Functions
-    int currMachine = conf.get_machine_id();
     std::map<int, Machine*> machineMap = conf.get_machine_map();
     for (auto it = machineMap.begin(); it != machineMap.end(); ++it) {
         Machine* mac = it->second;
         std::vector<RuntimeNode*> nodes_for_mac = conf.get_nodes_for_machine(mac->get_id());
         for (RuntimeNode* n : nodes_for_mac) {
             std::string func_ip = mac->get_ip();
-            nodeid_to_network[n->get_id()] = func_ip;
-            //nodeid_to_port[n->get_id()] 
+            int nodeid = n->get_id();
+            nodeid_to_network[nodeid] = func_ip;
+            // this is sending to port forwarder is listening
+            nodeid_to_port[nodeid] = port - nodeid - 1;
         }
     }
 }
@@ -292,10 +293,79 @@ std::unordered_map<int, int> setup_bridge_ports(MachineConfigurator &conf) {
  * Adds OVS flow rules between the containers.
  * reference: https://paper.dropbox.com/doc/Flows-in-OpenVSwitch-nVRg9phHBr5JSZO2vFwCJ?_tk=share_copylink
  */
-void make_flow_rules(MachineConfigurator conf, std::unordered_map<int,int> leaf_to_eth) {
-	std::string add_flow_command = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-ofctl add-flow ovs-br in_port=";
+void make_flow_rules(MachineConfigurator conf) {
+    std::cout << "MAKE FLOW RULES CALLED" << std::endl;
+	//std::string add_flow_command = "sudo \"PATH=$PATH\" /home/ubuntu/ovs/utilities/ovs-ofctl add-flow ovs-br in_port=";
+
+    /* Forwarder Setup */
+    std::string to_root = "../../";
+    std::string to_fwd_exe = "./DeepNF/build/src/runtime/forwarder/forwarder ";
 	
 	std::vector<RuntimeNode*> nodes = get_internal_nodes(conf);
+
+    for (RuntimeNode* node : nodes) {
+        int nodeid = node->get_id();
+        std::string node_ip = nodeid_to_network[nodeid];
+        std::string container_port = std::to_string(8000 + nodeid);
+        std::string fwd_port = std::to_string(8000 - nodeid - 1);
+        std::string cmd = "echo \"" + fwd_port + ";" + node_ip + ":" + container_port + "\" >> forwarder.txt";
+        std::cout << cmd << std::endl;
+        system(cmd.c_str());
+        std::cout << "line appended to fowarder.txt" << std::endl;
+    }
+
+    //start forwarder here!
+
+    /* Function setup */
+    for (RuntimeNode* node : nodes) {
+        std::string cmdArguments = "";
+        NF func = node->get_nf();
+        int nodeid = node->get_id();
+        int function_port = nodeid_to_port[nodeid];
+
+        switch(func) {
+            case dnf_firewall:
+            {
+                cmdArguments += "./fw " + std::to_string(function_port);
+                break;
+            }
+            case dnf_loadbalancer:
+            {
+                cmdArguments += "./fw " + std::to_string(function_port);
+                break;
+            }
+            case proxy: 
+            {
+                std::string server_ip("127.0.0.1");
+                std::string server_port = std::to_string(8000);
+                cmdArguments += "./proxy " + std::to_string(function_port) + " " + server_ip + " " + server_port;
+                break;
+            }
+            case compressor:
+            {
+                std::string newMsg("Hi:)");
+                cmdArguments += "./compressor " + newMsg;
+                break;
+            }
+            default:
+                perror("Undefined function encountered in flow setup");
+                break;
+        }
+
+        std::vector<int> neighbors = node->get_neighbors();
+
+        if ((int) neighbors.size() == 0) {
+            cmdArguments += " " + merger_ip + ":" + std::to_string((8000 - nodeid - 1));
+        }
+
+        for (int neighbor : neighbors) {
+            //neighbor in machine
+            std::string neighbor_ip = nodeid_to_network[neighbor];
+            std::string neighbor_port = std::to_string(nodeid_to_port[neighbor]);
+            cmdArguments += " " + neighbor_ip + ":" + neighbor_port;
+        }
+        std::cout << "COMMAND RUN: " << cmdArguments << std::endl;
+    }
     /* for each node in machine set its outputs properly
         RULES FOR SETTING output
             1. if neighbor is within machine -> then set give container ip
@@ -374,8 +444,8 @@ void start_network_functions(MachineConfigurator c) {
 }
 
 void reset(MachineConfigurator conf) {
-	std::string del_ports_cmd = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker del-ports ovs-br ";
-    std::string remove_config_folders = "rm -rf *_config";
+	std::string del_ports_cmd = "sudo \"PATH=$PATH\" /home/ubuntu/ovs/utilities/ovs-docker del-ports ovs-br ";
+    std::string remove_config_folders = "rm -rf ../../*_config forwarder.txt";
     system(remove_config_folders.c_str());
 	// clean up merger_old and classifier
 	/*system((del_ports_cmd + "classifier").c_str());
@@ -392,7 +462,7 @@ void reset(MachineConfigurator conf) {
 	}
 
 	// delete the bridge
-	system("sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-vsctl del-br ovs-br");
+	system("sudo \"PATH=$PATH\" /home/ubuntu/ovs/utilities/ovs-vsctl del-br ovs-br");
 }
 
 /**
@@ -411,12 +481,19 @@ int main(int argc, char *argv[]) {
 				port = atoi(optarg);
 				break;
 			case 'r':
+                std::cout << "resetting after getting graph\n";
 				needReset = true;
 				break;
 		}
 	}
-    merger_ip_port = argv[optind];
-    std::cout << "Merger IP:PORT = " << merger_ip_port << std::endl;
+
+    if (argc < 2) {
+        perror("not enough arguments: need to pass in ip and port of merger");
+        exit(1);
+    }
+
+    merger_ip = argv[optind];
+    std::cout << "Merger IP = " << merger_ip << std::endl;
 	MachineConfigurator conf = get_machine_configurator(port);
 
     
@@ -426,15 +503,15 @@ int main(int argc, char *argv[]) {
 	std::cout << mac->get_bridge_ip() << std::endl;
 
 	if (needReset) {
+		std::cout << "reset!" << std::endl;
 		reset(conf);
-	} else {
-		// making a dummy service graph
-        std::cout << "graph here!" << std::endl;
-		setup_nodes(conf);
-		/*std::unordered_map<int, int> leaf_to_eth = setup_bridge_ports(conf);
-		make_flow_rules(conf, leaf_to_eth);
-		start_network_functions(conf);*/
-	}
+	} 
+	// making a dummy service graph
+    std::cout << "graph here!" << std::endl;
+	setup_nodes(conf);
+	setup_bridge_ports(conf);
+	make_flow_rules(conf);
+	//start_network_functions(conf);
 
 	return 0;
 }
