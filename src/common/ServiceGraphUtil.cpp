@@ -153,6 +153,12 @@ namespace service_graph_util
                 printf("Reading node_map, %lu\n", val.first);
                 RuntimeNodeMsg msg = val.second;
                 mc->add_node(runtime_node_from_message(&msg));
+
+                std::map<int, RuntimeNode*> map = mc->get_node_map();
+                printf("Current node_map\n");
+                for (auto node : map) {
+                    printf("Node %d\n", node.first);
+                }
             }
 
             return mc;
