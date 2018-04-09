@@ -33,6 +33,11 @@ MergerOperator::MergerOperator() {
 
     // set up mutexes
     packet_map_mutex = PTHREAD_MUTEX_INITIALIZER;
+
+    // set up log
+    log.open("log/log.txt", std::ios::out);
+    if (!log) std::cerr << "Could not open the file!" << std::endl;
+    log_mutex = PTHREAD_MUTEX_INITIALIZER;
 }
 
 
@@ -298,6 +303,10 @@ void MergerOperator::run_merge_packet(int pkt_id) {
         fprintf(stderr, "Send packet error: %s", strerror(errno));
         exit(-1);
     }
+
+    pthread_mutex_lock(&log_mutex);
+    log_util::log_nf(log, merged_pkt, "merger", "Finished merging packet");
+    pthread_mutex_unlock(&log_mutex);
 
     printf("Sent merged packet for id: %d, printing packet_map:\n\n", pkt_id);
     print_packet_map();

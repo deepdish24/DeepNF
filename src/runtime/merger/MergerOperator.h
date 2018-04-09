@@ -16,6 +16,7 @@
 #include <sys/socket.h>
 #include <vector>
 #include <pthread.h>
+#include <fstream>
 
 #include <runtime/packet.h>
 #include <runtime/socket_util.h>
@@ -23,6 +24,7 @@
 #include <common/RuntimeNode.h>
 #include <common/Field.h>
 #include <runtime/address_util.h>
+#include <runtime/log_util.h>
 
 #include "ActionTable.h"
 #include "MergerInfo.h"
@@ -76,6 +78,10 @@ private:
      * packet id (if such a packet has been received) */
     std::map<int, std::map<int, packet*>*> packet_map;
     pthread_mutex_t packet_map_mutex;
+
+    // used to log merger activity
+    std::ofstream log;
+    pthread_mutex_t log_mutex;
 
     /**
      * Given two packets (one with precedence over the another), return a merged packet that merges all written fields

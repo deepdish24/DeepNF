@@ -64,6 +64,7 @@ void *run_thread(void *arg) {
         pthread_mutex_lock(&log_mutex);
         log_util::log_nf(log, p, "forwarder", "Forwarding packet to " + std::string(tp->v_addr_str));
         pthread_mutex_unlock(&log_mutex);
+
         printf("Sent packet to virtual address: %s\n", tp->v_addr_str);
     }
 }
