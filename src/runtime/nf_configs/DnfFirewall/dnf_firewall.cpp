@@ -51,7 +51,7 @@ int main(int argc,char **argv)
     }
 
     // setup log for this NF
-    std::ofstream log;
+    std::ifstream log;
     log.open("log/log.txt", std::ios::out);
 
     // create socket
