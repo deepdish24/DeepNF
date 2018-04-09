@@ -229,8 +229,9 @@ Orchestrator::Orchestrator(std::string filepath, std::string action_file_path) {
                 mc->add_machine(ip_to_machines[ips[j]]);
             }
         }
+        
         for (auto it = idToRuntimeNode.begin(); it != idToRuntimeNode.end(); it++) {
-            std::cout << "wtf!!!" << std::endl;
+            std::cout << "wtf node: " << it->second->get_id() << std::endl;
             mc->add_node(it->second);
         }
 
