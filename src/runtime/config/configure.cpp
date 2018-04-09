@@ -476,6 +476,12 @@ int main(int argc, char *argv[]) {
 				break;
 		}
 	}
+
+    if (argc < 2) {
+        perror("not enough arguments: need to pass in ip and port of merger");
+        exit(1);
+    }
+    
     merger_ip_port = argv[optind];
     std::cout << "Merger IP:PORT = " << merger_ip_port << std::endl;
 	MachineConfigurator conf = get_machine_configurator(port);
