@@ -15,7 +15,7 @@
 
 using json = nlohmann::json;
 
-std::string merger_ip_port;
+std::string merger_ip;
 
 // port associated with each NF (leaf -> port to forward packet to in merger)
 // (non-leaf node -> port of current function)
@@ -284,7 +284,7 @@ void setup_bridge_ports(MachineConfigurator &conf) {
             int nodeid = n->get_id();
             nodeid_to_network[nodeid] = func_ip;
             // this is sending to port forwarder is listening
-            nodeid_to_port[nodeid] = port - nodeid;
+            nodeid_to_port[nodeid] = port - nodeid - 1;
         }
     }
 }
@@ -307,14 +307,15 @@ void make_flow_rules(MachineConfigurator conf) {
         int nodeid = node->get_id();
         std::string node_ip = nodeid_to_network[nodeid];
         std::string container_port = std::to_string(8000 + nodeid);
-        std::string fwd_port = std::to_string(8000 - nodeid);
+        std::string fwd_port = std::to_string(8000 - nodeid - 1);
         std::string cmd = "echo " + fwd_port + ";" + node_ip + ":" + container_port + " >> forwarder.txt";
+        std::cout << cmd << std::endl;
         system(cmd.c_str());
+        std::cout << "line appended to fowarder.txt" << std::endl;
     }
 
     /* Function setup */
     for (RuntimeNode* node : nodes) {
-        //std::string cmdArguments = "./fw " + std::to_string(nodeid_to_port[node->get_id()]);
         std::string cmdArguments = "";
         NF func = node->get_nf();
         int nodeid = node->get_id();
@@ -352,7 +353,7 @@ void make_flow_rules(MachineConfigurator conf) {
         std::vector<int> neighbors = node->get_neighbors();
 
         if ((int) neighbors.size() == 0) {
-            cmdArguments += " " + merger_ip_port;
+            cmdArguments += " " + merger_ip + ":" + std::to_string((8000 - nodeid - 1));
         }
 
         for (int neighbor : neighbors) {
@@ -489,8 +490,8 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
-    merger_ip_port = argv[optind];
-    std::cout << "Merger IP:PORT = " << merger_ip_port << std::endl;
+    merger_ip = argv[optind];
+    std::cout << "Merger IP = " << merger_ip << std::endl;
 	MachineConfigurator conf = get_machine_configurator(port);
 
     
