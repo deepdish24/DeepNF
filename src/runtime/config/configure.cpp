@@ -308,11 +308,13 @@ void make_flow_rules(MachineConfigurator conf) {
         std::string node_ip = nodeid_to_network[nodeid];
         std::string container_port = std::to_string(8000 + nodeid);
         std::string fwd_port = std::to_string(8000 - nodeid - 1);
-        std::string cmd = "echo " + fwd_port + ";" + node_ip + ":" + container_port + " >> forwarder.txt";
+        std::string cmd = "echo " + "'" + fwd_port + ";" + node_ip + ":" + container_port + "' >> forwarder.txt";
         std::cout << cmd << std::endl;
         system(cmd.c_str());
         std::cout << "line appended to fowarder.txt" << std::endl;
     }
+
+    //start forwarder here!
 
     /* Function setup */
     for (RuntimeNode* node : nodes) {
