@@ -229,13 +229,14 @@ Orchestrator::Orchestrator(std::string filepath, std::string action_file_path) {
                 mc->add_machine(ip_to_machines[ips[j]]);
             }
         }
+        
         for (auto it = idToRuntimeNode.begin(); it != idToRuntimeNode.end(); it++) {
-            std::cout << "wtf!!!" << std::endl;
+            std::cout << "wtf node: " << it->second->get_id() << std::endl;
             mc->add_node(it->second);
         }
 
         std::vector<RuntimeNode*> nodes = mc->get_nodes_for_machine(0);
-        std::cout << "test2: " << nodes.size() << std::endl;
+        std::cout << "Number of nodes before serialization: " << nodes.size() << std::endl;
 
         /*std::vector<int> node_ids = m->get_node_ids();
         for (int id : node_ids) {
@@ -243,9 +244,8 @@ Orchestrator::Orchestrator(std::string filepath, std::string action_file_path) {
         }*/
         std::string serializedConfig = service_graph_util::machine_configurator_to_string(mc);
         MachineConfigurator *mc2 = service_graph_util::string_to_machine_configurator(serializedConfig);
-        MachineConfigurator conf = *(mc2);
-        std::vector<RuntimeNode*> newNodes = conf.get_nodes_for_machine(0);
-        std::cout << "Number of nodes: " << newNodes.size() << std::endl;
+        std::vector<RuntimeNode*> newNodes = mc2->get_nodes_for_machine(0);
+        std::cout << "Number of nodes after serialization: " << newNodes.size() << std::endl;
         ip_to_mc[ips[i]] = serializedConfig;
     }
     write_json_dictionary(func_to_inx);
@@ -313,6 +313,10 @@ NF Orchestrator::stringToNF(std::string function) {
         nf = dnf_firewall;
     } if (function.compare("dnf_loadbalancer") == 0) {
         nf = dnf_loadbalancer;
+    } if (function.compare("proxy") == 0) {
+        nf = proxy;
+    } if (function.compare("compressor") == 0) {
+        nf = compressor;
     } else {
         perror("stringToNf called on unknown function");
     }

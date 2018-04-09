@@ -202,7 +202,7 @@ void setup_nodes(MachineConfigurator conf) {
 	}*/
 }
 
-std::unordered_map<int, int> setup_bridge_ports(MachineConfigurator &conf) {
+void setup_bridge_ports(MachineConfigurator &conf) {
     system("sudo “PATH=$PATH” /home/ubuntu/ovs/utilities/ovs-ctl --system-id=random --no-ovs-vswitchd start");
     system("sudo “PATH=$PATH” /home/ubuntu/ovs/utilities/ovs-ctl --no-ovsdb-server start");
 
@@ -275,15 +275,16 @@ std::unordered_map<int, int> setup_bridge_ports(MachineConfigurator &conf) {
 	}
 
     //Assign Machine IP and PORT for all other Functions
-    int currMachine = conf.get_machine_id();
     std::map<int, Machine*> machineMap = conf.get_machine_map();
     for (auto it = machineMap.begin(); it != machineMap.end(); ++it) {
         Machine* mac = it->second;
         std::vector<RuntimeNode*> nodes_for_mac = conf.get_nodes_for_machine(mac->get_id());
         for (RuntimeNode* n : nodes_for_mac) {
             std::string func_ip = mac->get_ip();
-            nodeid_to_network[n->get_id()] = func_ip;
-            //nodeid_to_port[n->get_id()] 
+            int nodeid = n->get_id();
+            nodeid_to_network[nodeid] = func_ip;
+            // this is sending to port forwarder is listening
+            nodeid_to_port[nodeid] = port - nodeid;
         }
     }
 }
@@ -292,10 +293,70 @@ std::unordered_map<int, int> setup_bridge_ports(MachineConfigurator &conf) {
  * Adds OVS flow rules between the containers.
  * reference: https://paper.dropbox.com/doc/Flows-in-OpenVSwitch-nVRg9phHBr5JSZO2vFwCJ?_tk=share_copylink
  */
-void make_flow_rules(MachineConfigurator conf, std::unordered_map<int,int> leaf_to_eth) {
-	std::string add_flow_command = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-ofctl add-flow ovs-br in_port=";
+void make_flow_rules(MachineConfigurator conf) {
+	//std::string add_flow_command = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-ofctl add-flow ovs-br in_port=";
+
+    /* Forwarder Setup */
+    std::string to_root = "../../";
+    std::string to_fwd_exe = "./DeepNF/build/src/runtime/forwarder/forwarder ";
 	
 	std::vector<RuntimeNode*> nodes = get_internal_nodes(conf);
+
+    for (RuntimeNode* node : nodes) {
+        int nodeid = node->get_id();
+        std::string node_ip = nodeid_to_network[nodeid];
+        std::string container_port = std::to_string(8000 + nodeid);
+        std::string fwd_port = std::to_string(8000 - nodeid);
+        std::string cmd = "echo " + fwd_port + ";" + node_ip + ":" + container_port + " >> forwarder.txt";
+        system(cmd.c_str());
+    }
+
+    /* Function setup */
+    for (RuntimeNode* node : nodes) {
+        //std::string cmdArguments = "./fw " + std::to_string(nodeid_to_port[node->get_id()]);
+        std::string cmdArguments = "";
+        NF func = node->get_nf();
+        int nodeid = node->get_id();
+        int function_port = nodeid_to_port[nodeid];
+
+        switch(func) {
+            case dnf_firewall:
+            {
+                cmdArguments += "./fw " + std::to_string(function_port);
+                break;
+            }
+            case dnf_loadbalancer:
+            {
+                cmdArguments += "./fw " + std::to_string(function_port);
+                break;
+            }
+            case proxy: 
+            {
+                std::string server_ip("127.0.0.1");
+                std::string server_port = std::to_string(8000);
+                cmdArguments += "./proxy " + std::to_string(function_port) + " " + server_ip + " " + server_port;
+                break;
+            }
+            case compressor:
+            {
+                std::string newMsg("Hi:)");
+                cmdArguments += "./compressor " + newMsg;
+                break;
+            }
+            default:
+                perror("Undefined function encountered in flow setup");
+                break;
+        }
+
+        std::vector<int> neighbors = node->get_neighbors();
+        for (int neighbor : neighbors) {
+            //neighbor in machine
+            std::string neighbor_ip = nodeid_to_network[neighbor];
+            std::string neighbor_port = std::to_string(nodeid_to_port[neighbor]);
+            cmdArguments += " " + neighbor_ip + ":" + neighbor_port;
+        }
+        std::cout << "COMMAND RUN: " << cmdArguments << std::endl;
+    }
     /* for each node in machine set its outputs properly
         RULES FOR SETTING output
             1. if neighbor is within machine -> then set give container ip
@@ -375,7 +436,7 @@ void start_network_functions(MachineConfigurator c) {
 
 void reset(MachineConfigurator conf) {
 	std::string del_ports_cmd = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker del-ports ovs-br ";
-    std::string remove_config_folders = "rm -rf *_config";
+    std::string remove_config_folders = "rm -rf *_config forwarder.txt";
     system(remove_config_folders.c_str());
 	// clean up merger_old and classifier
 	/*system((del_ports_cmd + "classifier").c_str());
@@ -431,9 +492,9 @@ int main(int argc, char *argv[]) {
 		// making a dummy service graph
         std::cout << "graph here!" << std::endl;
 		setup_nodes(conf);
-		/*std::unordered_map<int, int> leaf_to_eth = setup_bridge_ports(conf);
-		make_flow_rules(conf, leaf_to_eth);
-		start_network_functions(conf);*/
+		//std::unordered_map<int, int> leaf_to_eth = setup_bridge_ports(conf);
+		make_flow_rules(conf);
+		//start_network_functions(conf);
 	}
 
 	return 0;
