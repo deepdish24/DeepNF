@@ -282,6 +282,8 @@ std::unordered_map<int, int> setup_bridge_ports(MachineConfigurator &conf) {
         std::vector<RuntimeNode*> nodes_for_mac = conf.get_nodes_for_machine(mac->get_id());
         for (RuntimeNode* n : nodes_for_mac) {
             std::string func_ip = mac->get_ip();
+            nodeid_to_network[n->get_id()] = func_ip;
+            //nodeid_to_port[n->get_id()] 
         }
     }
 }
@@ -302,15 +304,6 @@ void make_flow_rules(MachineConfigurator conf, std::unordered_map<int,int> leaf_
 
         RULES FOR FORWARDER
             1. Map port from forwarder to ip of container running function */
-
-
-
-
-
-
-
-
-
 
 	/*std::vector<int> source_node_inports;
 	
@@ -382,7 +375,8 @@ void start_network_functions(MachineConfigurator c) {
 
 void reset(MachineConfigurator conf) {
 	std::string del_ports_cmd = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker del-ports ovs-br ";
-
+    std::string remove_config_folders = "rm -rf *_config";
+    system(remove_config_folders.c_str());
 	// clean up merger_old and classifier
 	/*system((del_ports_cmd + "classifier").c_str());
 	system((del_ports_cmd + "merger_old").c_str());

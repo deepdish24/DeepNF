@@ -1,8 +1,8 @@
 {
-    "ips": ["18.217.175.10", "18.188.160.168"],
-    "ports": [10000, 10000],
-    "functions": ["firewall", "loadbalancer"],
+    "ips": ["18.217.175.10"],
+    "ports": [10000],
+    "functions": ["dnf_firewall", "dnf_loadbalancer"],
     "positional": [],
-    "orderDependencies": [["loadbalancer", "firewall"]],
+    "orderDependencies": [["dnf_loadbalancer", "dnf_firewall"]],
     "priorities": []
 }

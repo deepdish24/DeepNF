@@ -11,6 +11,6 @@
     "CiscoIOS": {"SIP": "null", "DIP": "null", "SPORT": "null", "DPORT": "null", "Payload": "R/W", "Add/Rm": "null", "Drop":"null" },
     "Linuxtc": {"SIP": "null", "DIP": "null", "SPORT": "null", "DPORT": "null", "Payload": "null", "Add/Rm": "null", "Drop":"null" },
     "NetFlow": {"SIP": "null", "DIP": "R", "SPORT": "R", "DPORT": "R", "Payload": "null", "Add/Rm": "null", "Drop":"null" },
-    "firewall": {"SIP": "R", "DIP": "R", "SPORT": "R", "DPORT": "R", "Payload": "null", "Add/Rm": "null", "Drop":"null"},
-    "loadbalancer": {"SIP": "R/W", "DIP": "R", "SPORT": "R/W", "DPORT": "R", "Payload": "null", "Add/Rm": "null", "Drop":"null" }
+    "dnf_firewall": {"SIP": "R", "DIP": "R", "SPORT": "R", "DPORT": "R", "Payload": "null", "Add/Rm": "null", "Drop":"null"},
+    "dnf_loadbalancer": {"SIP": "R", "DIP": "R", "SPORT": "R", "DPORT": "R", "Payload": "null", "Add/Rm": "null", "Drop":"null" }
 }
