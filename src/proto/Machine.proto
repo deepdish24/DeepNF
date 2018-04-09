@@ -11,6 +11,8 @@ message RuntimeNodeMsg {
     enum NFMsg {
         DNF_FIREWALL = 0;
         DNF_LOADBALANCER = 1;
+        PROXY = 2;
+        COMPRESSOR = 3;
     }
 
     uint64 id = 1;
