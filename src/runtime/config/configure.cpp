@@ -271,7 +271,9 @@ void make_flow_rules(MachineConfigurator conf) {
     /* Function setup */
     for (RuntimeNode* node : nodes) {
         std::string function_name = node->get_name();
+        std::cout << "function name: " << function_name << std::endl;
         if (function_name.compare("pktgen") == 0) {
+            std::cout << "on pktgen node!" << std::endl;
             pktgenNode = node;
             continue;
         }
