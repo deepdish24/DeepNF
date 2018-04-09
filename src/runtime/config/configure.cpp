@@ -271,6 +271,11 @@ void make_flow_rules(MachineConfigurator conf) {
         int function_port = nodeid_to_port[nodeid];
 
         switch(func) {
+            case pktgen:
+            {
+                cmdArguments += "./sender -n 10000 ";
+                break;
+            }
             case dnf_firewall:
             {
                 cmdArguments += "./fw " + std::to_string(function_port);

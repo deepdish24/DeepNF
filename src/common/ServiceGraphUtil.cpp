@@ -75,6 +75,10 @@ namespace service_graph_util
                     nf = compressor;
                     break;
 
+                case RuntimeNodeMsg::PKTGEN:
+                  nf = pktgen;
+                  break;
+
                 default:
                     throw std::invalid_argument("Message has unknown NF type");
             }
@@ -120,6 +124,10 @@ namespace service_graph_util
                     message.set_nf(RuntimeNodeMsg::COMPRESSOR);
                     break;
 
+                case pktgen:
+                  message.set_nf(RuntimeNodeMsg::PKTGEN);
+                  break;
+                  
                 default:
                     throw std::invalid_argument("RuntimeNode has unknown NF type");
             }

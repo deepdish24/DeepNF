@@ -321,6 +321,8 @@ NF Orchestrator::stringToNF(std::string function) {
         nf = proxy;
     } if (function.compare("compressor") == 0) {
         nf = compressor;
+    } if (function.compare("pktgen") == 0) {
+        nf = pktgen;
     } else {
         perror("stringToNf called on unknown function");
     }

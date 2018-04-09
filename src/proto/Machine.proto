@@ -13,6 +13,7 @@ message RuntimeNodeMsg {
         DNF_LOADBALANCER = 1;
         PROXY = 2;
         COMPRESSOR = 3;
+        PKTGEN = 4;
     }
 
     uint64 id = 1;
