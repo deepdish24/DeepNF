@@ -14,7 +14,7 @@
 
 #include "../../address_util.h"
 #include "../../socket_util.h"
-
+#include "../../log_util.h"
 
 
 #pragma clang diagnostic push
@@ -49,6 +49,11 @@ int main(int argc,char **argv)
         std::cerr << "No valid destination addresses\n";
         return -1;
     }
+
+    // setup log for this NF
+    std::ofstream log;
+    log.open("log/log.txt", std::ios::out);
+    if (!log) std::cerr << "Could not open the file!" << std::endl;
 
     // create socket
     int sockfd = open_socket();
@@ -88,6 +93,8 @@ int main(int argc,char **argv)
                 exit(-1);
             }
         }
+
+        log_util::log_nf(log, p, "compressor", "compressed packet payload to " + new_msg);
 
     }
 

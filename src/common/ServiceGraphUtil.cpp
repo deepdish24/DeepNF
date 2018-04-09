@@ -67,6 +67,14 @@ namespace service_graph_util
                     nf = dnf_loadbalancer;
                     break;
 
+                case RuntimeNodeMsg::PROXY:
+                    nf = proxy;
+                    break;
+
+                case RuntimeNodeMsg::COMPRESSOR:
+                    nf = compressor;
+                    break;
+
                 default:
                     throw std::invalid_argument("Message has unknown NF type");
             }
@@ -102,6 +110,14 @@ namespace service_graph_util
 
                 case dnf_loadbalancer:
                     message.set_nf(RuntimeNodeMsg::DNF_LOADBALANCER);
+                    break;
+
+                case proxy:
+                    message.set_nf(RuntimeNodeMsg::PROXY);
+                    break;
+
+                case compressor:
+                    message.set_nf(RuntimeNodeMsg::COMPRESSOR);
                     break;
 
                 default:

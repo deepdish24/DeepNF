@@ -6,13 +6,20 @@
 #include <stdlib.h>
 #include <string>
 #include <pthread.h>
+#include <fstream>
 
 #include <runtime/socket_util.h>
 #include <runtime/address_util.h>
+#include <runtime/log_util.h>
+#include <iostream>
 
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
+
+
+std::ofstream log;
+pthread_mutex_t log_mutex;
 
 typedef struct threadParams {
     int real_port;
@@ -53,6 +60,11 @@ void *run_thread(void *arg) {
             fprintf(stderr, "Send packet error: %s", strerror(errno));
             exit(-1);
         }
+
+        pthread_mutex_lock(&log_mutex);
+        log_util::log_nf(log, p, "forwarder", "Forwarding packet to " + std::string(tp->v_addr_str));
+        pthread_mutex_unlock(&log_mutex);
+
         printf("Sent packet to virtual address: %s\n", tp->v_addr_str);
     }
 }
@@ -64,6 +76,11 @@ int main(int argc, char *argv[]) {
         perror("Cannot open file (%s)\n");
         exit(1);
     }
+
+    // open log
+    log_mutex = PTHREAD_MUTEX_INITIALIZER;
+    log.open("log/log.txt", std::ios::out);
+    if (!log) std::cerr << "Could not open the file!" << std::endl;
 
     // count number of containers to spawn threads for
     int num_threads = 0;

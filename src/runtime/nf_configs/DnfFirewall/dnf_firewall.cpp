@@ -9,11 +9,13 @@
 #include <errno.h>
 #include <vector>
 #include <signal.h>
-#include<unistd.h>
-// #include <sys/socket.h>
+#include <iostream>
+#include <fstream>
+#include <sys/time.h>
 
 #include "../../address_util.h"
 #include "../../socket_util.h"
+#include "../../log_util.h"
 
 
 
@@ -26,7 +28,7 @@ int sockfd;
 std::vector<address*> addresses;
 
 int main(int argc,char **argv)
-{   
+{
     signal(SIGINT, int_handler);
 
     if (argc < 3) {
@@ -49,6 +51,11 @@ int main(int argc,char **argv)
         return -1; 
     }
 
+    // setup log for this NF
+    std::ofstream log;
+    log.open("log/log.txt", std::ios::out);
+    if (!log) std::cerr << "Could not open the file!" << std::endl;
+
     // create socket
     int sockfd = open_socket();
 
@@ -58,10 +65,8 @@ int main(int argc,char **argv)
         return -1;
     }
     printf("Firewall listening for packets on port: %d\n", bind_port);
-    
-    
-    while (true) {
 
+    while (true) {
         sockdata *pkt_data = receive_data(sockfd);
         if (pkt_data == NULL || pkt_data->size == 0) { 
             std::cerr << "packet receive error: " << strerror(errno) << std::endl;
@@ -87,7 +92,8 @@ int main(int argc,char **argv)
                 exit(-1);
             }
         }
-        
+
+        log_util::log_nf(log, p, "dnf_firewall", "dropped packet");
     }
 
     return 0;
