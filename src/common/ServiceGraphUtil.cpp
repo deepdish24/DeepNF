@@ -70,7 +70,7 @@ namespace service_graph_util
                 default:
                     throw std::invalid_argument("Message has unknown NF type");
             }
-            
+
             RuntimeNode* rn = new RuntimeNode(message->id(), nf);
             rn->inport = message->inport();
             rn->outport = message->outport();
