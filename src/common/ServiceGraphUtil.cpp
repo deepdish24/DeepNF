@@ -70,8 +70,7 @@ namespace service_graph_util
                 default:
                     throw std::invalid_argument("Message has unknown NF type");
             }
-
-            printf("runtime_node_from_message, message id: %lu\n", message->id());
+            
             RuntimeNode* rn = new RuntimeNode(message->id(), nf);
             rn->inport = message->inport();
             rn->outport = message->outport();
@@ -152,19 +151,8 @@ namespace service_graph_util
 
             // add runtime nodes to mc
             for (auto val : message->node_map()) {
-                printf("Reading node_map, %lu\n", val.first);
                 RuntimeNodeMsg msg = val.second;
-
-                RuntimeNode* rtnode = runtime_node_from_message(&msg);
-                printf("rtnode: %d\n", rtnode->get_id());
-
                 mc->add_node(runtime_node_from_message(&msg));
-
-                std::map<int, RuntimeNode*> map = mc->get_node_map();
-                printf("Current node_map\n");
-                for (auto node : map) {
-                    printf("Node %d\n", node.first);
-                }
             }
 
             return mc;
@@ -184,7 +172,6 @@ namespace service_graph_util
             MachineConfiguratorMsg message;
 
             message.set_machine_id(mc->get_machine_id());
-            printf(" message->set_machine_id(mc->get_machine_id());\n");
 
             // add machines to message
             google::protobuf::Map<google::protobuf::uint64, MachineMsg>* machine_msg_map =
@@ -197,7 +184,6 @@ namespace service_graph_util
             google::protobuf::Map<google::protobuf::uint64, RuntimeNodeMsg>* node_msg_map =
                     message.mutable_node_map();
             for (auto val : mc->get_node_map()) {
-                printf("Adding runtime node: %d\n", val.first);
                 (*node_msg_map)[val.first] = message_from_runtime_node(val.second);
             }
 
@@ -218,8 +204,6 @@ namespace service_graph_util
 
         std::string msg;
         mc_msg.SerializeToString(&msg);
-
-        printf("serialized to string\n");
 
         return msg;
     }
