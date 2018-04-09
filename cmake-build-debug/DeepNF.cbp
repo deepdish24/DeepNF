@@ -904,6 +904,12 @@
 		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/runtime/forwarder/tester.cpp">
 			<Option target="tester"/>
 		</Unit>
+		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/runtime/log_util.cpp">
+			<Option target="runtime"/>
+		</Unit>
+		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/runtime/log_util.h">
+			<Option target="runtime"/>
+		</Unit>
 		<Unit filename="/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/runtime/merger/ActionTable.cpp">
 			<Option target="merger"/>
 			<Option target="merger_lib"/>
