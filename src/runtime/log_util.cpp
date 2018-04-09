@@ -14,7 +14,7 @@ namespace log_util
      * @param name      The name of the NF/program that is logging
      * @param action    A status update indicating the action performed on the packet
      */
-    void log_nf(std::ofstream log, packet* p, std::string name, std::string action) {
+    void log_nf(std::ofstream& log, packet* p, std::string name, std::string action) {
 
         int count = 0;
         struct timeval tv;
