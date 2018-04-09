@@ -129,12 +129,12 @@ void start_docker_container(std::string container_name, std::string image_name) 
 * Function starts network function via cmd in docker container
 */
 void run_docker_command(std::string container_name, std::string cmd) {
-    std::cout << ("docker exec -it " + container_name + " " + cmd + " &");
+    std::cout << ("docker exec -it " + container_name + " " + cmd + " &") << std::endl;
     system(("docker exec -it " + container_name + " " + cmd + " &").c_str());
 }
 
 void run_lst_docker_cmd(std::string container_name, std::string cmd) {
-	std::cout << ("docker exec -it " + container_name + " " + cmd);
+	std::cout << ("docker exec -it " + container_name + " " + cmd) << std::endl;
     system(("docker exec -it " + container_name + " " + cmd).c_str());
 }
 
@@ -351,7 +351,7 @@ void make_flow_rules(MachineConfigurator conf) {
     }
 
     std::cout << "COMMADN FOR PKTGEN: " << pktgenArgs << std::endl;
-    run_docker_command(pktgen_container_name, pktgenArgs);
+    run_lst_docker_cmd(pktgen_container_name, pktgenArgs);
     /* for each node in machine set its outputs properly
         RULES FOR SETTING output
             1. if neighbor is within machine -> then set give container ip
