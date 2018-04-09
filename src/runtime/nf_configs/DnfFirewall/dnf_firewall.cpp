@@ -52,7 +52,7 @@ int main(int argc,char **argv)
 
     // setup log for this NF
     std::ofstream log;
-    log.open("log.txt", std::ios::out);
+    log.open("log/log.txt", std::ios::out);
 
     // create socket
     int sockfd = open_socket();
@@ -105,7 +105,7 @@ int main(int argc,char **argv)
         strftime(tmbuf, sizeof tmbuf, "%Y-%m-%d %H:%M:%S", nowtm);
         snprintf(buf, sizeof buf, "%s.%06ld", tmbuf, tv.tv_usec);
         printf("Printing into log\n");
-        log << "%s.%06ld" << tmbuf << tv.tv_usec;
+        log << tmbuf << "." << tv.tv_usec;
         if (count % 1 == 0) {
             count = 0;
             log.flush();
