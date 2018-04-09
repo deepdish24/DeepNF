@@ -184,13 +184,13 @@ namespace service_graph_util
             google::protobuf::Map<google::protobuf::uint64, RuntimeNodeMsg>* node_msg_map =
                     message.mutable_node_map();
             for (auto val : mc->get_node_map()) {
-                printf("Adding runtime node: %d", val.first);
+                printf("Adding runtime node: %d\n", val.first);
                 (*node_msg_map)[val.first] = message_from_runtime_node(val.second);
             }
 
             google::protobuf::Map<google::protobuf::uint64, RuntimeNodeMsg> node_msg_map2 = message.node_map();
             for (auto it = node_msg_map->begin(); it != node_msg_map->end(); ++it) {
-                printf("Reading node_map, %d\n", it->first);
+                printf("Reading node_map, %lu\n", it->first);
             }
 
             return message;
