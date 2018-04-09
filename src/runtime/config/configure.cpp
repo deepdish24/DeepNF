@@ -129,6 +129,7 @@ void start_docker_container(std::string container_name, std::string image_name) 
 * Function starts network function via cmd in docker container
 */
 void run_docker_command(std::string container_name, std::string cmd) {
+	std::cout << ("docker exec -it " + container_name + " " + cmd);
     system(("docker exec -it " + container_name + " " + cmd).c_str());
 }
 
@@ -287,7 +288,7 @@ void make_flow_rules(MachineConfigurator conf) {
         switch(func) {
             case pktgen:
             {
-                cmdArguments += "./sender -n 10000 ";
+                cmdArguments += "./sender -n 10 ";
                 break;
             }
             case dnf_firewall:
@@ -337,7 +338,7 @@ void make_flow_rules(MachineConfigurator conf) {
     //Set up pktgen container
     std::cout << "SHOULD BE PKTGEN NODE: " << pktgenNode->get_name() << std::endl;
     std::string pktgen_container_name = conf.get_config_dir(pktgenNode->get_id());
-    std::string pktgenArgs = "./sender -n 10000 ";
+    std::string pktgenArgs = "./sender -n 10 ";
     for (int neighbor : pktgenNode->get_neighbors()) {
         std::string neighbor_ip = nodeid_to_network[neighbor];
         std::string neighbor_port = std::to_string(nodeid_to_port[neighbor]);
