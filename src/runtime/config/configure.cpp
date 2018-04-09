@@ -281,7 +281,7 @@ void make_flow_rules(MachineConfigurator conf) {
         NF func = node->get_nf();
 
         if (func == pktgen) {
-            std::cout << "on pktgen node!" << std::endl;
+            //std::cout << "on pktgen node!" << std::endl;
             pktgenNode = node;
             continue;
         }
@@ -349,14 +349,17 @@ void make_flow_rules(MachineConfigurator conf) {
         pktgenArgs += " " + neighbor_ip + ":" + neighbor_port;
     }*/
 
+    std::string container_before2 = "c0";
+    std::string cmdBefore2 = "./fw 8000 " + merger_ip + ":8001";
+
     std::string container_before = "c1";
-    std::string cmdBefore = "./fw 8000 " + merger_ip + ":8001";
+    std::string cmdBefore = "./fw 8000 173.16.1.2:8000";
 
    // std::cout << "COMMAND BEFORE: " << cmdBefore << std::endl;
 
     pktgenArgs += "173.16.1.3:11000";
     //std::cout << "COMMADN FOR PKTGEN: " << pktgenArgs << std::endl;
-
+    run_docker_command(container_before2, cmdBefore2);
     run_docker_command(container_before, cmdBefore);
     run_lst_docker_cmd(pktgen_container_name, pktgenArgs);
 
