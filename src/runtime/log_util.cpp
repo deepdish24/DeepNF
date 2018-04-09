@@ -28,7 +28,6 @@ namespace log_util
         nowtm = localtime(&nowtime);
         strftime(tmbuf, sizeof tmbuf, "%Y-%m-%d %H:%M:%S", nowtm);
         snprintf(buf, sizeof buf, "%s.%06ld", tmbuf, tv.tv_usec);
-        printf("Printing into log\n");
         log << tmbuf << "." << tv.tv_usec << ",";
 
         // print packet id into log

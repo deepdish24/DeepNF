@@ -10,12 +10,12 @@
 #include <vector>
 #include <signal.h>
 #include<unistd.h>
+#include <runtime/log_util.h>
 // #include <sys/socket.h>
 
 #include "../../address_util.h"
 #include "../../socket_util.h"
-
-
+#include "../../log_util.h"
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
@@ -51,6 +51,11 @@ int main(int argc,char **argv)
         std::cerr << "No valid destination addresses\n";
         return -1;
     }
+
+    // setup log for this NF
+    std::ofstream log;
+    log.open("log/log.txt", std::ios::out);
+    if (!log) std::cerr << "Could not open the file!" << std::endl;
 
     // create socket
     int sockfd = open_socket();
@@ -91,6 +96,9 @@ int main(int argc,char **argv)
                 exit(-1);
             }
         }
+
+        log_util::log_nf(log, p, "proxy",
+            "rewrote packet destination to " + std::string(server_ip) + ":" + std::to_string(server_port));
 
     }
 

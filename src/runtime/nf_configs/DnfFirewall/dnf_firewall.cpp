@@ -94,23 +94,6 @@ int main(int argc,char **argv)
         }
 
         log_util::log_nf(log, p, "dnf_firewall", "dropped packet");
-
-//        // print time into log
-//        gettimeofday(&tv, NULL);
-//        nowtime = tv.tv_sec;
-//        nowtm = localtime(&nowtime);
-//        strftime(tmbuf, sizeof tmbuf, "%Y-%m-%d %H:%M:%S", nowtm);
-//        snprintf(buf, sizeof buf, "%s.%06ld", tmbuf, tv.tv_usec);
-//        printf("Printing into log\n");
-//        log << tmbuf << "." << tv.tv_usec;
-//
-//
-//        if (count % 1 == 0) {
-//            count = 0;
-//            log.flush();
-//        }
-
-        
     }
 
     return 0;
