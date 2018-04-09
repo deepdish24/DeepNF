@@ -52,7 +52,7 @@ int main(int argc,char **argv)
 
     // setup log for this NF
     std::ofstream log;
-    log.open("/log/log.txt", std::ios::out);
+    log.open("log/log.txt", std::ios::out);
     if (!log) std::cerr << "Could not open the file!" << std::endl;
 
     // create socket
