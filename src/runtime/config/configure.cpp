@@ -211,22 +211,26 @@ void setup_bridge_ports(MachineConfigurator &conf) {
     //Assign Machine IP and PORT for all other Functions
     //Forwarder ip + port assignment (function forwards to 8000 - node_id - 1)
     //which then forwards to container_ip:8000
+    int curr_mac_id = conf.get_machine_id();
     std::map<int, Machine*> machineMap = conf.get_machine_map();
     for (auto it = machineMap.begin(); it != machineMap.end(); ++it) {
-        Machine* mac = it->second;
-        std::vector<RuntimeNode*> nodes_for_mac = conf.get_nodes_for_machine(mac->get_id());
-        for (RuntimeNode* n : nodes_for_mac) {
-            std::string func_ip = mac->get_ip();
-            int nodeid = n->get_id();
-            nodeid_to_network[nodeid] = func_ip;
-            // this is sending to port forwarder is listening on
-            nodeid_to_port[nodeid] = port - nodeid - 1;
-            std::vector<int> neighbors = n->get_neighbors();
-            if ((int) neighbors.size() == 0) {
-                auto obj = json::object();
-                obj["nodeid"] = nodeid;
-                obj["port"] = 8000 + nodeid;
-                arr.push_back(obj);
+        int mac_id = it->first;
+        if (mac_id != curr_mac_id) {
+            Machine* mac = it->second;
+            std::vector<RuntimeNode*> nodes_for_mac = conf.get_nodes_for_machine(mac->get_id());
+            for (RuntimeNode* n : nodes_for_mac) {
+                std::string func_ip = mac->get_ip();
+                int nodeid = n->get_id();
+                nodeid_to_network[nodeid] = func_ip;
+                // this is sending to port forwarder is listening on
+                nodeid_to_port[nodeid] = port - nodeid - 1;
+                std::vector<int> neighbors = n->get_neighbors();
+                if ((int) neighbors.size() == 0) {
+                    auto obj = json::object();
+                    obj["nodeid"] = nodeid;
+                    obj["port"] = 8000 + nodeid;
+                    arr.push_back(obj);
+                }
             }
         }
     }
@@ -317,7 +321,7 @@ void make_flow_rules(MachineConfigurator conf) {
             cmdArguments += " " + neighbor_ip + ":" + neighbor_port;
         }
         std::cout << "COMMAND RUN: " << cmdArguments << std::endl;
-        run_docker_command(container_name, cmdArguments);
+        //run_docker_command(container_name, cmdArguments);
     }
     /* for each node in machine set its outputs properly
         RULES FOR SETTING output
