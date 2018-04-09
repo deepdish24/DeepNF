@@ -5,6 +5,7 @@ set(SOURCE_FILES
         address_util.cpp
         packet.cpp
         socket_util.cpp
+        log_util.cpp
         )
 
 set(HEADERS
@@ -12,7 +13,7 @@ set(HEADERS
         address_util.h
         packet.h
         socket_util.h
-        )
+        log_util.h)
 
 add_library(runtime ${SOURCE_FILES} ${HEADERS})
 

@@ -15,6 +15,7 @@
 
 #include "../../address_util.h"
 #include "../../socket_util.h"
+#include "../../log_util.h"
 
 
 
@@ -64,16 +65,8 @@ int main(int argc,char **argv)
         return -1;
     }
     printf("Firewall listening for packets on port: %d\n", bind_port);
-    
-
-    int count = 0;
-    struct timeval tv;
-    time_t nowtime;
-    struct tm *nowtm;
-    char tmbuf[64], buf[64];
 
     while (true) {
-        count++;
         sockdata *pkt_data = receive_data(sockfd);
         if (pkt_data == NULL || pkt_data->size == 0) { 
             std::cerr << "packet receive error: " << strerror(errno) << std::endl;
@@ -100,17 +93,22 @@ int main(int argc,char **argv)
             }
         }
 
-        gettimeofday(&tv, NULL);
-        nowtime = tv.tv_sec;
-        nowtm = localtime(&nowtime);
-        strftime(tmbuf, sizeof tmbuf, "%Y-%m-%d %H:%M:%S", nowtm);
-        snprintf(buf, sizeof buf, "%s.%06ld", tmbuf, tv.tv_usec);
-        printf("Printing into log\n");
-        log << tmbuf << "." << tv.tv_usec;
-        if (count % 1 == 0) {
-            count = 0;
-            log.flush();
-        }
+        log_util::log_nf(log, p, "dnf_firewall", "dropped packet");
+
+//        // print time into log
+//        gettimeofday(&tv, NULL);
+//        nowtime = tv.tv_sec;
+//        nowtm = localtime(&nowtime);
+//        strftime(tmbuf, sizeof tmbuf, "%Y-%m-%d %H:%M:%S", nowtm);
+//        snprintf(buf, sizeof buf, "%s.%06ld", tmbuf, tv.tv_usec);
+//        printf("Printing into log\n");
+//        log << tmbuf << "." << tv.tv_usec;
+//
+//
+//        if (count % 1 == 0) {
+//            count = 0;
+//            log.flush();
+//        }
 
         
     }
