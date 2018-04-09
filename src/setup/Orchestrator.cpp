@@ -205,6 +205,10 @@ Orchestrator::Orchestrator(std::string filepath, std::string action_file_path) {
         machine->add_node_id(rnode->get_id());
     }
 
+    /*Machine* m = ip_to_machines.begin()->second;
+    std::vector<int> ids = m->get_node_ids();
+    std::cout << "test: " << ids.size() << std::endl;*/
+
     for (int i = 0; i < (int) functions.size(); i++) {
         ServiceGraphNode *node = func_to_nodes[functions[i]];
         RuntimeNode *rnode = idToRuntimeNode[i];
@@ -226,13 +230,22 @@ Orchestrator::Orchestrator(std::string filepath, std::string action_file_path) {
             }
         }
         for (auto it = idToRuntimeNode.begin(); it != idToRuntimeNode.end(); it++) {
+            std::cout << "wtf!!!" << std::endl;
             mc->add_node(it->second);
         }
+
+        std::vector<RuntimeNode*> nodes = mc->get_nodes_for_machine(0);
+        std::cout << "test2: " << nodes.size() << std::endl;
+
         /*std::vector<int> node_ids = m->get_node_ids();
         for (int id : node_ids) {
             mc->add_node(idToRuntimeNode[id]);
         }*/
         std::string serializedConfig = service_graph_util::machine_configurator_to_string(mc);
+        MachineConfigurator *mc2 = service_graph_util::string_to_machine_configurator(serializedConfig);
+        MachineConfigurator conf = *(mc2);
+        std::vector<RuntimeNode*> newNodes = conf.get_nodes_for_machine(0);
+        std::cout << "Number of nodes: " << newNodes.size() << std::endl;
         ip_to_mc[ips[i]] = serializedConfig;
     }
     write_json_dictionary(func_to_inx);
