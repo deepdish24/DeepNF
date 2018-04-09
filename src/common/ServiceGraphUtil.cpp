@@ -188,11 +188,6 @@ namespace service_graph_util
                 (*node_msg_map)[val.first] = message_from_runtime_node(val.second);
             }
 
-            google::protobuf::Map<google::protobuf::uint64, RuntimeNodeMsg> node_msg_map2 = message.node_map();
-            for (auto it = node_msg_map2.begin(); it != node_msg_map2.end(); ++it) {
-                printf("Reading node_map, %lu\n", it->first);
-            }
-
             return message;
         }
     }
@@ -208,6 +203,10 @@ namespace service_graph_util
         printf("machine_configurator_to_string\n");
         MachineConfiguratorMsg mc_msg = message_from_machine_configurator(mc);
 
+        google::protobuf::Map<google::protobuf::uint64, RuntimeNodeMsg> node_msg_map2 = mc_msg.node_map();
+        for (auto it = node_msg_map2.begin(); it != node_msg_map2.end(); ++it) {
+            printf("Reading node_map, %lu\n", it->first);
+        }
         std::string msg;
         mc_msg.SerializeToString(&msg);
 
