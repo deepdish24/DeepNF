@@ -1,4 +1,4 @@
-DeepNF/src/runtime/nf_configs/DnfFirewall/dnf_loadbalancer.cpp
+DeepNF/src/runtime/nf_configs/DnfLoadBalancer/dnf_loadbalancer.cpp
 DeepNF/src/runtime/packet.h
 DeepNF/src/runtime/packet.cpp
 DeepNF/src/runtime/socket_util.h

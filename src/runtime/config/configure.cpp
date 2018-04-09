@@ -499,6 +499,7 @@ int main(int argc, char *argv[]) {
 	std::cout << mac->get_bridge_ip() << std::endl;
 
 	if (needReset) {
+		std::cout << "reset!" << std::endl;
 		reset(conf);
 	} else {
 		// making a dummy service graph

@@ -6,7 +6,7 @@ RUN apt-get update -y && \
     apt-get upgrade -y && \
     apt-get install -y g++ libpcap-dev
 
-COPY dnf_firewall.cpp .
+COPY dnf_loadbalancer.cpp .
 COPY packet.h .
 COPY packet.cpp .
 COPY socket_util.h .
