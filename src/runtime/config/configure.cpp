@@ -294,6 +294,7 @@ void setup_bridge_ports(MachineConfigurator &conf) {
  * reference: https://paper.dropbox.com/doc/Flows-in-OpenVSwitch-nVRg9phHBr5JSZO2vFwCJ?_tk=share_copylink
  */
 void make_flow_rules(MachineConfigurator conf) {
+    std::cout << "MAKE FLOW RULES CALLED" << std::endl;
 	//std::string add_flow_command = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-ofctl add-flow ovs-br in_port=";
 
     /* Forwarder Setup */
@@ -349,6 +350,11 @@ void make_flow_rules(MachineConfigurator conf) {
         }
 
         std::vector<int> neighbors = node->get_neighbors();
+
+        if ((int) neighbors.size() == 0) {
+            cmdArguments += " " + merger_ip_port;
+        }
+
         for (int neighbor : neighbors) {
             //neighbor in machine
             std::string neighbor_ip = nodeid_to_network[neighbor];
@@ -481,7 +487,7 @@ int main(int argc, char *argv[]) {
         perror("not enough arguments: need to pass in ip and port of merger");
         exit(1);
     }
-    
+
     merger_ip_port = argv[optind];
     std::cout << "Merger IP:PORT = " << merger_ip_port << std::endl;
 	MachineConfigurator conf = get_machine_configurator(port);
