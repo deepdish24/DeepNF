@@ -71,6 +71,7 @@ namespace service_graph_util
                     throw std::invalid_argument("Message has unknown NF type");
             }
 
+            printf("runtime_node_from_message, message id: %d\n", message->id());
             RuntimeNode* rn = new RuntimeNode(message->id(), nf);
             rn->inport = message->inport();
             rn->outport = message->outport();
