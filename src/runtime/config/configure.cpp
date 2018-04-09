@@ -331,11 +331,12 @@ void make_flow_rules(MachineConfigurator conf) {
             cmdArguments += " " + neighbor_ip + ":" + neighbor_port;
         }
         std::cout << "COMMAND RUN: " << cmdArguments << " (on container with ip: " << node_ip << ")" << std::endl;
-        //run_docker_command(container_name, cmdArguments);
+        run_docker_command(container_name, cmdArguments);
     }
 
     //Set up pktgen container
     std::cout << "SHOULD BE PKTGEN NODE: " << pktgenNode->get_name() << std::endl;
+    std::string pktgen_container_name = conf.get_config_dir(pktgenNode->get_id());
     std::string pktgenArgs = "./sender -n 10000 ";
     for (int neighbor : pktgenNode->get_neighbors()) {
         std::string neighbor_ip = nodeid_to_network[neighbor];
@@ -344,7 +345,7 @@ void make_flow_rules(MachineConfigurator conf) {
     }
 
     std::cout << "COMMADN FOR PKTGEN: " << pktgenArgs << std::endl;
-
+    run_docker_command(pktgen_container_name, pktgenArgs);
     /* for each node in machine set its outputs properly
         RULES FOR SETTING output
             1. if neighbor is within machine -> then set give container ip
