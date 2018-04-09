@@ -222,13 +222,13 @@ void setup_bridge_ports(MachineConfigurator &conf) {
 	int ip_inx = ofport_inx + 1;
 
 	// connect containers to the bridge
-	// std::string add_port_classifier = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br eth1 classifier";
-	//std::string add_port_merger = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br eth1 merger_old";
+	// std::string add_port_classifier = "sudo \"PATH=$PATH\" /home/ubuntu/ovs/utilities/ovs-docker add-port ovs-br eth1 classifier";
+	//std::string add_port_merger = "sudo \"PATH=$PATH\" /home/ubuntu/ovs/utilities/ovs-docker add-port ovs-br eth1 merger_old";
 	//system(add_port_classifier.c_str());
 	//system(add_port_merger.c_str());
 
     /* Connect Forwarder to Bridge (with one ETH) */
-    /*std::string add_ip_port_forwarder = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br eth1 --ipaddress=" + ip_assign + std::to_string(ip_inx) +  " forwarder ";
+    /*std::string add_ip_port_forwarder = "sudo \"PATH=$PATH\" /home/ubuntu/ovs/utilities/ovs-docker add-port ovs-br eth1 --ipaddress=" + ip_assign + std::to_string(ip_inx) +  " forwarder ";
     system(add_ip_port_forwarder.c_str());
     ip_inx++;*/
 
@@ -238,7 +238,7 @@ void setup_bridge_ports(MachineConfigurator &conf) {
 
 	// node id to eth setup map
 	/*std::unordered_map<int, int> nodeid_to_eth;
-	std::string add_port_merger = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br eth";
+	std::string add_port_merger = "sudo \"PATH=$PATH\" /home/ubuntu/ovs/utilities/ovs-docker add-port ovs-br eth";
     // inx of virtual ethernet port
 	int eth_inx = 1;
 	auto j = json::object();
@@ -295,7 +295,7 @@ void setup_bridge_ports(MachineConfigurator &conf) {
  */
 void make_flow_rules(MachineConfigurator conf) {
     std::cout << "MAKE FLOW RULES CALLED" << std::endl;
-	//std::string add_flow_command = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-ofctl add-flow ovs-br in_port=";
+	//std::string add_flow_command = "sudo \"PATH=$PATH\" /home/ubuntu/ovs/utilities/ovs-ofctl add-flow ovs-br in_port=";
 
     /* Forwarder Setup */
     std::string to_root = "../../";
@@ -441,7 +441,7 @@ void start_network_functions(MachineConfigurator c) {
 }
 
 void reset(MachineConfigurator conf) {
-	std::string del_ports_cmd = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker del-ports ovs-br ";
+	std::string del_ports_cmd = "sudo \"PATH=$PATH\" /home/ubuntu/ovs/utilities/ovs-docker del-ports ovs-br ";
     std::string remove_config_folders = "rm -rf ../../*_config forwarder.txt";
     system(remove_config_folders.c_str());
 	// clean up merger_old and classifier
@@ -459,7 +459,7 @@ void reset(MachineConfigurator conf) {
 	}
 
 	// delete the bridge
-	system("sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-vsctl del-br ovs-br");
+	system("sudo \"PATH=$PATH\" /home/ubuntu/ovs/utilities/ovs-vsctl del-br ovs-br");
 }
 
 /**
@@ -502,14 +502,13 @@ int main(int argc, char *argv[]) {
 	if (needReset) {
 		std::cout << "reset!" << std::endl;
 		reset(conf);
-	} else {
-		// making a dummy service graph
-        std::cout << "graph here!" << std::endl;
-		setup_nodes(conf);
-		setup_bridge_ports(conf);
-		make_flow_rules(conf);
-		//start_network_functions(conf);
-	}
+	} 
+	// making a dummy service graph
+    std::cout << "graph here!" << std::endl;
+	setup_nodes(conf);
+	setup_bridge_ports(conf);
+	make_flow_rules(conf);
+	//start_network_functions(conf);
 
 	return 0;
 }
