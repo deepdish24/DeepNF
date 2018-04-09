@@ -9,8 +9,9 @@
 #include <errno.h>
 #include <vector>
 #include <signal.h>
-#include<unistd.h>
-// #include <sys/socket.h>
+#include <iostream>
+#include <fstream>
+#include <sys/time.h>
 
 #include "../../address_util.h"
 #include "../../socket_util.h"
@@ -26,7 +27,7 @@ int sockfd;
 std::vector<address*> addresses;
 
 int main(int argc,char **argv)
-{   
+{
     signal(SIGINT, int_handler);
 
     if (argc < 3) {
@@ -49,6 +50,10 @@ int main(int argc,char **argv)
         return -1; 
     }
 
+    // setup log for this NF
+    std::ofstream log;
+    log.open("dnf_log.txt", std::ios::out);
+
     // create socket
     int sockfd = open_socket();
 
@@ -59,9 +64,15 @@ int main(int argc,char **argv)
     }
     printf("Firewall listening for packets on port: %d\n", bind_port);
     
-    
-    while (true) {
 
+    int count = 0;
+    struct timeval tv;
+    time_t nowtime;
+    struct tm *nowtm;
+    char tmbuf[64], buf[64];
+
+    while (true) {
+        count++;
         sockdata *pkt_data = receive_data(sockfd);
         if (pkt_data == NULL || pkt_data->size == 0) { 
             std::cerr << "packet receive error: " << strerror(errno) << std::endl;
@@ -87,6 +98,18 @@ int main(int argc,char **argv)
                 exit(-1);
             }
         }
+
+        gettimeofday(&tv, NULL);
+        nowtime = tv.tv_sec;
+        nowtm = localtime(&nowtime);
+        strftime(tmbuf, sizeof tmbuf, "%Y-%m-%d %H:%M:%S", nowtm);
+        snprintf(buf, sizeof buf, "%s.%06ld", tmbuf, tv.tv_usec);
+        log << "%s.%06ld" << tmbuf << tv.tv_usec;
+        if (count % 1 == 0) {
+            count = 0;
+            log.flush();
+        }
+
         
     }
 
