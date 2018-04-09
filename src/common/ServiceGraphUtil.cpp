@@ -206,6 +206,8 @@ namespace service_graph_util
         std::string msg;
         mc_msg.SerializeToString(&msg);
 
+        printf("serialized to string\n");
+
         MachineConfiguratorMsg message;
         message.ParseFromString(msg);
         google::protobuf::Map<google::protobuf::uint64, RuntimeNodeMsg> node_msg_map2 = msg.node_map();
