@@ -188,7 +188,8 @@ namespace service_graph_util
                 (*node_msg_map)[val.first] = message_from_runtime_node(val.second);
             }
 
-            for (auto val: message.mutable_node_map()) {
+            node_msg_map = message.node_map();
+            for (auto it = node_msg_map->begin(); it != node_msg_map->end(); ++it) {
                 printf("Reading node_map, %d\n", val.first);
             }
 
