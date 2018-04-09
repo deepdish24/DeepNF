@@ -129,12 +129,12 @@ void start_docker_container(std::string container_name, std::string image_name) 
 * Function starts network function via cmd in docker container
 */
 void run_docker_command(std::string container_name, std::string cmd) {
-    std::cout << ("docker exec -it " + container_name + " " + cmd + " &") << std::endl;
+    std::cout << ("docker exec -dit " + container_name + " " + cmd + " &") << std::endl;
     system(("docker exec -dit " + container_name + " " + cmd + " &").c_str());
 }
 
 void run_lst_docker_cmd(std::string container_name, std::string cmd) {
-	std::cout << ("docker exec -it " + container_name + " " + cmd) << std::endl;
+	std::cout << ("docker exec -dit " + container_name + " " + cmd) << std::endl;
     system(("docker exec -dit " + container_name + " " + cmd).c_str());
 }
 
@@ -336,12 +336,11 @@ void make_flow_rules(MachineConfigurator conf) {
             std::string neighbor_port = std::to_string(nodeid_to_port[neighbor]);
             cmdArguments += " " + neighbor_ip + ":" + neighbor_port;
         }
-        std::cout << "COMMAND RUN: " << cmdArguments << " (on container with ip: " << node_ip << ")" << std::endl;
+        //std::cout << "COMMAND RUN: " << cmdArguments << " (on container with ip: " << node_ip << ")" << std::endl;
         //run_docker_command(container_name, cmdArguments);
     }
 
     //Set up pktgen container
-    std::cout << "SHOULD BE PKTGEN NODE: " << pktgenNode->get_name() << std::endl;
     std::string pktgen_container_name = conf.get_config_dir(pktgenNode->get_id());
     std::string pktgenArgs = "./sender -n 10 ";
     /*for (int neighbor : pktgenNode->get_neighbors()) {
@@ -349,8 +348,16 @@ void make_flow_rules(MachineConfigurator conf) {
         std::string neighbor_port = std::to_string(nodeid_to_port[neighbor]);
         pktgenArgs += " " + neighbor_ip + ":" + neighbor_port;
     }*/
-    pktgenArgs += merger_ip + ":8001";
-    std::cout << "COMMADN FOR PKTGEN: " << pktgenArgs << std::endl;
+
+    std::string container_before = "c1";
+    std::string cmdBefore = "./fw 8000 " + merger_ip + ":8001";
+
+   // std::cout << "COMMAND BEFORE: " << cmdBefore << std::endl;
+
+    pktgenArgs += "173.16.1.3:11000";
+    //std::cout << "COMMADN FOR PKTGEN: " << pktgenArgs << std::endl;
+
+    run_docker_command(container_before, cmdBefore);
     run_lst_docker_cmd(pktgen_container_name, pktgenArgs);
 
     /* ============================================= */
