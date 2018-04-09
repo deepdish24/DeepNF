@@ -256,7 +256,7 @@ void make_flow_rules(MachineConfigurator conf) {
     for (RuntimeNode* node : nodes) {
         int nodeid = node->get_id();
         std::string node_ip = nodeid_to_network[nodeid];
-        std::string container_port = std::to_string(8000 + nodeid);
+        std::string container_port = std::to_string(8000);
         std::string fwd_port = std::to_string(8000 - nodeid - 1);
         std::string cmd = "echo \"" + fwd_port + ";" + node_ip + ":" + container_port + "\" >> ../../forwarder.txt";
         std::cout << cmd << std::endl;
@@ -282,6 +282,7 @@ void make_flow_rules(MachineConfigurator conf) {
         NF func = node->get_nf();
         int nodeid = node->get_id();
         int function_port = nodeid_to_port[nodeid];
+        std::string node_ip = nodeid_to_network[nodeid];
 
         switch(func) {
             case pktgen:
@@ -320,7 +321,7 @@ void make_flow_rules(MachineConfigurator conf) {
         std::vector<int> neighbors = node->get_neighbors();
 
         if ((int) neighbors.size() == 0) {
-            cmdArguments += " " + merger_ip + ":" + std::to_string((8000 - nodeid - 1));
+            cmdArguments += " " + merger_ip + ":" + std::to_string(8000 + nodeid);
         }
 
         for (int neighbor : neighbors) {
@@ -329,7 +330,7 @@ void make_flow_rules(MachineConfigurator conf) {
             std::string neighbor_port = std::to_string(nodeid_to_port[neighbor]);
             cmdArguments += " " + neighbor_ip + ":" + neighbor_port;
         }
-        std::cout << "COMMAND RUN: " << cmdArguments << std::endl;
+        std::cout << "COMMAND RUN: " << cmdArguments << "(on container with ip: " << node_ip << ")" << std::endl;
         //run_docker_command(container_name, cmdArguments);
     }
 
