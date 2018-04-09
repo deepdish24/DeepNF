@@ -228,7 +228,7 @@ void setup_bridge_ports(MachineConfigurator &conf) {
                 if ((int) neighbors.size() == 0) {
                     auto obj = json::object();
                     obj["nodeid"] = nodeid;
-                    obj["port"] = 8000 + nodeid;
+                    obj["port"] = 8000 + nodeid + 1;
                     arr.push_back(obj);
                 }
             }
@@ -270,16 +270,16 @@ void make_flow_rules(MachineConfigurator conf) {
 
     /* Function setup */
     for (RuntimeNode* node : nodes) {
-        std::string function_name = node->get_name();
-        std::cout << "function name: " << function_name << std::endl;
-        if (function_name.compare("pktgen") == 0) {
+        std::string container_name = conf.get_config_dir(node->get_id());
+        std::string cmdArguments = "";
+        NF func = node->get_nf();
+
+        if (func == pktgen) {
             std::cout << "on pktgen node!" << std::endl;
             pktgenNode = node;
             continue;
         }
-        std::string container_name = conf.get_config_dir(node->get_id());
-        std::string cmdArguments = "";
-        NF func = node->get_nf();
+
         int nodeid = node->get_id();
         int function_port = nodeid_to_port[nodeid];
         std::string node_ip = nodeid_to_network[nodeid];
@@ -321,7 +321,7 @@ void make_flow_rules(MachineConfigurator conf) {
         std::vector<int> neighbors = node->get_neighbors();
 
         if ((int) neighbors.size() == 0) {
-            cmdArguments += " " + merger_ip + ":" + std::to_string(8000 + nodeid);
+            cmdArguments += " " + merger_ip + ":" + std::to_string(8000 + nodeid + 1);
         }
 
         for (int neighbor : neighbors) {
@@ -330,7 +330,7 @@ void make_flow_rules(MachineConfigurator conf) {
             std::string neighbor_port = std::to_string(nodeid_to_port[neighbor]);
             cmdArguments += " " + neighbor_ip + ":" + neighbor_port;
         }
-        std::cout << "COMMAND RUN: " << cmdArguments << "(on container with ip: " << node_ip << ")" << std::endl;
+        std::cout << "COMMAND RUN: " << cmdArguments << " (on container with ip: " << node_ip << ")" << std::endl;
         //run_docker_command(container_name, cmdArguments);
     }
 
