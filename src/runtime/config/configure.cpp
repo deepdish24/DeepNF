@@ -271,7 +271,7 @@ void make_flow_rules(MachineConfigurator conf) {
     }
 
     //start forwarder here!
-    system("./src/runtime/forwarder/forwarder ../../forwarder.txt");
+    system("./src/runtime/forwarder/forwarder ../../forwarder.txt &");
 
     RuntimeNode* pktgenNode = NULL;
 
