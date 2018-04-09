@@ -402,6 +402,8 @@ void make_flow_rules(MachineConfigurator conf) {
 
 void reset(MachineConfigurator conf) {
 	std::string del_ports_cmd = "sudo \"PATH=$PATH\" /home/ubuntu/ovs/utilities/ovs-docker del-ports ovs-br ";
+
+    std::cout << "deleting config directories" << std::endl;
     std::string remove_config_folders = "rm -rf ../../*_config forwarder.txt";
     system(remove_config_folders.c_str());
 	// clean up merger_old and classifier
@@ -464,10 +466,10 @@ int main(int argc, char *argv[]) {
 		reset(conf);
 	} 
 	// making a dummy service graph
-    std::cout << "graph here!" << std::endl;
+    /*std::cout << "graph here!" << std::endl;
 	setup_nodes(conf);
 	setup_bridge_ports(conf);
-	make_flow_rules(conf);
+	make_flow_rules(conf);*/
 	return 0;
 }
 
