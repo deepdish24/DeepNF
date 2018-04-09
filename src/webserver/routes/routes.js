@@ -84,6 +84,10 @@ var showMachine3 = function(req, res) {
 	});
 }
 
+var showVisualization = function (req, res){
+  res.render("visualization.ejs");
+}
+
 
 //Set routes
 var routes = { 
@@ -93,6 +97,7 @@ var routes = {
 		show_machine1: showMachine1,
 		show_machine2: showMachine2,
 		show_machine3: showMachine3,
+    show_visualization: showVisualization,
 		//get_data_machine1: getDataMachine1
 };
 
