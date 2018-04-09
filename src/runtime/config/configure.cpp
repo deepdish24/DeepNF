@@ -207,7 +207,7 @@ void setup_bridge_ports(MachineConfigurator &conf) {
     system("sudo “PATH=$PATH” /home/ubuntu/ovs/utilities/ovs-ctl --no-ovsdb-server start");
 
 	// create a bridge
-	system("sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-vsctl add-br ovs-br");
+	system("sudo \"PATH=$PATH\" /home/ubuntu/ovs/utilities/ovs-vsctl add-br ovs-br");
 	
 	// get bridge ip
 	Machine* cur_machine = conf.get_machine_with_id(conf.get_machine_id());
@@ -261,14 +261,14 @@ void setup_bridge_ports(MachineConfigurator &conf) {
     out.close();*/
    // int eth_inx = 1;
     int port  = 8000;
-	std::string add_port_command = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker add-port ovs-br";
+	std::string add_port_command = "sudo \"PATH=$PATH\" /home/ubuntu/ovs/utilities/ovs-docker add-port ovs-br";
 	for (RuntimeNode* n : nodes) {
         int nodeid = n->get_id();
         std::string container_name = conf.get_config_dir(n->get_id());
         std::string func_ip = ip_assign + std::to_string(ip_inx);
         nodeid_to_network[n->get_id()] = func_ip;
         nodeid_to_port[n->get_id()] = nodeid + port;
-		std::string command1 = add_port_command + " eth1 --ipaddress=" + func_ip + " " + container_name;
+		std::string command1 = add_port_command + " eth1 " + container_name +  " --ipaddress=" + func_ip + "/24";
 		std::cout << "command: " << command1 << std::endl;
 		system(command1.c_str());
 		ip_inx++;
@@ -442,7 +442,7 @@ void start_network_functions(MachineConfigurator c) {
 
 void reset(MachineConfigurator conf) {
 	std::string del_ports_cmd = "sudo \"PATH=$PATH\" /home/ec2-user/ovs/utilities/ovs-docker del-ports ovs-br ";
-    std::string remove_config_folders = "rm -rf *_config forwarder.txt";
+    std::string remove_config_folders = "rm -rf ../../*_config forwarder.txt";
     system(remove_config_folders.c_str());
 	// clean up merger_old and classifier
 	/*system((del_ports_cmd + "classifier").c_str());
@@ -504,7 +504,7 @@ int main(int argc, char *argv[]) {
 		// making a dummy service graph
         std::cout << "graph here!" << std::endl;
 		setup_nodes(conf);
-		//std::unordered_map<int, int> leaf_to_eth = setup_bridge_ports(conf);
+		setup_bridge_ports(conf);
 		make_flow_rules(conf);
 		//start_network_functions(conf);
 	}
