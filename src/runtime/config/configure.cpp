@@ -126,6 +126,13 @@ void start_docker_container(std::string container_name, std::string image_name) 
 }
 
 /**
+* Function starts network function via cmd in docker container
+*/
+void run_docker_command(std::string container_name, std::string cmd) {
+    system(("docker exec -it " + container_name + " " + cmd).c_str());
+}
+
+/**
  * Creates the containers using Dockerfiles.
  */
 void setup_nodes(MachineConfigurator conf) {
@@ -134,22 +141,6 @@ void setup_nodes(MachineConfigurator conf) {
     // from build directory
 
 	std::string to_root = "../../";
-	/*std::string path_to_merger_dockerfile = to_root + "DeepNF/src/runtime/merger/Dockerfile";
-    std::string path_to_fwd_dockerfile = to_root + "DeepnNF/src/runtime/forwarder/Dockerfile";
-    std::string fwd_config_dir = to_root + "fwd_config";
-	std::string merger_config_dir = to_root + "merger_config";*/
-
-    /* Forwarder Container Setup */
-    /*make_config_dir(merger_config_dir);
-    copy_dockerfile(path_to_fwd_dockerfile, fwd_config_dir, to_root);
-    start_docker_container("forwarder", "base_img");*/
-
-    /* Merger Container Setup */
-   /* make_config_dir(merger_config_dir);
-    copy_dockerfile(path_to_merger_dockerfile, merger_config_dir, to_root);
-    //build_docker_image("merger_image", merger_config_dir);
-    start_docker_container("merger", "base_img");*/
-
     // list of nodes on this machine
 	std::vector<RuntimeNode*> nodes = get_internal_nodes(conf);
     std::cout << "Number of Nodes: " << nodes.size() << std::endl;
@@ -168,38 +159,6 @@ void setup_nodes(MachineConfigurator conf) {
         build_docker_image(image_name, func_config_dir);
         start_docker_container(container_name, image_name);
     }
-
-
-
-	// create new containers for classifier and merger_old
-	//system("docker run -d -t -i --name classifier ubuntu /bin/bash");
-	//system("docker run -d -t -i --name merger_old ubuntu /bin/bash");
-	
-	/*for (RuntimeNode* n : nodes) {
-		int node_id = n->get_id();
-		NF node_nf = n->get_nf();
-
-		std::string dockerfile_path = conf.get_dockerfile(node_nf);
-		if (dockerfile_path == "") {
-			// TODO: raise exception
-		}
-
-		std::string config_dir = conf.get_config_dir(node_id);
-		conf.make_config_dir(node_id);
-
-		std::string image_name = conf.get_docker_image_name(node_id, node_nf);
-		if (image_name == "") {
-			// TODO: raise exception
-		}
-		// store Dockerfile in node config directory
-		system(("cp " + dockerfile_path + " " + config_dir).c_str());
-		
-		// build Docker image with the network function installed and configured
-		system(("docker build -t=" + image_name + " " + config_dir).c_str());
-
-		// create a new Docker container for the node
-		system(("docker run -d -t -i --name " + n->get_name() + " " + image_name + ":latest /bin/bash").c_str());
-	}*/
 }
 
 void setup_bridge_ports(MachineConfigurator &conf) {
@@ -221,53 +180,28 @@ void setup_bridge_ports(MachineConfigurator &conf) {
 	int ofport_inx = atoi(bridge_ip.substr(dotinx+1).c_str());
 	int ip_inx = ofport_inx + 1;
 
-	// connect containers to the bridge
-	// std::string add_port_classifier = "sudo \"PATH=$PATH\" /home/ubuntu/ovs/utilities/ovs-docker add-port ovs-br eth1 classifier";
-	//std::string add_port_merger = "sudo \"PATH=$PATH\" /home/ubuntu/ovs/utilities/ovs-docker add-port ovs-br eth1 merger_old";
-	//system(add_port_classifier.c_str());
-	//system(add_port_merger.c_str());
-
-    /* Connect Forwarder to Bridge (with one ETH) */
-    /*std::string add_ip_port_forwarder = "sudo \"PATH=$PATH\" /home/ubuntu/ovs/utilities/ovs-docker add-port ovs-br eth1 --ipaddress=" + ip_assign + std::to_string(ip_inx) +  " forwarder ";
-    system(add_ip_port_forwarder.c_str());
-    ip_inx++;*/
-
 	std::vector<RuntimeNode*> nodes = get_internal_nodes(conf);
 
-	/* MERGER PORT SETUP */
-
-	// node id to eth setup map
-	/*std::unordered_map<int, int> nodeid_to_eth;
-	std::string add_port_merger = "sudo \"PATH=$PATH\" /home/ubuntu/ovs/utilities/ovs-docker add-port ovs-br eth";
-    // inx of virtual ethernet port
-	int eth_inx = 1;
-	auto j = json::object();
-	for (RuntimeNode* n : nodes) {
-		if (n->get_neighbors().size() == 0) {
-			std::string command = add_port_merger + std::to_string(eth_inx) + " --ipaddress=" + 
-				ip_assign + std::to_string(ip_inx) + " " + "merger";
-			std::cout << "command: " << command << std::endl;
-			nodeid_to_eth[n->get_id()] = eth_inx;
-			j["eth" + std::to_string(eth_inx)] = n->get_name();
-			system(command.c_str());
-			eth_inx++;
-		}
-	}
-    ip_inx++;
-    std::string to_root = "../../";
-    std::string path_to_json = to_root + "DeepNF/src/common/eth_leaf_map.json";
-	std::ofstream out(path_to_json);
-    out << j;
-    out.close();*/
-   // int eth_inx = 1;
+    // Container IP + Port assignment (all functions bind to port 8000 on container)
     int port  = 8000;
+    auto arr = json::array();
 	std::string add_port_command = "sudo \"PATH=$PATH\" /home/ubuntu/ovs/utilities/ovs-docker add-port ovs-br";
 	for (RuntimeNode* n : nodes) {
         int nodeid = n->get_id();
         std::string container_name = conf.get_config_dir(n->get_id());
         std::string func_ip = ip_assign + std::to_string(ip_inx);
         nodeid_to_network[n->get_id()] = func_ip;
-        nodeid_to_port[n->get_id()] = nodeid + port;
+        //nodeid_to_port[n->get_id()] = nodeid + port;
+        nodeid_to_port[n->get_id()] = port;
+
+        std::vector<int> neighbors = n->get_neighbors();
+        if ((int) neighbors.size() == 0) {
+            auto obj = json::object();
+            obj["nodeid"] = nodeid;
+            obj["port"] = 8000 + nodeid;
+            arr.push_back(obj);
+        }
+
 		std::string command1 = add_port_command + " eth1 " + container_name +  " --ipaddress=" + func_ip + "/24";
 		std::cout << "command: " << command1 << std::endl;
 		system(command1.c_str());
@@ -275,6 +209,8 @@ void setup_bridge_ports(MachineConfigurator &conf) {
 	}
 
     //Assign Machine IP and PORT for all other Functions
+    //Forwarder ip + port assignment (function forwards to 8000 - node_id - 1)
+    //which then forwards to container_ip:8000
     std::map<int, Machine*> machineMap = conf.get_machine_map();
     for (auto it = machineMap.begin(); it != machineMap.end(); ++it) {
         Machine* mac = it->second;
@@ -283,10 +219,20 @@ void setup_bridge_ports(MachineConfigurator &conf) {
             std::string func_ip = mac->get_ip();
             int nodeid = n->get_id();
             nodeid_to_network[nodeid] = func_ip;
-            // this is sending to port forwarder is listening
+            // this is sending to port forwarder is listening on
             nodeid_to_port[nodeid] = port - nodeid - 1;
+            std::vector<int> neighbors = n->get_neighbors();
+            if ((int) neighbors.size() == 0) {
+                auto obj = json::object();
+                obj["nodeid"] = nodeid;
+                obj["port"] = 8000 + nodeid;
+                arr.push_back(obj);
+            }
         }
     }
+    std::ofstream out("../src/common/port_leaf_map.json");
+    out << arr;
+    out.close();
 }
 
 /**
@@ -308,7 +254,7 @@ void make_flow_rules(MachineConfigurator conf) {
         std::string node_ip = nodeid_to_network[nodeid];
         std::string container_port = std::to_string(8000 + nodeid);
         std::string fwd_port = std::to_string(8000 - nodeid - 1);
-        std::string cmd = "echo \"" + fwd_port + ";" + node_ip + ":" + container_port + "\" >> forwarder.txt";
+        std::string cmd = "echo \"" + fwd_port + ";" + node_ip + ":" + container_port + "\" >> ../../forwarder.txt";
         std::cout << cmd << std::endl;
         system(cmd.c_str());
         std::cout << "line appended to fowarder.txt" << std::endl;
@@ -318,6 +264,7 @@ void make_flow_rules(MachineConfigurator conf) {
 
     /* Function setup */
     for (RuntimeNode* node : nodes) {
+        std::string container_name = conf.get_config_dir(node->get_id());
         std::string cmdArguments = "";
         NF func = node->get_nf();
         int nodeid = node->get_id();
@@ -365,6 +312,7 @@ void make_flow_rules(MachineConfigurator conf) {
             cmdArguments += " " + neighbor_ip + ":" + neighbor_port;
         }
         std::cout << "COMMAND RUN: " << cmdArguments << std::endl;
+        run_docker_command(container_name, cmdArguments);
     }
     /* for each node in machine set its outputs properly
         RULES FOR SETTING output
@@ -412,35 +360,6 @@ void make_flow_rules(MachineConfigurator conf) {
 	}
 
 	//system((add_flow_command + "1,actions=" + outport_ports).c_str());*/
-}
-
-/**
- * Runs the NF on each node
- */
-void start_network_functions(MachineConfigurator c) {
-	std::string docker_exec_command = "docker exec -d -t -i ";
-	std::vector<RuntimeNode*> nodes = get_internal_nodes(c);
-	std::string exec_nf_cmd;
-	for (RuntimeNode* n : nodes) {
-		std::string exec_nf_cmd = docker_exec_command + n->get_name() + " ";
-		switch(n->get_nf()) {
-			case dnf_firewall:
-				// TODO (deepan): write correct command to setup firewall
-				exec_nf_cmd += "";
-				break;
-
-			default:
-				break;
-
-//		case snort:
-//			exec_nf_cmd += "snort -N -A console -q -c /etc/snort/snort.conf -Q -i eth1:eth2";
-//			break;
-//		case haproxy:
-//			exec_nf_cmd += "service haproxy start";
-//			break;
-		}
-		system(exec_nf_cmd.c_str());
-	}
 }
 
 void reset(MachineConfigurator conf) {
@@ -511,8 +430,6 @@ int main(int argc, char *argv[]) {
 	setup_nodes(conf);
 	setup_bridge_ports(conf);
 	make_flow_rules(conf);
-	//start_network_functions(conf);
-
 	return 0;
 }
 
