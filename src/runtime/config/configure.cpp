@@ -271,6 +271,7 @@ void make_flow_rules(MachineConfigurator conf) {
     }
 
     //start forwarder here!
+    system("./src/runtime/forwarder/forwarder ../../forwarder.txt");
 
     RuntimeNode* pktgenNode = NULL;
 
@@ -478,7 +479,8 @@ int main(int argc, char *argv[]) {
 		std::cout << "reset!" << std::endl;
 		reset(conf);
 	} 
-	
+	std::string remove_config_folders = "rm -rf ../../forwarder.txt";
+    system(remove_config_folders.c_str());
 	setup_nodes(conf);
 	setup_bridge_ports(conf);
 	make_flow_rules(conf);
