@@ -160,21 +160,25 @@ Orchestrator::Orchestrator(std::string filepath, std::string action_file_path) {
         for (auto node : priorityNodes) {
             first->add_neighbor(node);
             node->add_parent(first);
-            node->add_neighbor(last);
-            last->add_parent(node);
+            if (last != NULL) {
+                node->add_neighbor(last);
+                last->add_parent(node);
+            }
         }
 
         // attaching all leaf nodes to last node
-        for (auto node : leafNodes) {
-            node->add_neighbor(last);
-            last->add_parent(node);
+        if (last != NULL) {
+            for (auto node : leafNodes) {
+                node->add_neighbor(last);
+                last->add_parent(node);
+            }
         }
 
         // if no middle nodes exit, then we connect first directly to last
-        if (rootNodes.size() == 0 && priorityNodes.size() == 0) {
+        /*if (rootNodes.size() == 0 && priorityNodes.size() == 0) {
             first->add_neighbor(last);
             last->add_parent(first);
-        }
+        }*/
     }
 
     /* NODE PARTITIONING */
@@ -466,7 +470,7 @@ void Orchestrator::write_json_dictionary(std::unordered_map<std::string, int> fu
             arr.push_back(object);
         }
     }
-    std::ofstream out("../../../src/common/eth_to_leaf.json");
+    std::ofstream out("../../../src/common/conflict_pairs.json");
     out << arr;
 }
 
