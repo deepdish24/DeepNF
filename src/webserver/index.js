@@ -11,5 +11,5 @@ app.get('/', routes.show_machine1); // Home page
 //app.get('https://ec2-13-58-167-87.us-east-2.compute.amazonaws.com', routes.show_machine2); // Machine 2
 //app.get('ec2-18-188-160-168.us-east-2.compute.amazonaws.com', routes.show_machine3); // Machine 3
 app.get('/visualization', routes.show_visualization);
-app.listen(8080);
+app.listen(80);
 console.log('Server running on port 8080. Now open http://localhost:8080/ in your browser!');
