@@ -493,6 +493,9 @@ std::vector<ConflictItem*> Orchestrator::create_conflicts_list(std::unordered_ma
             // object["major"] = func_to_inx[major];
             // object["minor"] = func_to_inx[minor];
             // object["parent"] = parentId;
+            std::cout << "MAJOR: " << major << std::endl;
+            std::cout << "MINOR: " << minor << std::endl;
+            std::cout << "PARENT: " << parentId << std::endl;
             ConflictItem *item = new ConflictItem(func_to_inx[major], func_to_inx[minor], parentId);
             conflicts_list.push_back(item);
             /*for (Field f : fields) {
