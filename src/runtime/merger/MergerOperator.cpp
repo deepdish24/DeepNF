@@ -13,6 +13,7 @@
 #include <netinet/tcp.h>   //Provides declarations for tcp header
 #include <netinet/ip.h>    //Provides declarations for ip header
 #include <string>
+#include <common/Field.h>
 
 
 #pragma clang diagnostic push

@@ -16,6 +16,8 @@
 #include "../common/RuntimeNode.h"
 #include "../common/MachineConfigurator.h"
 #include "../common/ServiceGraphUtil.h"
+#include "../common/Field.h"
+#include "../runtime/merger/ConflictItem.h"
 
 Orchestrator::Orchestrator(std::string filepath, std::string action_file_path) {
     std::ifstream fileInput(filepath);
@@ -249,17 +251,30 @@ Orchestrator::Orchestrator(std::string filepath, std::string action_file_path) {
 
     //port to node id
     std::map<int, int> port_to_node_map;
+    int port;
     for (int i = 0; i < (int) functions.size(); i++) {
         RuntimeNode *rnode = idToRuntimeNode[i];
-        int port = 8000 + rnode->get_id() + 1;
-        port_to_node_map[port] = rnode->get_id();
+        if (rnode->get_neighbors().size() == 0) {
+            port = 8000 + rnode->get_id() + 1;
+            port_to_node_map[port] = rnode->get_id();
+        }
     }
 
-    //std::vector<ConflictItem*> conflicts_list;
-
-    write_json_dictionary(func_to_inx);
+    std::vector<ConflictItem*> conflicts_list = create_conflicts_list(func_to_inx);
 
     //SETUP MERGER
+    std::map<int, RuntimeNode*> node_map;
+    for (auto it = idToRuntimeNode.begin(); it != idToRuntimeNode.end(); ++it) {
+        node_map.insert(std::make_pair(it->first, it->second));
+    }
+    MergerInfo *merger_info = new MergerInfo(port_to_node_map, conflicts_list, node_map, "127.0.0.1", 10000);
+
+    this->merger_operator = new MergerOperator(merger_info);
+}
+
+void Orchestrator::run_merger()
+{
+    merger_operator->run();
 }
 
 void Orchestrator::round_robin_partitioning(std::vector<std::string> &ips, std::vector<std::string> &functions) {
@@ -451,10 +466,10 @@ void Orchestrator::checkLevelParallelizability(std::set<ServiceGraphNode*> nodes
     }
 }
 
-void Orchestrator::write_json_dictionary(std::unordered_map<std::string, int> func_to_inx) {
+std::vector<ConflictItem*> Orchestrator::create_conflicts_list(std::unordered_map<std::string, int> func_to_inx) {
     //std::vector<ConflictPairInfo> conflictPairs = {};
-    auto arr = json::array();
-
+    // auto arr = json::array();
+    std::vector<ConflictItem*> conflicts_list;
     for (auto it = pair_to_conflicts.begin(); it != pair_to_conflicts.end(); ++it) {
         std::string major = it->first;
         std::unordered_map<std::string, std::vector<Field>> map = it->second;
@@ -466,23 +481,27 @@ void Orchestrator::write_json_dictionary(std::unordered_map<std::string, int> fu
             parentId = func_to_inx[parent];
         }
         for (auto nextIt = map.begin(); nextIt != map.end(); ++nextIt) {
-            auto object = json::object();
+            // auto object = json::object();
+
             //auto fieldArr = json::array();
             std::string minor = nextIt->first;
             //std::vector<Field> fields = nextIt->second;
-            object["major"] = func_to_inx[major];
-            object["minor"] = func_to_inx[minor];
-            object["parent"] = parentId;
-
+            // object["major"] = func_to_inx[major];
+            // object["minor"] = func_to_inx[minor];
+            // object["parent"] = parentId;
+            ConflictItem *item = new ConflictItem(func_to_inx[major], func_to_inx[minor], parentId);
+            conflicts_list.push_back(item);
             /*for (Field f : fields) {
                 fieldArr.push_back(fieldToString(f));
             }*/
             //object["conflicts"] = fieldArr;
-            arr.push_back(object);
+            // arr.push_back(object);
         }
     }
-    std::ofstream out("../../../src/common/conflict_pairs.json");
-    out << arr;
+
+    return conflicts_list;
+    // std::ofstream out("../../../src/common/conflict_pairs.json");
+    // out << arr;
 }
 
 void Orchestrator::setup_containers() {

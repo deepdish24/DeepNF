@@ -26,6 +26,7 @@ int main(int argc,char **argv)
 
 	// get this server's bind port
     int bind_port = atoi(argv[1]);
+    printf("Listening on port %s\n", argv[1]);
 
 	sockfd = open_socket();
 
@@ -41,6 +42,7 @@ int main(int argc,char **argv)
             std::cerr << "packet receive error: " << strerror(errno) << std::endl;
             continue;
         }
+        printf("Listening for packets...\n");
 
         packet *p = packet_from_data(pkt_data);
         delete pkt_data;

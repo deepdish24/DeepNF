@@ -16,3 +16,5 @@ ADD . DeepNF
 
 RUN cd DeepNF && rm -rf build && mkdir build && cd build && \
     cmake ../ && make google_protobuf && make
+
+RUN mkdir logs
