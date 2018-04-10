@@ -155,7 +155,7 @@ void setup_nodes(MachineConfigurator conf) {
 	std::vector<RuntimeNode*> nodes = get_internal_nodes(conf);
     std::cout << "Number of Nodes: " << nodes.size() << std::endl;
 
-    int log_port = 5000;
+    int log_port = 12000;
     for (RuntimeNode* node : nodes) {
         std::cout << "curr node id: " << node->get_id() << std::endl;
         std::string func_name = node->get_name();
