@@ -188,7 +188,11 @@ Orchestrator::Orchestrator(std::string filepath, std::string action_file_path) {
 
     /* MACHINE CONFIGURATION */
     std::unordered_map<std::string, Machine*> ip_to_machines;
+
+    // id of runtime node -> runtime node (node_map)
     std::unordered_map<int, RuntimeNode*> idToRuntimeNode = {};
+
+
     std::unordered_map<std::string, int> func_to_inx = {};
 
     //configure each machine
@@ -252,7 +256,20 @@ Orchestrator::Orchestrator(std::string filepath, std::string action_file_path) {
         std::cout << "Number of nodes after serialization: " << newNodes.size() << std::endl;
         ip_to_mc[ips[i]] = serializedConfig;
     }
+
+    //port to node id
+    std::map<int, int> port_to_node_map;
+    for (int i = 0; i < (int) functions.size(); i++) {
+        RuntimeNode *rnode = idToRuntimeNode[i];
+        int port = 8000 + rnode->get_id() + 1;
+        port_to_node_map[port] = rnode->get_id();
+    }
+
+    //std::vector<ConflictItem*> conflicts_list;
+
     write_json_dictionary(func_to_inx);
+
+    //SETUP MERGER
 }
 
 void Orchestrator::round_robin_partitioning(std::vector<std::string> &ips, std::vector<std::string> &functions) {
@@ -447,6 +464,7 @@ void Orchestrator::checkLevelParallelizability(std::set<ServiceGraphNode*> nodes
 void Orchestrator::write_json_dictionary(std::unordered_map<std::string, int> func_to_inx) {
     //std::vector<ConflictPairInfo> conflictPairs = {};
     auto arr = json::array();
+
     for (auto it = pair_to_conflicts.begin(); it != pair_to_conflicts.end(); ++it) {
         std::string major = it->first;
         std::unordered_map<std::string, std::vector<Field>> map = it->second;
@@ -465,6 +483,7 @@ void Orchestrator::write_json_dictionary(std::unordered_map<std::string, int> fu
             object["major"] = func_to_inx[major];
             object["minor"] = func_to_inx[minor];
             object["parent"] = parentId;
+
             /*for (Field f : fields) {
                 fieldArr.push_back(fieldToString(f));
             }*/
