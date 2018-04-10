@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
     std::string action_file_path(argv[2]);
     Orchestrator orca(filepath, action_file_path);
     orca.setup_containers();
-    orca.run_merger();
+//    orca.run_merger();
     
     //std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
     return 0;
