@@ -563,11 +563,16 @@ void Orchestrator::write_graph_format(std::unordered_map<int, RuntimeNode*> idTo
 
         node_obj["id"] = id;
         node_obj["label"] = functions[id];
+        node_obj["group"] = func_to_ip[functions[id]];
         nodes.push_back(node_obj);
         for (int id2 : node->get_neighbors()) {
             auto edge_obj = json::object();
             edge_obj["from"] = id;
             edge_obj["to"] = id2;
+            edge_obj["arrows"] = "to";
+            auto colorObj = json::object();
+            colorObj["inherit"] = "from";
+            edge_obj["color"] = colorObj;
             edges.push_back(edge_obj);
         }
     }
