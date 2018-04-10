@@ -450,6 +450,7 @@ int main(int argc, char *argv[]) {
 	setup_nodes(conf);
 	setup_bridge_ports(conf);
 	make_flow_rules(conf);
+    std::cout << "CONFIGURE FINISHED!!!!" << std::endl;
 	return 0;
 }
 
