@@ -36,7 +36,7 @@ MergerOperator::MergerOperator() {
     packet_map_mutex = PTHREAD_MUTEX_INITIALIZER;
 
     // set up log
-    log.open("log/merger_log.txt", std::ios::out);
+    log.open("log/merger/log.txt", std::ios::out);
     if (!log) std::cerr << "Could not open the file!" << std::endl;
     log_mutex = PTHREAD_MUTEX_INITIALIZER;
 }
@@ -299,11 +299,6 @@ packet* MergerOperator::merge_packet(int pkt_id) {
         exit(-1);
     }
 
-    // remove pkt_id from packet_map
-    pthread_mutex_lock(&packet_map_mutex);
-    packet_map.erase(pkt_id);
-    pthread_mutex_unlock(&packet_map_mutex);
-
     return merged_packet->pkt;
 }
 
@@ -315,6 +310,11 @@ packet* MergerOperator::merge_packet(int pkt_id) {
  */
 void MergerOperator::run_merge_packet(int pkt_id) {
     packet* merged_pkt = this->merge_packet(pkt_id);
+
+    // remove pkt_id from packet_map
+    pthread_mutex_lock(&packet_map_mutex);
+    packet_map.erase(pkt_id);
+    pthread_mutex_unlock(&packet_map_mutex);
 
     printf("\nFinished merging packet\n");
 
@@ -335,6 +335,7 @@ void MergerOperator::run_merge_packet(int pkt_id) {
     pthread_mutex_unlock(&log_mutex);
 
     printf("Sent merged packet for id: %d, printing packet_map:\n\n", pkt_id);
+    merged_pkt->print_info();
     print_packet_map();
 
 }

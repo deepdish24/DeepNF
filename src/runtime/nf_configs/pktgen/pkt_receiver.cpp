@@ -5,11 +5,15 @@
 #include <string>
 #include <iostream>
 #include <signal.h>
-#include<unistd.h>
+#include <unistd.h>
+#include <fstream>
 
+#include "../../log_util.h"
 #include "../../socket_util.h"
 
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-noreturn"
 void int_handler(int sig);
 
 
@@ -24,6 +28,10 @@ int main(int argc,char **argv)
 		return -1;
 	}
 
+    std::ofstream log;
+    log.open("log/receiver/log.txt", std::ios::out);
+    if (!log) std::cerr << "Could not open the file!" << std::endl;
+
 	// get this server's bind port
     int bind_port = atoi(argv[1]);
     printf("Listening on port %s\n", argv[1]);
@@ -35,19 +43,28 @@ int main(int argc,char **argv)
         return -1;
     }
 
+    int count = 0;
+
     while (true) {
+        printf("\nListening for packets...\n");
 
         sockdata *pkt_data = receive_data(sockfd);
         if (pkt_data == NULL || pkt_data->size == 0) { 
             std::cerr << "packet receive error: " << strerror(errno) << std::endl;
             continue;
         }
-        printf("Listening for packets...\n");
+        count++;
 
         packet *p = packet_from_data(pkt_data);
+
+        if (!p->is_null()) {
+            log << p->get_payload() << " ";
+        }
+
         delete pkt_data;
         
         p->print_info();
+        printf("Received %d packets in total\n", count);
     }
 
 
@@ -59,3 +76,5 @@ void int_handler(int sig)
     close(sockfd);
     exit(0);
 }
+
+#pragma clang diagnostic pop

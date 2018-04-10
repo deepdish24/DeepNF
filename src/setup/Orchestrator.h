@@ -64,6 +64,10 @@ class Orchestrator {
 private:
     json userInput;
     json actionTable;
+
+    std::string dest_ip;
+    int dest_port;
+
     std::unordered_map<std::string, ServiceGraphNode*> func_to_nodes = {};
     std::unordered_map<std::string, std::string> ip_to_mc = {};
     std::vector<std::string> ips;
@@ -93,6 +97,7 @@ private:
     void single_node_partitioning(std::vector<std::string> &ips, std::vector<std::string> &functions);
     std::string fieldToString(Field a);
     NF stringToNF(std::string function);
+    void write_graph_format(std::unordered_map<int, RuntimeNode*> idToRuntimeNode, std::vector<std::string> functions);
 
     // Check if the given node is a leaf node
     bool isLeaf(ServiceGraphNode* n);
