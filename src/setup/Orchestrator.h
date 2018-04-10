@@ -100,13 +100,11 @@ private:
     // Returns the root node assoicated with n
     ServiceGraphNode* findRootNode(ServiceGraphNode* n);
 
-
-    void run_merger();
-
     
 public:
     Orchestrator(std::string filepath, std::string action_file_path);
     void setup_containers();
+    void run_merger();
 };
 
 #endif
