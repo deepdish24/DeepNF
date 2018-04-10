@@ -104,10 +104,9 @@ var showMachine1 = function(req, res) {
 var showReceiver = function (req, res){
     var fs = require('fs');
     var content_object = {};
-    var filename = '/home/ubuntu/DeepNF/build/log//log/receiver/log.txt';
+    var filename = '/home/ubuntu/DeepNF/build/log/receiver/log.txt';
     fs.readFile(filename, 'utf8', function(err, contents) {
-        console.log("currently reading file");
-
+        console.log("currently reading file: " + contents);
 
         var contents_array = contents.split('\n');
         var i = 0
