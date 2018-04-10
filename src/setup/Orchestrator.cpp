@@ -262,7 +262,7 @@ Orchestrator::Orchestrator(std::string filepath, std::string action_file_path) {
         }
     }
 
-    write_graph_format(idToRuntimeNode);
+    write_graph_format(idToRuntimeNode, functions);
 
     std::vector<ConflictItem*> conflicts_list = create_conflicts_list(func_to_inx);
 
@@ -551,7 +551,8 @@ void Orchestrator::setup_containers() {
     }
 }
 
-void Orchestrator::write_graph_format(std::unordered_map<int, RuntimeNode*> idToRuntimeNode) {
+void Orchestrator::write_graph_format(std::unordered_map<int, RuntimeNode*> idToRuntimeNode, 
+    std::vector<std::string> functions) {
     std::string output_dir = "../inputs/";
     auto nodes = json::array();
     auto edges = json::array();
@@ -561,7 +562,7 @@ void Orchestrator::write_graph_format(std::unordered_map<int, RuntimeNode*> idTo
         auto node_obj = json::object();
 
         node_obj["id"] = id;
-        node_obj["label"] = node->get_name();
+        node_obj["label"] = functions[id];
         nodes.push_back(node_obj);
         for (int id2 : node->get_neighbors()) {
             auto edge_obj = json::object();
@@ -570,13 +571,14 @@ void Orchestrator::write_graph_format(std::unordered_map<int, RuntimeNode*> idTo
             edges.push_back(edge_obj);
         }
     }
-    
+
     std::ofstream node_out(output_dir + "nodes.txt");
     std::ofstream edge_out(output_dir + "edges.txt");
     node_out << nodes;
     edge_out << edges;
     node_out.close();
     edge_out.close();
+    std::cout << "GRAPH SERIALIZED TO TXT FILE" << std::endl;
 }
 
 // Given a service graph node, determine if it is a root node
