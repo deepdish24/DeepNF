@@ -271,9 +271,16 @@ void make_flow_rules(MachineConfigurator conf) {
     }
 
     //start forwarder here!
-    system("./src/runtime/forwarder/forwarder ../../forwarder.txt &");
 
-    RuntimeNode* pktgenNode = NULL;
+    pid_t childpid = fork();
+
+    if (childpid == -1) {
+        perror("Failed to fork!");
+        exit(-1);
+    } else if (childpid == 0) {
+        system("./src/runtime/forwarder/forwarder ../../forwarder.txt");
+    } else {
+        RuntimeNode* pktgenNode = NULL;
 
     /* Function setup */
     for (RuntimeNode* node : nodes) {
@@ -363,55 +370,9 @@ void make_flow_rules(MachineConfigurator conf) {
     run_docker_command(container_before2, cmdBefore2);
     run_docker_command(container_before, cmdBefore);*/
     run_lst_docker_cmd(pktgen_container_name, pktgenArgs);
-
-    /* ============================================= */
-
-    /* for each node in machine set its outputs properly
-        RULES FOR SETTING output
-            1. if neighbor is within machine -> then set give container ip
-            2. if neighbor is outside machine -> give ip/port of other machine
-            3. if node is leaf point to merger -> give ip/port of merger
-
-        RULES FOR FORWARDER
-            1. Map port from forwarder to ip of container running function */
-
-	/*std::vector<int> source_node_inports;
-	
-	for (RuntimeNode* n : nodes) {
-		
-		if (is_source_node(n, nodes)) { // flow from classifier to this node
-			source_node_inports.push_back(n->inport);
-			// system((add_flow_command + "1,actions=" + std::to_string(n.inport)).c_str());
-		}
-
-		if (n->get_neighbors().size() == 0) { // if node is a sink, flow from this node to merger_old
-			int merger_port = leaf_to_eth[n->get_id()];
-			system((add_flow_command + std::to_string(n->outport) + ",actions=" + std::to_string(merger_port)).c_str());
-		} else { // flow from output port of this node to all its successors ports
-			std::vector<int> neighbors = n->get_neighbors();
-			std::string outport_ports = "";
-			for (int j = 0; j < (int) neighbors.size(); j++) {
-				RuntimeNode* neighbor = conf.get_node_with_id(neighbors[j]);
-				outport_ports += std::to_string(neighbor->inport);
-				if (j < (int)neighbors.size() - 1) {
-					outport_ports += ",";
-				}
-			}
-			system((add_flow_command + std::to_string(n->outport) + ",actions=" + outport_ports).c_str());
-		}
-	}
-	std::string outport_ports = "";
-	int i = 0;
-	for (int p : source_node_inports) {
-		if (i == (int) source_node_inports.size() - 1) {
-			outport_ports += std::to_string(p);
-		} else {
-			outport_ports += std::to_string(p) + ",";
-		}
-		i++;
-	}
-
-	//system((add_flow_command + "1,actions=" + outport_ports).c_str());*/
+    int status;
+    wait(&status);
+    }
 }
 
 void reset(MachineConfigurator conf) {
