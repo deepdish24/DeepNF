@@ -17,6 +17,12 @@ set(HEADERS
         )
 
 add_library(merger_lib ${SOURCE_FILES} ${HEADERS})
+target_link_libraries(merger_lib common)
+target_link_libraries(merger_lib runtime)
+
+add_dependencies(merger_lib runtime)
+add_dependencies(merger_lib common)
+
 add_executable(merger ${SOURCE_FILES} ${HEADERS})
 
 target_link_libraries(merger common)
