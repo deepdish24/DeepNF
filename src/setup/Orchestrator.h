@@ -15,6 +15,7 @@
 #include <tuple>
 #include "ServiceGraphNode.cpp"
 #include "../common/NF.h"
+#include "../runtime/merger/MergerOperator.h"
 
 using json = nlohmann::json;
 
@@ -26,13 +27,13 @@ enum Action {
     DROP = 5
 };
 
-enum Field {
-    SIP,
-    DIP,
-    SPORT,
-    DPORT,
-    PAYLOAD
-};
+// enum Field {
+//     SIP,
+//     DIP,
+//     SPORT,
+//     DPORT,
+//     PAYLOAD
+// };
 
 struct ActionPair {
     Action action;
@@ -59,6 +60,7 @@ struct ConflictPairInfo {
 };
 
 class Orchestrator {
+
 private:
     json userInput;
     json actionTable;
@@ -66,6 +68,8 @@ private:
     std::unordered_map<std::string, std::string> ip_to_mc = {};
     std::vector<std::string> ips;
     std::vector<int> ports;
+
+    MergerOperator *merger_operator;
 
     // map if pair of functions (a, b) -> conflicts between a and b
     std::unordered_map<std::string, std::unordered_map<std::string, std::vector<Field>>> pair_to_conflicts = {};
@@ -83,7 +87,8 @@ private:
     void parseOrderDependencies(std::vector<std::vector<std::string>> dependencies);
     void checkLevelParallelizability(std::set<ServiceGraphNode*> nodes);
     void findAllLeaves(ServiceGraphNode* root, std::set<ServiceGraphNode*> &leaves);
-    void write_json_dictionary(std::unordered_map<std::string, int> func_to_inx);
+    std::vector<ConflictItem*> create_conflicts_list(std::unordered_map<std::string, int> func_to_inx);
+    // void write_json_dictionary(std::unordered_map<std::string, int> func_to_inx);
     void round_robin_partitioning(std::vector<std::string> &ips, std::vector<std::string> &functions);
     void single_node_partitioning(std::vector<std::string> &ips, std::vector<std::string> &functions);
     std::string fieldToString(Field a);
@@ -94,6 +99,9 @@ private:
 
     // Returns the root node assoicated with n
     ServiceGraphNode* findRootNode(ServiceGraphNode* n);
+
+
+    void run_merger();
 
     
 public:
