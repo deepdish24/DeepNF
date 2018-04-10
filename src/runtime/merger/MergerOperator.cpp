@@ -299,11 +299,6 @@ packet* MergerOperator::merge_packet(int pkt_id) {
         exit(-1);
     }
 
-    // remove pkt_id from packet_map
-    pthread_mutex_lock(&packet_map_mutex);
-    packet_map.erase(pkt_id);
-    pthread_mutex_unlock(&packet_map_mutex);
-
     return merged_packet->pkt;
 }
 
@@ -315,6 +310,11 @@ packet* MergerOperator::merge_packet(int pkt_id) {
  */
 void MergerOperator::run_merge_packet(int pkt_id) {
     packet* merged_pkt = this->merge_packet(pkt_id);
+
+    // remove pkt_id from packet_map
+    pthread_mutex_lock(&packet_map_mutex);
+    packet_map.erase(pkt_id);
+    pthread_mutex_unlock(&packet_map_mutex);
 
     printf("\nFinished merging packet\n");
 
