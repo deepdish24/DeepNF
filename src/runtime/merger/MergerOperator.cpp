@@ -40,6 +40,21 @@ MergerOperator::MergerOperator() {
     log_mutex = PTHREAD_MUTEX_INITIALIZER;
 }
 
+MergerOperator::MergerOperator(MergerInfo* mi) {
+    this->action_table = new ActionTable();
+    this->merger_info = mi;
+    this->num_nodes = (int) this->merger_info->get_port_to_node_map().size();
+    std::vector<ConflictItem*> conflicts_list = this->merger_info->get_conflicts_list();
+
+    // set up mutexes
+    packet_map_mutex = PTHREAD_MUTEX_INITIALIZER;
+
+    // set up log
+    log.open("log/merger_log.txt", std::ios::out);
+    if (!log) std::cerr << "Could not open the file!" << std::endl;
+    log_mutex = PTHREAD_MUTEX_INITIALIZER;
+}
+
 
 typedef struct merge_thread_params {
     MergerOperator* inst; // the MergerOperator instance to operate on
