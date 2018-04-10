@@ -36,7 +36,7 @@ MergerOperator::MergerOperator() {
     packet_map_mutex = PTHREAD_MUTEX_INITIALIZER;
 
     // set up log
-    log.open("log/merger_log.txt", std::ios::out);
+    log.open("log/merger/log.txt", std::ios::out);
     if (!log) std::cerr << "Could not open the file!" << std::endl;
     log_mutex = PTHREAD_MUTEX_INITIALIZER;
 }
