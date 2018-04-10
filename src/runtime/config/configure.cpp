@@ -309,7 +309,7 @@ void make_flow_rules(MachineConfigurator conf) {
             }
             case dnf_firewall:
             {
-                cmdArguments += "./fw " + std::to_string(function_port);
+                cmdArguments += "./fw " + std::to_string(function_port) + " 1";
                 break;
             }
             case dnf_loadbalancer:
