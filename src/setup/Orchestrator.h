@@ -64,6 +64,10 @@ class Orchestrator {
 private:
     json userInput;
     json actionTable;
+
+    std::string dest_ip;
+    int dest_port;
+
     std::unordered_map<std::string, ServiceGraphNode*> func_to_nodes = {};
     std::unordered_map<std::string, std::string> ip_to_mc = {};
     std::vector<std::string> ips;
