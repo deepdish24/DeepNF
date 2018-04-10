@@ -97,6 +97,7 @@ private:
     void single_node_partitioning(std::vector<std::string> &ips, std::vector<std::string> &functions);
     std::string fieldToString(Field a);
     NF stringToNF(std::string function);
+    void write_graph_format(std::unordered_map<int, RuntimeNode*> idToRuntimeNode, std::vector<std::string> functions);
 
     // Check if the given node is a leaf node
     bool isLeaf(ServiceGraphNode* n);
