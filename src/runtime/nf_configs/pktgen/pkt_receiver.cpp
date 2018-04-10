@@ -10,6 +10,8 @@
 #include "../../socket_util.h"
 
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-noreturn"
 void int_handler(int sig);
 
 
@@ -35,19 +37,23 @@ int main(int argc,char **argv)
         return -1;
     }
 
+    int count = 0;
+
     while (true) {
+        printf("\nListening for packets...\n");
 
         sockdata *pkt_data = receive_data(sockfd);
         if (pkt_data == NULL || pkt_data->size == 0) { 
             std::cerr << "packet receive error: " << strerror(errno) << std::endl;
             continue;
         }
-        printf("Listening for packets...\n");
+        count++;
 
         packet *p = packet_from_data(pkt_data);
         delete pkt_data;
         
         p->print_info();
+        printf("Received %d packets in total\n", count);
     }
 
 
@@ -59,3 +65,5 @@ void int_handler(int sig)
     close(sockfd);
     exit(0);
 }
+
+#pragma clang diagnostic pop
