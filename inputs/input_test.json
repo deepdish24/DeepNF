@@ -1,8 +1,8 @@
 {
     "ips": ["18.217.175.10"],
     "ports": [10000],
-    "functions": ["dnf_firewall", "dnf_loadbalancer"],
-    "positional": [],
-    "orderDependencies": [["dnf_loadbalancer", "dnf_firewall"]],
+    "functions": ["dnf_firewall", "pktgen", "proxy"],
+    "positional": [["pktgen", "first"]],
+    "orderDependencies": [["proxy", "dnf_firewall"]],
     "priorities": []
 }
