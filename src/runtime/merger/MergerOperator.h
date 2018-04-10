@@ -44,6 +44,7 @@ public:
     } PACKET_INFO;
 
     MergerOperator();
+    MergerOperator(MergerInfo* mi);
 
     /**
      * Setup MergerOperator to start listening and merging packets
