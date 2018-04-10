@@ -565,7 +565,21 @@ void Orchestrator::write_graph_format(std::unordered_map<int, RuntimeNode*> idTo
         node_obj["label"] = functions[id];
         node_obj["group"] = func_to_ip[functions[id]];
         nodes.push_back(node_obj);
-        for (int id2 : node->get_neighbors()) {
+
+        std::vector<int> neighbors = node->get_neighbors();
+
+        if ((int) neighbors.size() == 0) {
+            auto edge_obj = json::object();
+            edge_obj["from"] = id;
+            edge_obj["to"] = (int) functions.size();
+            edge_obj["arrows"] = "to";
+            auto colorObj = json::object();
+            colorObj["inherit"] = "from";
+            edge_obj["color"] = colorObj;
+            edges.push_back(edge_obj);
+        }
+
+        for (int id2 : neighbors) {
             auto edge_obj = json::object();
             edge_obj["from"] = id;
             edge_obj["to"] = id2;
@@ -576,6 +590,28 @@ void Orchestrator::write_graph_format(std::unordered_map<int, RuntimeNode*> idTo
             edges.push_back(edge_obj);
         }
     }
+
+    auto node_obj_merger = json::object();
+    node_obj_merger["id"] = (int) functions.size();
+    node_obj_merger["label"] = "merger";
+    node_obj_merger["group"] = "13.58.167.87";
+
+    auto node_obj_receiver = json::object();
+    node_obj_receiver["id"] = (int) functions.size() + 1;
+    node_obj_receiver["label"] = "receiver";
+    node_obj_receiver["group"] = dest_ip;
+
+    auto edge_obj_merger = json::object();
+    edge_obj_merger["from"] = (int) functions.size();
+    edge_obj_merger["to"] = (int) functions.size() + 1;
+    edge_obj_merger["arrows"] = "to";
+    auto colorObj = json::object();
+    colorObj["inherit"] = "from";
+    edge_obj_merger["color"] = colorObj;
+
+    nodes.push_back(node_obj_merger);
+    nodes.push_back(node_obj_receiver);
+    edges.push_back(edge_obj_merger);
 
     std::ofstream node_out(output_dir + "nodes.txt");
     std::ofstream edge_out(output_dir + "edges.txt");
