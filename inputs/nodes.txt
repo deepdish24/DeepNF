@@ -1,0 +1,1 @@
+[{"id":4,"label":"compressor"},{"id":0,"label":"dnf_firewall"},{"id":1,"label":"pktgen"},{"id":2,"label":"dnf_loadbalancer"},{"id":3,"label":"proxy"}]
