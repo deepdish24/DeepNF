@@ -29,6 +29,8 @@ Orchestrator::Orchestrator(std::string filepath, std::string action_file_path) {
     std::vector<std::string> functions = userInput["functions"];
     std::vector<std::string> ips_tmp = userInput["ips"];
     std::vector<int> ports_tmp = userInput["ports"];
+    dest_ip = userInput["receiver_ip"];
+    dest_port = userInput["receiver_port"];
     ips = ips_tmp;
     ports = ports_tmp;
 
@@ -267,7 +269,7 @@ Orchestrator::Orchestrator(std::string filepath, std::string action_file_path) {
     for (auto it = idToRuntimeNode.begin(); it != idToRuntimeNode.end(); ++it) {
         node_map.insert(std::make_pair(it->first, it->second));
     }
-    MergerInfo *merger_info = new MergerInfo(port_to_node_map, conflicts_list, node_map, "127.0.0.1", 10000);
+    MergerInfo *merger_info = new MergerInfo(port_to_node_map, conflicts_list, node_map, dest_ip, dest_port);
 
     this->merger_operator = new MergerOperator(merger_info);
 }

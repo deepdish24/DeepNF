@@ -124,7 +124,8 @@ void build_docker_image(std::string image_name, std::string config_dir) {
 * Function starts docker container
 */
 void start_docker_container(std::string container_name, std::string image_name) {
-    system(("docker run -d -t -i --name " + container_name + " " + image_name + ":latest /bin/bash").c_str());
+    //system(("docker run -d -t -i --name " + container_name + " -v /home/ubuntu/DeepNF/build/" + container_name + "/log:/log -p 5000:80 " + image_name + " /bin/bash").c_str());
+    system(("docker run -d -t -i --name " + container_name + " " + image_name + " /bin/bash").c_str());
 }
 
 /**
@@ -400,6 +401,7 @@ void reset(MachineConfigurator conf) {
 
 	// delete the bridge
 	system("sudo \"PATH=$PATH\" /home/ubuntu/ovs/utilities/ovs-vsctl del-br ovs-br");
+    system("./../src/runtime/config/remveth");
 }
 
 /**
