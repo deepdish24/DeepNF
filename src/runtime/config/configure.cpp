@@ -123,9 +123,9 @@ void build_docker_image(std::string image_name, std::string config_dir) {
 /**
 * Function starts docker container
 */
-void start_docker_container(std::string container_name, std::string image_name) {
-    //system(("docker run -d -t -i --name " + container_name + " -v /home/ubuntu/DeepNF/build/" + container_name + "/log:/log -p 5000:80 " + image_name + " /bin/bash").c_str());
-    system(("docker run -d -t -i --name " + container_name + " " + image_name + " /bin/bash").c_str());
+void start_docker_container(std::string container_name, std::string image_name, int log_port) {
+    system(("docker run -d -t -i --name " + container_name + " -v /home/ubuntu/DeepNF/build/" + container_name + "/log:/log -p " + std::to_string(log_port) + ":8080 " + image_name + " /bin/bash").c_str());
+    // system(("docker run -d -t -i --name " + container_name + " " + image_name + " /bin/bash").c_str());
 }
 
 /**
@@ -154,6 +154,7 @@ void setup_nodes(MachineConfigurator conf) {
 	std::vector<RuntimeNode*> nodes = get_internal_nodes(conf);
     std::cout << "Number of Nodes: " << nodes.size() << std::endl;
 
+    int log_port = 5000;
     for (RuntimeNode* node : nodes) {
         std::cout << "curr node id: " << node->get_id() << std::endl;
         std::string func_name = node->get_name();
@@ -166,7 +167,7 @@ void setup_nodes(MachineConfigurator conf) {
         make_config_dir(func_config_dir);
         copy_dockerfile(path_to_dockerfile, func_config_dir, to_root, path_to_dependencies);
         build_docker_image(image_name, func_config_dir);
-        start_docker_container(container_name, image_name);
+        start_docker_container(container_name, image_name, ++log_port);
     }
 }
 
@@ -352,13 +353,14 @@ void make_flow_rules(MachineConfigurator conf) {
     }
 
     //Set up pktgen container
-    std::string pktgen_container_name = conf.get_config_dir(pktgenNode->get_id());
-    std::string pktgenArgs = "./sender -n 10 ";
-    for (int neighbor : pktgenNode->get_neighbors()) {
-        std::string neighbor_ip = nodeid_to_network[neighbor];
-        std::string neighbor_port = std::to_string(nodeid_to_port[neighbor]);
-        pktgenArgs += " " + neighbor_ip + ":" + neighbor_port;
-    }
+    if (pktgenNode != NULL) {
+        std::string pktgen_container_name = conf.get_config_dir(pktgenNode->get_id());
+        std::string pktgenArgs = "./sender -n 10 ";
+        for (int neighbor : pktgenNode->get_neighbors()) {
+            std::string neighbor_ip = nodeid_to_network[neighbor];
+            std::string neighbor_port = std::to_string(nodeid_to_port[neighbor]);
+            pktgenArgs += " " + neighbor_ip + ":" + neighbor_port;
+        }
 
     /*std::string container_before2 = "c0";
     std::string cmdBefore2 = "./fw 8000 " + merger_ip + ":8001";
@@ -372,8 +374,10 @@ void make_flow_rules(MachineConfigurator conf) {
     //std::cout << "COMMADN FOR PKTGEN: " << pktgenArgs << std::endl;
     run_docker_command(container_before2, cmdBefore2);
     run_docker_command(container_before, cmdBefore);*/
-    run_lst_docker_cmd(pktgen_container_name, pktgenArgs);
-    std::cout << "=======================================\n";
+        run_lst_docker_cmd(pktgen_container_name, pktgenArgs);
+        std::cout << "=======================================\n";
+    }
+    
     int status = 0;
     wait(NULL);
     }
@@ -450,6 +454,7 @@ int main(int argc, char *argv[]) {
 	setup_nodes(conf);
 	setup_bridge_ports(conf);
 	make_flow_rules(conf);
+    std::cout << "CONFIGURE FINISHED!!!!" << std::endl;
 	return 0;
 }
 
