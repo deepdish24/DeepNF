@@ -10,8 +10,6 @@
 #include <vector>
 #include <signal.h>
 #include<unistd.h>
-// #include <sys/socket.h>
-
 #include "../../address_util.h"
 #include "../../socket_util.h"
 #include "../../log_util.h"

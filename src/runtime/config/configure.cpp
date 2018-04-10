@@ -6,6 +6,8 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 #include <unordered_map>
 #include "../../setup/json.hpp"
 
@@ -271,7 +273,6 @@ void make_flow_rules(MachineConfigurator conf) {
     }
 
     //start forwarder here!
-
     pid_t childpid = fork();
 
     if (childpid == -1) {
@@ -372,8 +373,8 @@ void make_flow_rules(MachineConfigurator conf) {
     run_docker_command(container_before, cmdBefore);*/
     run_lst_docker_cmd(pktgen_container_name, pktgenArgs);
     std::cout << "=======================================\n";
-    int status;
-    wait(&status);
+    int status = 0;
+    wait(NULL);
     }
 }
 

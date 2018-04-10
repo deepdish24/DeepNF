@@ -7,7 +7,7 @@ RUN apt-get update -y && \
     apt-get install -y g++ libpcap-dev && \
     mkdir log
 
-COPY dnf_firewall.cpp .
+COPY proxy.cpp .
 COPY packet.h .
 COPY packet.cpp .
 COPY socket_util.h .
@@ -22,4 +22,4 @@ RUN g++ -std=c++11 -c address.h address_util.h address_util.cpp && \
 	g++ -std=c++11 -c packet.h packet.cpp && \
     g++ -std=c++11 -c packet.cpp log_util.h log_util.cpp && \
 	g++ -std=c++11 -c packet.cpp socket_util.h socket_util.cpp && \
-	g++ -std=c++11 packet.cpp address_util.cpp socket_util.cpp log_util.cpp dnf_firewall.cpp -o fw
+	g++ -std=c++11 packet.cpp address_util.cpp socket_util.cpp log_util.cpp proxy.cpp -o proxy
