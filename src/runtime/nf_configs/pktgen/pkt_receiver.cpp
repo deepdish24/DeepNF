@@ -26,7 +26,7 @@ int main(int argc,char **argv)
 
 	// get this server's bind port
     int bind_port = atoi(argv[1]);
-    printf("Listening on port %d\n", argv[1]);
+    printf("Listening on port %s\n", argv[1]);
 
 	sockfd = open_socket();
 
