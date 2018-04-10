@@ -240,9 +240,12 @@ packet* MergerOperator::merge_packet(int pkt_id) {
         was_changed = false;
         for (auto it = conflicts_list.begin(); it != conflicts_list.end(); ++it) {
             ConflictItem *ci = *it;
+            printf("Checking conflict between %d and %d\n", ci->get_major(), ci->get_minor());
 
             // begin merging if both packets of the conflict conflict are available
             if (pkt_info_map->count(ci->get_major()) != 0 && pkt_info_map->count(ci->get_minor()) != 0) {
+                printf("Both members of conflict available, merging now\n");
+
                 PACKET_INFO *new_packet = resolve_packet_conflict(
                         pkt_info_map->at(ci->get_major()), pkt_info_map->at(ci->get_minor()), ci);
 
@@ -342,7 +345,6 @@ std::map<int, MergerOperator::PACKET_INFO*>* MergerOperator::packet_map_to_packe
     for (auto it = packet_map->begin(); it != packet_map->end(); ++it) {
         int node_id = it->first;
         packet* pkt = it->second;
-        printf("Iterating through packet_map_to_packet_info_map: id: %d, pkt: %s\n", node_id, pkt->get_payload().c_str());
 
         ret_map->insert(std::make_pair(node_id, packet_to_packet_info(pkt, node_id)));
     }
