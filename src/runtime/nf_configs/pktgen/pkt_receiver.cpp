@@ -58,7 +58,8 @@ int main(int argc,char **argv)
         packet *p = packet_from_data(pkt_data);
 
         if (!p->is_null()) {
-            log << p->get_payload() << " ";
+            log << p->get_pkt_id() << "," << p->get_src_ip() << "," << p->get_src_port() << ","
+                << p->get_dest_ip() << "," << p->get_dest_port() << "," << p->get_payload() << std::endl;
         }
 
         delete pkt_data;
