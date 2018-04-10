@@ -344,8 +344,9 @@ void make_flow_rules(MachineConfigurator conf) {
             std::string neighbor_port = std::to_string(nodeid_to_port[neighbor]);
             cmdArguments += " " + neighbor_ip + ":" + neighbor_port;
         }
-        //std::cout << "COMMAND RUN: " << cmdArguments << " (on container with ip: " << node_ip << ")" << std::endl;
+        std::cout << "COMMAND RUN: " << cmdArguments << " (on container with ip: " << node_ip << ")" << std::endl;
         run_docker_command(container_name, cmdArguments);
+        std::cout << "=============================\n";
     }
 
     //Set up pktgen container
@@ -370,6 +371,7 @@ void make_flow_rules(MachineConfigurator conf) {
     run_docker_command(container_before2, cmdBefore2);
     run_docker_command(container_before, cmdBefore);*/
     run_lst_docker_cmd(pktgen_container_name, pktgenArgs);
+    std::cout << "=======================================\n";
     int status;
     wait(&status);
     }
@@ -445,11 +447,6 @@ int main(int argc, char *argv[]) {
 	setup_nodes(conf);
 	setup_bridge_ports(conf);
 	make_flow_rules(conf);
-	// making a dummy service graph
-    /*std::cout << "graph here!" << std::endl;
-	setup_nodes(conf);
-	setup_bridge_ports(conf);
-	make_flow_rules(conf);*/
 	return 0;
 }
 
