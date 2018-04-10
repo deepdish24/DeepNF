@@ -400,6 +400,7 @@ void reset(MachineConfigurator conf) {
 
 	// delete the bridge
 	system("sudo \"PATH=$PATH\" /home/ubuntu/ovs/utilities/ovs-vsctl del-br ovs-br");
+    system("./../src/runtime/config/remveth");
 }
 
 /**
