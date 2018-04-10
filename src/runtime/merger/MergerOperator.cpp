@@ -248,6 +248,13 @@ packet* MergerOperator::merge_packet(int pkt_id) {
 
                 PACKET_INFO *new_packet = resolve_packet_conflict(
                         pkt_info_map->at(ci->get_major()), pkt_info_map->at(ci->get_minor()), ci);
+                printf("Finished merging!\n");
+
+                // if merged packet is null, return nullified packet
+                if (new_packet->pkt->is_null()) {
+                    printf ("Packet is null, returning null packet\n");
+                    return new_packet->pkt;
+                }
 
                 // add merged packet's NF's written fields
                 if (this->merger_info->get_node_map().count(new_packet->node_id) > 0) {
