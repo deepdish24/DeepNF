@@ -335,6 +335,7 @@ void MergerOperator::run_merge_packet(int pkt_id) {
     pthread_mutex_unlock(&log_mutex);
 
     printf("Sent merged packet for id: %d, printing packet_map:\n\n", pkt_id);
+    merged_pkt->print_info();
     print_packet_map();
 
 }
