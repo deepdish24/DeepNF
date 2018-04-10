@@ -374,12 +374,13 @@ void make_flow_rules(MachineConfigurator conf) {
     //std::cout << "COMMADN FOR PKTGEN: " << pktgenArgs << std::endl;
     run_docker_command(container_before2, cmdBefore2);
     run_docker_command(container_before, cmdBefore);*/
+        sleep(30 * 1000000);
         run_lst_docker_cmd(pktgen_container_name, pktgenArgs);
         std::cout << "=======================================\n";
     }
     
-    int status = 0;
-    wait(NULL);
+        int status = 0;
+        wait(NULL);
     }
 }
 
