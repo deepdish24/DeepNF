@@ -21,7 +21,7 @@ function readFiles(dirname, onFileContent, onError) {
     if (folders.length == 0) {
     	onFileContent(undefined);
     }
-    //console.log(folders);
+    console.log(folders);
     // Read all files in the directory
     folders.forEach(function(folder) {
       //console.log(folder);
@@ -89,6 +89,7 @@ function readReceiverFile(filename, onFileContent, onError) {
 
 // Send machine 1's log data to the webpage
 var showMachine1 = function(req, res) {
+    console.log("running showMachine1\n");
 	var dirname = '/home/ubuntu/DeepNF/build/log/';
     // var dirname = '/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/webserver/log/machine1/';
 	var data = {};
