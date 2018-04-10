@@ -9,11 +9,13 @@
 #include <errno.h>
 #include <vector>
 #include <signal.h>
-#include<unistd.h>
-// #include <sys/socket.h>
+#include <iostream>
+#include <fstream>
+#include <sys/time.h>
 
 #include "../../address_util.h"
 #include "../../socket_util.h"
+#include "../../log_util.h"
 
 
 
@@ -26,7 +28,7 @@ int sockfd;
 std::vector<address*> addresses;
 
 int main(int argc,char **argv)
-{   
+{
     signal(SIGINT, int_handler);
 
     if (argc < 3) {
@@ -36,8 +38,14 @@ int main(int argc,char **argv)
 
     // get this server's bind port
     int bind_port = atoi(argv[1]);
+    int should_drop_int = std::stoi(argv[2]);
+    if (should_drop_int != 0 && should_drop_int != 1) {
+        std::cerr << "Invalid should_drop argument \n";
+        return -1;
+    }
+    bool should_drop = should_drop_int == 1;
    
-    for (int i = 2; i < argc; i++) {
+    for (int i = 3; i < argc; i++) {
         address *addr = address_from_string(argv[i]);
         if (addr != NULL) {
             addresses.push_back(addr);
@@ -49,6 +57,11 @@ int main(int argc,char **argv)
         return -1; 
     }
 
+    // setup log for this NF
+    std::ofstream log;
+    log.open("log/log.txt", std::ios::out);
+    if (!log) std::cerr << "Could not open the file!" << std::endl;
+
     // create socket
     int sockfd = open_socket();
 
@@ -57,23 +70,41 @@ int main(int argc,char **argv)
         std::cerr << "bind failure: " << strerror(errno) << std::endl;
         return -1;
     }
-    
-    
-    while (true) {
+    printf("Firewall listening for packets on port: %d\n", bind_port);
 
+    while (true) {
         sockdata *pkt_data = receive_data(sockfd);
-        if (pkt_data == NULL || pkt_data->size == 0) { 
+        if (pkt_data == NULL || pkt_data->size == 0) {
             std::cerr << "packet receive error: " << strerror(errno) << std::endl;
             continue;
         }
-        
-        // TODO: process packet
+        packet *p = packet_from_data(pkt_data);
+
+
+            // process packet
+            printf("\n-------------------------------------\n");
+            printf("\nReceived packet:\n");
+            p->print_info();
+
+            if (should_drop) {
+                // drops input packet
+                p->nullify();
+
+                log_util::log_nf(log, p, "dnf_firewall", "dropped packet");
+            } else {
+                log_util::log_nf(log, p, "dnf_firewall", "didn't drop packet");
+            }
+
+            printf("\nSending modified packet:\n");
+            p->print_info();
 
         // forward packet
         for (address *addr : addresses) {
-            send_data(pkt_data->buffer, pkt_data->size, sockfd, addr);
+            if (send_packet(p, sockfd, addr) < 0) {
+                fprintf(stderr, "Send packet error: %s", strerror(errno));
+                exit(-1);
+            }
         }
-        
     }
 
     return 0;

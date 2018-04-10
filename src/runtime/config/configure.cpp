@@ -313,13 +313,13 @@ void make_flow_rules(MachineConfigurator conf) {
             case dnf_firewall:
             {
                 function_name = "dnf_firewall";
-                cmdArguments += "./fw " + std::to_string(function_port) + " 1";
+                cmdArguments += "./fw " + std::to_string(function_port) + " 0";
                 break;
             }
             case dnf_loadbalancer:
             {
                 function_name = "dnf_loadbalancer";
-                cmdArguments += "./fw " + std::to_string(function_port);
+                cmdArguments += "./fw " + std::to_string(function_port) + " 0";
                 break;
             }
             case proxy: 
