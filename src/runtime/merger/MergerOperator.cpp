@@ -94,7 +94,7 @@ void MergerOperator::run_node_thread(int port, int node_id) {
         fprintf(stderr, "Cannot open socket: %s", strerror(errno));
         exit(-1);
     }
-    printf("opened socket on port: %d\n", port);
+    printf("opened socket on port %d for node_id %d\n", port, node_id);
 
     // binds socket with given fd to given port */
     bind_socket(sockfd, port);
