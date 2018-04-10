@@ -399,7 +399,9 @@ void reset(MachineConfigurator conf) {
 
     std::cout << "deleting config directories" << std::endl;
     std::string remove_config_folders = "rm -rf ../../*_config ../../forwarder.txt";
+    std::string remove_log_dirs = "sudo rm -rf log/*";
     system(remove_config_folders.c_str());
+    system(remove_log_dirs.c_str());
 	// clean up merger_old and classifier
 	/*system((del_ports_cmd + "classifier").c_str());
 	system((del_ports_cmd + "merger_old").c_str());
