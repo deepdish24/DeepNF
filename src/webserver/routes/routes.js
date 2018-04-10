@@ -89,8 +89,8 @@ function readReceiverFile(filename, onFileContent, onError) {
 
 // Send machine 1's log data to the webpage
 var showMachine1 = function(req, res) {
-	// var dirname = '/home/ubuntu/DeepNF/build/log/';//'/home/nets212/DeepNF/src/webserver/log/machine1/';////' // directory path
-    var dirname = '/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/webserver/log/machine1/';
+	var dirname = '/home/ubuntu/DeepNF/build/log/';
+    // var dirname = '/Users/jon-andmir/Documents/SCHOOL/2018aSpring/CIS401/DeepNF/src/webserver/log/machine1/';
 	var data = {};
 	readFiles(dirname, function(callback) {
   	  data = callback;
