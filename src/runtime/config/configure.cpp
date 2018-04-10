@@ -375,7 +375,7 @@ void make_flow_rules(MachineConfigurator conf) {
     run_docker_command(container_before2, cmdBefore2);
     run_docker_command(container_before, cmdBefore);*/
         std::cout << "proceeding to wait for pktgen to startup" << std::endl;
-        sleep(30 * 1000000);
+        sleep(10);
         std::cout << "pktgen is woke" << std::endl;
         run_lst_docker_cmd(pktgen_container_name, pktgenArgs);
         std::cout << "=======================================\n";
