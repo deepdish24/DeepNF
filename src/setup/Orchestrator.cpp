@@ -173,12 +173,6 @@ Orchestrator::Orchestrator(std::string filepath, std::string action_file_path) {
                 last->add_parent(node);
             }
         }
-
-        // if no middle nodes exit, then we connect first directly to last
-        /*if (rootNodes.size() == 0 && priorityNodes.size() == 0) {
-            first->add_neighbor(last);
-            last->add_parent(first);
-        }*/
     }
 
     /* NODE PARTITIONING */
@@ -212,10 +206,6 @@ Orchestrator::Orchestrator(std::string filepath, std::string action_file_path) {
         Machine *machine = ip_to_machines[func_to_ip[functions[i]]];
         machine->add_node_id(rnode->get_id());
     }
-
-    /*Machine* m = ip_to_machines.begin()->second;
-    std::vector<int> ids = m->get_node_ids();
-    std::cout << "test: " << ids.size() << std::endl;*/
 
     for (int i = 0; i < (int) functions.size(); i++) {
         ServiceGraphNode *node = func_to_nodes[functions[i]];
