@@ -79,7 +79,7 @@ int main(int argc, char *argv[]) {
 
     // open log
     log_mutex = PTHREAD_MUTEX_INITIALIZER;
-    log.open("log/forwarder_log.txt", std::ios::out);
+    log.open("log/forwarder/log.txt", std::ios::out);
     if (!log) std::cerr << "Could not open the file!" << std::endl;
 
     // count number of containers to spawn threads for
