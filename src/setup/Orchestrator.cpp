@@ -16,6 +16,7 @@
 #include "../common/RuntimeNode.h"
 #include "../common/MachineConfigurator.h"
 #include "../common/ServiceGraphUtil.h"
+#include "../common/Field.h"
 #include "../runtime/merger/ConflictItem.h"
 
 Orchestrator::Orchestrator(std::string filepath, std::string action_file_path) {
