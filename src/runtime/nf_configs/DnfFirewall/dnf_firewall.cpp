@@ -38,8 +38,14 @@ int main(int argc,char **argv)
 
     // get this server's bind port
     int bind_port = atoi(argv[1]);
+    int should_drop_int = std::stoi(argv[2]);
+    if (should_drop_int != 0 && should_drop_int != 1) {
+        std::cerr << "Invalid should_drop argument \n";
+        return -1;
+    }
+    bool should_drop = should_drop_int == 1;
    
-    for (int i = 2; i < argc; i++) {
+    for (int i = 3; i < argc; i++) {
         address *addr = address_from_string(argv[i]);
         if (addr != NULL) {
             addresses.push_back(addr);
@@ -68,22 +74,29 @@ int main(int argc,char **argv)
 
     while (true) {
         sockdata *pkt_data = receive_data(sockfd);
-        if (pkt_data == NULL || pkt_data->size == 0) { 
+        if (pkt_data == NULL || pkt_data->size == 0) {
             std::cerr << "packet receive error: " << strerror(errno) << std::endl;
             continue;
         }
-        packet* p = packet_from_data(pkt_data);
+        packet *p = packet_from_data(pkt_data);
 
-        // process packet
-        printf("\n-------------------------------------\n");
-        printf("\nReceived packet:\n");
-        p->print_info();
 
-        // drops input packet
-        p->nullify();
+            // process packet
+            printf("\n-------------------------------------\n");
+            printf("\nReceived packet:\n");
+            p->print_info();
 
-        printf("\nSending modified packet:\n");
-        p->print_info();
+            if (should_drop) {
+                // drops input packet
+                p->nullify();
+
+                log_util::log_nf(log, p, "dnf_firewall", "dropped packet");
+            } else {
+                log_util::log_nf(log, p, "dnf_firewall", "didn't drop packet");
+            }
+
+            printf("\nSending modified packet:\n");
+            p->print_info();
 
         // forward packet
         for (address *addr : addresses) {
@@ -92,8 +105,6 @@ int main(int argc,char **argv)
                 exit(-1);
             }
         }
-
-        log_util::log_nf(log, p, "dnf_firewall", "dropped packet");
     }
 
     return 0;
