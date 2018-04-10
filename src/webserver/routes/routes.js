@@ -201,7 +201,7 @@ function readGraph(dirname, onFileContent, onError) {
 }
 
 var showVisualization = function (req, res){
-  var dirname = '/home/ubuntu/DeepNF/inputs'; // directory path
+  var dirname = '/home/ubuntu/DeepNF/inputs/'; // directory path
   var data = {};
   readGraph(dirname, function(callback) {
       data = callback;
