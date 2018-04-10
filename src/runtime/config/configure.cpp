@@ -124,6 +124,7 @@ void build_docker_image(std::string image_name, std::string config_dir) {
 * Function starts docker container
 */
 void start_docker_container(std::string container_name, std::string image_name, int log_port) {
+    std::cout "CONTAINER START COMMAND: " << ("docker run -d -t -i --name " + container_name + " -v /home/ubuntu/DeepNF/build/log/" + container_name + ":/log -p " + std::to_string(log_port) + ":8080 " + image_name + " /bin/bash");
     system(("docker run -d -t -i --name " + container_name + " -v /home/ubuntu/DeepNF/build/log/" + container_name + ":/log -p " + std::to_string(log_port) + ":8080 " + image_name + " /bin/bash").c_str());
     // system(("docker run -d -t -i --name " + container_name + " " + image_name + " /bin/bash").c_str());
 }
@@ -333,7 +334,7 @@ void make_flow_rules(MachineConfigurator conf) {
             {
                 function_name = "compressor";
                 std::string newMsg("Altered!");
-                cmdArguments += "./compressor " + newMsg;
+                cmdArguments += "./compressor " + std::to_string(function_port) + " " +  newMsg;
                 break;
             }
             default:
