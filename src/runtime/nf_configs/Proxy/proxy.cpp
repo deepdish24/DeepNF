@@ -62,6 +62,7 @@ int main(int argc,char **argv)
     // bind onto a port
     if (bind_socket(sockfd, bind_port) == -1) {
         std::cerr << "bind failure: " << strerror(errno) << std::endl;
+        close(sockfd);
         return -1;
     }
     printf("Proxy listening for packets on port: %d\n", bind_port);
@@ -92,6 +93,7 @@ int main(int argc,char **argv)
         for (address *addr : addresses) {
             if (send_packet(p, sockfd, addr) < 0) {
                 fprintf(stderr, "Send packet error: %s", strerror(errno));
+                close(sockfd);
                 exit(-1);
             }
         }
@@ -100,7 +102,7 @@ int main(int argc,char **argv)
             "rewrote packet destination to " + std::string(server_ip) + ":" + std::to_string(server_port));
 
     }
-
+    close(sockfd);
     return 0;
 }
 
