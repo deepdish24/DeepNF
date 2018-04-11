@@ -91,9 +91,9 @@ int main(int argc,char **argv)
                 // drops input packet
                 p->nullify();
 
-                log_util::log_nf(log, p, "dnf_loadbalancer", "dropped packet");
+                log_util::log_nf(log, p, "IDS", "dropped packet");
             } else {
-                log_util::log_nf(log, p, "dnf_loadbalancer", "didn't drop packet");
+                log_util::log_nf(log, p, "IDS", "didn't drop packet");
             }
 
             printf("\nSending modified packet:\n");
