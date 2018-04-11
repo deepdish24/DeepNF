@@ -24,4 +24,5 @@ RUN g++ -std=c++11 -c address.h address_util.h address_util.cpp && \
 	g++ -std=c++11 packet.cpp socket_util.cpp address_util.cpp pkt_sender.cpp -o sender && \
 	g++ -std=c++11 packet.cpp socket_util.cpp address_util.cpp pkt_receiver.cpp -o receiver
 
-RUN mkdir logs
+RUN mkdir log
+RUN touch log/log.txt
