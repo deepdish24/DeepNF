@@ -8,8 +8,8 @@
 #include <unistd.h>
 #include <fstream>
 
-#include "../../log_util.h"
-#include "../../socket_util.h"
+#include "log_util.h"
+#include "socket_util.h"
 
 
 #pragma clang diagnostic push
