@@ -39,6 +39,7 @@ MergerOperator::MergerOperator() {
     log.open("log/merger/log.txt", std::ios::out);
     if (!log) std::cerr << "Could not open the file!" << std::endl;
     log_mutex = PTHREAD_MUTEX_INITIALIZER;
+    pkt_count = 0;
 }
 
 MergerOperator::MergerOperator(MergerInfo* mi) {
@@ -54,6 +55,7 @@ MergerOperator::MergerOperator(MergerInfo* mi) {
     log.open("log/merger_log.txt", std::ios::out);
     if (!log) std::cerr << "Could not open the file!" << std::endl;
     log_mutex = PTHREAD_MUTEX_INITIALIZER;
+    pkt_count = 0;
 }
 
 
@@ -112,28 +114,47 @@ void MergerOperator::run_node_thread(int port, int node_id) {
 
         // add packet to packet_map
         pthread_mutex_lock(&packet_map_mutex);
-        if (packet_map.count(p->ip_header->ip_id) == 0) {
-            std::map<int, packet *>* new_node_map = new std::map<int, packet *>();
-            packet_map.insert(std::make_pair(p->ip_header->ip_id, new_node_map));
-        }
-        this_pkt_map = packet_map.at(p->ip_header->ip_id);
-        this_pkt_map->insert(std::make_pair(node_id, p));
-        printf("Printing this_node_map\n");
+        pkt_count++;
+        if (pkt_count % 3 == 0) {
+            struct packet* p = new packet("127.0.0.1", 8080, "127.0.0.1", 8080, (int) 19, "hi");
+            int sockfd = open_socket();
+            if (sockfd < 0) {
+                fprintf(stderr, "Cannot open socket: %s", strerror(errno));
+                exit(-1);
+            }
 
-        packet_map.insert(std::make_pair(p->ip_header->ip_id, this_pkt_map));
+            if (send_packet(p, sockfd, this->dest_address) < 0) {
+                fprintf(stderr, "Send packet error: %s", strerror(errno));
+                exit(-1);
+            }
+
+        }
         pthread_mutex_unlock(&packet_map_mutex);
 
-        print_packet_map();
+//        // add packet to packet_map
+//        pthread_mutex_lock(&packet_map_mutex);
+//        if (packet_map.count(p->ip_header->ip_id) == 0) {
+//            std::map<int, packet *>* new_node_map = new std::map<int, packet *>();
+//            packet_map.insert(std::make_pair(p->ip_header->ip_id, new_node_map));
+//        }
+//        this_pkt_map = packet_map.at(p->ip_header->ip_id);
+//        this_pkt_map->insert(std::make_pair(node_id, p));
+//        printf("Printing this_node_map\n");
+//
+//        packet_map.insert(std::make_pair(p->ip_header->ip_id, this_pkt_map));
+//        pthread_mutex_unlock(&packet_map_mutex);
 
-        // if all packets have been received for this packet_id, begin merging process
-        if ((int) this_pkt_map->size() == num_nodes) {
-            pthread_t merge_thread;
-            auto * tp = (MERGE_THREAD_PARAMS*) malloc(sizeof(MERGE_THREAD_PARAMS));
-            tp->inst = this;
-            tp->packet_id = p->ip_header->ip_id;
-            pthread_create(&merge_thread, nullptr, MergerOperator::merge_packet_wrapper, tp);
-            pthread_detach(merge_thread);
-        }
+//        print_packet_map();
+//
+//        // if all packets have been received for this packet_id, begin merging process
+//        if ((int) this_pkt_map->size() == num_nodes) {
+//            pthread_t merge_thread;
+//            auto * tp = (MERGE_THREAD_PARAMS*) malloc(sizeof(MERGE_THREAD_PARAMS));
+//            tp->inst = this;
+//            tp->packet_id = p->ip_header->ip_id;
+//            pthread_create(&merge_thread, nullptr, MergerOperator::merge_packet_wrapper, tp);
+//            pthread_detach(merge_thread);
+//        }
     }
 }
 
@@ -213,8 +234,8 @@ MergerOperator::PACKET_INFO* MergerOperator::resolve_packet_conflict(
  * @return Pointer to a packet with all changes merged
  */
 packet* MergerOperator::merge_packet(int pkt_id) {
-    struct packet* p = new packet("127.0.0.1", 8080, "127.0.0.1", 8080, (int) 19, "hi");
-    return p;
+//    struct packet* p = new packet("127.0.0.1", 8080, "127.0.0.1", 8080, (int) 19, "hi");
+//    return p;
 
 //    printf("MergerOperator::merge_packet\n");
 //    std::map<int, packet*>* this_pkt_map = packet_map.at(pkt_id);

@@ -81,6 +81,7 @@ private:
     pthread_mutex_t packet_map_mutex;
 
     // used to log merger activity
+    int pkt_count;
     std::ofstream log;
     pthread_mutex_t log_mutex;
 
