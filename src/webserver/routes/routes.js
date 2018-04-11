@@ -14,7 +14,9 @@ var getAbout = function(req, res) {
 function readFiles(dirname, onFileContent, onError) {
   fs.readdir(dirname, function(err, folders) {
     if (err) {
+        console.log(err);
       onError(err);
+
       return;
     }
     var data = {}; // object containing all text files results
@@ -27,6 +29,7 @@ function readFiles(dirname, onFileContent, onError) {
       //console.log(folder);
       fs.readdir(dirname + folder, function(err, filenames) {
         if (err) {
+            console.log(err);
           onError(err);
           return;
         }
