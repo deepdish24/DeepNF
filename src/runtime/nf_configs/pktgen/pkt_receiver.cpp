@@ -5,8 +5,10 @@
 #include <string>
 #include <iostream>
 #include <signal.h>
-#include<unistd.h>
+#include <unistd.h>
+#include <fstream>
 
+#include "../../log_util.h"
 #include "../../socket_util.h"
 
 
@@ -25,6 +27,10 @@ int main(int argc,char **argv)
 		std::cerr << "./receiver portno";
 		return -1;
 	}
+
+    std::ofstream log;
+    log.open("log/receiver/log.txt", std::ios::out);
+    if (!log) std::cerr << "Could not open the file!" << std::endl;
 
 	// get this server's bind port
     int bind_port = atoi(argv[1]);
@@ -50,6 +56,12 @@ int main(int argc,char **argv)
         count++;
 
         packet *p = packet_from_data(pkt_data);
+
+        log << p->get_pkt_id() << "," << p->get_src_ip() << "," << p->get_src_port() << ","
+            << p->get_dest_ip() << "," << p->get_dest_port() << "," << p->get_payload() << std::endl;
+        printf("Wrote to file\n");
+
+
         delete pkt_data;
         
         p->print_info();

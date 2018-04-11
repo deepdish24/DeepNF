@@ -47,13 +47,16 @@ styles for this template -->
               <a class="nav-link" href="http://ec2-18-217-175-10.us-east-2.compute.amazonaws.com">Machine 1</a>
             </li>
             <li>
-              <a class="nav-link" href="http://ec2-13-58-86-105.us-east-2.compute.amazonaws.com">Machine 2</a>
+              <a class="nav-link" href="http://ec2-18-217-69-3.us-east-2.compute.amazonaws.com">Machine 2</a>
             </li>
             <li>
               <a class="nav-link" href="http://ec2-18-188-160-168.us-east-2.compute.amazonaws.com">Machine 3</a>
             </li>
-                        <li>
-              <a class="nav-link" href="/visualization">Visualization</a>
+            <li>
+              <a class="nav-link" href="http://ec2-13-58-167-87.us-east-2.compute.amazonaws.com/visualization">Visualization</a>
+            </li>
+            <li>
+              <a class="nav-link" href="http://ec2-13-58-167-87.us-east-2.compute.amazonaws.com/receiver">Receiver</a>
             </li>
           </ul>
         </div>
@@ -69,37 +72,39 @@ styles for this template -->
  <!-- Page Content -->
     <% var counter = 0 %>
     <% if (content_data != undefined) { %>
-    <% for (var filename in content_data) { %>
       <div class="container">
         <div class="row">
           <div class="col-lg-12 text-center">
             <table class="table" id="myTable">
-              <h1 class="mt-5"> DeepNF Machine 2 <%= filename  %> Logs </h1>
+              <h1 class="mt-5"> DeepNF Packet Receiver Logs </h1>
               <thead>
                 <tr>
-                  <th scope="col">Time</th>
-                  <th scope="col">PacketId</th>
-                  <th scope="col">Function</th>
-                  <th scope="col">Action</th>
+                  <th scope="col">Packet ID</th>
+                  <th scope="col">Source IP</th>
+                  <th scope="col">Source Port</th>
+                  <th scope="col">Dest IP</th>
+                  <th scope="col">Dest Port</th>
+                  <th scope="col">Payload</th>
                 </tr>
               </thead>
               <tbody>
-              <% for (var element in content_data[filename]) { %>
+              <% for (var element in content_data) { %>
                 <tr>
-                  <td> <%= content_data[filename][element].time %> </td>
-                  <td> <%= content_data[filename][element].packetID %> </td>
-                  <td> <%= content_data[filename][element].function %> </td>
-                  <td> <%= content_data[filename][element].action %> </td>
+                  <td> <%= content_data[element].id %> </td>
+                  <td> <%= content_data[element].sip %> </td>
+                  <td> <%= content_data[element].sport %> </td>
+                  <td> <%= content_data[element].dip %> </td>
+                  <td> <%= content_data[element].dport %> </td>
+                  <td> <%= content_data[element].payload %> </td>
                 </tr>
               <% } %>
               </tbody>
-    <% } %>
     <% } else {%>
          <div class="container">
       <div 
 class="row">
         <div class="col-lg-12 text-center">
-          <h1 class="mt-5">DeepNF Machine 2 
+          <h1 class="mt-5">DeepNF Machine 1 
 Logs</h1>
           <table class="table" id="myTable">
             <thead>

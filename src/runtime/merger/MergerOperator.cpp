@@ -261,17 +261,17 @@ packet* MergerOperator::merge_packet(int pkt_id) {
                     RuntimeNode *rn = this->merger_info->get_node_map().at(new_packet->node_id);
                     std::set<Field> new_write_fields = this->action_table->get_write_fields(rn->get_nf());
 
-                    for (auto it = new_write_fields.begin(); it != new_write_fields.end(); ++it) {
-                        new_packet->written_fields->insert(*it);
-                    }
+                for (auto it = new_write_fields.begin(); it != new_write_fields.end(); ++it) {
+                    new_packet->written_fields->insert(*it);
                 }
+            }
 
-                // remove major and minor, then add merged packet to pkt_map
-                pkt_info_map->erase(ci->get_major());
-                pkt_info_map->erase(ci->get_minor());
-                pkt_info_map->insert(std::make_pair(ci->get_parent(), new_packet));
+            // remove major and minor, then add merged packet to pkt_map
+            pkt_info_map->erase(ci->get_major());
+            pkt_info_map->erase(ci->get_minor());
+            pkt_info_map->insert(std::make_pair(ci->get_parent(), new_packet));
 
-                was_changed = true;
+            was_changed = true;
             }
         }
     }

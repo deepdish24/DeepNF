@@ -262,6 +262,8 @@ Orchestrator::Orchestrator(std::string filepath, std::string action_file_path) {
         }
     }
 
+    write_graph_format(idToRuntimeNode, functions);
+
     std::vector<ConflictItem*> conflicts_list = create_conflicts_list(func_to_inx);
 
     //SETUP MERGER
@@ -491,6 +493,9 @@ std::vector<ConflictItem*> Orchestrator::create_conflicts_list(std::unordered_ma
             // object["major"] = func_to_inx[major];
             // object["minor"] = func_to_inx[minor];
             // object["parent"] = parentId;
+            std::cout << "MAJOR: " << major << std::endl;
+            std::cout << "MINOR: " << minor << std::endl;
+            std::cout << "PARENT: " << parentId << std::endl;
             ConflictItem *item = new ConflictItem(func_to_inx[major], func_to_inx[minor], parentId);
             conflicts_list.push_back(item);
             /*for (Field f : fields) {
@@ -547,6 +552,77 @@ void Orchestrator::setup_containers() {
             }
         }
     }
+}
+
+void Orchestrator::write_graph_format(std::unordered_map<int, RuntimeNode*> idToRuntimeNode, 
+    std::vector<std::string> functions) {
+    std::string output_dir = "../inputs/";
+    auto nodes = json::array();
+    auto edges = json::array();
+    for (auto it = idToRuntimeNode.begin(); it != idToRuntimeNode.end(); ++it) {
+        int id = it->first;
+        RuntimeNode* node = it->second;
+        auto node_obj = json::object();
+
+        node_obj["id"] = id;
+        node_obj["label"] = functions[id];
+        node_obj["group"] = func_to_ip[functions[id]];
+        nodes.push_back(node_obj);
+
+        std::vector<int> neighbors = node->get_neighbors();
+
+        if ((int) neighbors.size() == 0) {
+            auto edge_obj = json::object();
+            edge_obj["from"] = id;
+            edge_obj["to"] = (int) functions.size();
+            edge_obj["arrows"] = "to";
+            auto colorObj = json::object();
+            colorObj["inherit"] = "from";
+            edge_obj["color"] = colorObj;
+            edges.push_back(edge_obj);
+        }
+
+        for (int id2 : neighbors) {
+            auto edge_obj = json::object();
+            edge_obj["from"] = id;
+            edge_obj["to"] = id2;
+            edge_obj["arrows"] = "to";
+            auto colorObj = json::object();
+            colorObj["inherit"] = "from";
+            edge_obj["color"] = colorObj;
+            edges.push_back(edge_obj);
+        }
+    }
+
+    auto node_obj_merger = json::object();
+    node_obj_merger["id"] = (int) functions.size();
+    node_obj_merger["label"] = "merger";
+    node_obj_merger["group"] = "13.58.167.87";
+
+    auto node_obj_receiver = json::object();
+    node_obj_receiver["id"] = (int) functions.size() + 1;
+    node_obj_receiver["label"] = "receiver";
+    node_obj_receiver["group"] = dest_ip;
+
+    auto edge_obj_merger = json::object();
+    edge_obj_merger["from"] = (int) functions.size();
+    edge_obj_merger["to"] = (int) functions.size() + 1;
+    edge_obj_merger["arrows"] = "to";
+    auto colorObj = json::object();
+    colorObj["inherit"] = "from";
+    edge_obj_merger["color"] = colorObj;
+
+    nodes.push_back(node_obj_merger);
+    nodes.push_back(node_obj_receiver);
+    edges.push_back(edge_obj_merger);
+
+    std::ofstream node_out(output_dir + "nodes.txt");
+    std::ofstream edge_out(output_dir + "edges.txt");
+    node_out << nodes;
+    edge_out << edges;
+    node_out.close();
+    edge_out.close();
+    std::cout << "GRAPH SERIALIZED TO TXT FILE" << std::endl;
 }
 
 // Given a service graph node, determine if it is a root node
