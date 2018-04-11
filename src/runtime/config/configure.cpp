@@ -322,7 +322,7 @@ void make_flow_rules(MachineConfigurator conf) {
             case pktgen:
             {
                 function_name = "pktgen";
-                cmdArguments += "./sender -n 10 ";
+                cmdArguments += "./sender -n " + std::to_string(num_packets_sent);
                 break;
             }
             case dnf_firewall:
