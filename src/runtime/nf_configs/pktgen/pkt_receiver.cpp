@@ -8,8 +8,8 @@
 #include <unistd.h>
 #include <fstream>
 
-#include "../../log_util.h"
-#include "../../socket_util.h"
+#include "log_util.h"
+#include "socket_util.h"
 
 
 #pragma clang diagnostic push
@@ -40,6 +40,7 @@ int main(int argc,char **argv)
 
     if (bind_socket(sockfd, bind_port) < 0) {
         std::cerr << "bind failure: " << strerror(errno) << std::endl;
+        close(sockfd);
         return -1;
     }
 
@@ -68,7 +69,7 @@ int main(int argc,char **argv)
         printf("Received %d packets in total\n", count);
     }
 
-
+    close(sockfd);
 	return 0;
 }
 

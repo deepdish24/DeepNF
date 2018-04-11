@@ -13,9 +13,9 @@
 #include <fstream>
 #include <sys/time.h>
 
-#include "../../address_util.h"
-#include "../../socket_util.h"
-#include "../../log_util.h"
+#include "address_util.h"
+#include "socket_util.h"
+#include "log_util.h"
 
 
 
@@ -59,8 +59,8 @@ int main(int argc,char **argv)
 
     // setup log for this NF
     std::ofstream log;
-    log.open("log/log.txt", std::ios::out);
-    if (!log) std::cerr << "Could not open the file!" << std::endl;
+    log.open("/log/log.txt", std::ios::out);
+    if (!log) std::cerr << "Could not open the file!" << strerror(errno) << std::endl;
 
     // create socket
     int sockfd = open_socket();
@@ -68,6 +68,7 @@ int main(int argc,char **argv)
     // bind onto a port
     if (bind_socket(sockfd, bind_port) == -1) {
         std::cerr << "bind failure: " << strerror(errno) << std::endl;
+        close(sockfd);
         return -1;
     }
     printf("Firewall listening for packets on port: %d\n", bind_port);
@@ -102,11 +103,12 @@ int main(int argc,char **argv)
         for (address *addr : addresses) {
             if (send_packet(p, sockfd, addr) < 0) {
                 fprintf(stderr, "Send packet error: %s", strerror(errno));
+                close(sockfd);
                 exit(-1);
             }
         }
     }
-
+    close(sockfd);
     return 0;
 }
 

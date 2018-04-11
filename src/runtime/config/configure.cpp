@@ -25,68 +25,68 @@ std::unordered_map<int, int> nodeid_to_port;
 std::unordered_map<int, std::string> nodeid_to_network;
 
 MachineConfigurator get_machine_configurator(int port) {
-	std::cout << "get machine config called with port: " << port << std::endl;
-	int sockfd = socket(AF_INET, SOCK_STREAM, 0);
-	if (sockfd < 0) {
-		fprintf(stderr, "Cannot open socket\n");
-		exit(1);
-	}
-	struct sockaddr_in servaddr;
-	bzero(&servaddr, sizeof(servaddr));
+    std::cout << "get machine config called with port: " << port << std::endl;
+    int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd < 0) {
+        fprintf(stderr, "Cannot open socket\n");
+        exit(1);
+    }
+    struct sockaddr_in servaddr;
+    bzero(&servaddr, sizeof(servaddr));
 
-	servaddr.sin_family = AF_INET;
-	servaddr.sin_port = htons(port);
-	servaddr.sin_addr.s_addr = htons(INADDR_ANY);
+    servaddr.sin_family = AF_INET;
+    servaddr.sin_port = htons(port);
+    servaddr.sin_addr.s_addr = htons(INADDR_ANY);
 
-	if (bind(sockfd, (struct sockaddr*) &servaddr, sizeof(struct sockaddr)) < 0) {
-		std::cout << "cannot bind!" << std::endl;
-	}
+    if (bind(sockfd, (struct sockaddr*) &servaddr, sizeof(struct sockaddr)) < 0) {
+        std::cout << "cannot bind!" << std::endl;
+    }
 
-	listen(sockfd, 10);
+    listen(sockfd, 10);
 
-	const char* ack = "ACK";
-	char buffer[1000];
+    const char* ack = "ACK";
+    char buffer[1000];
 
-	std::cout << "code here" << std::endl;
+    std::cout << "code here" << std::endl;
 
-	while (true) {
-		struct sockaddr_in clientaddr;
-		socklen_t clientaddrlen = sizeof(clientaddr);
-		int fd = accept(sockfd, (struct sockaddr*) &clientaddr, &clientaddrlen);
+    while (true) {
+        struct sockaddr_in clientaddr;
+        socklen_t clientaddrlen = sizeof(clientaddr);
+        int fd = accept(sockfd, (struct sockaddr*) &clientaddr, &clientaddrlen);
 
-		bzero(buffer, sizeof(buffer));
-		std::cout << "starting to read from socket" << std::endl;
-		int x = read(fd, buffer, sizeof(buffer));
-		if (x == 0) {
-			std::cout << "read failed" << std::endl;
-			break;
-		}
-		write(fd, ack, strlen(ack));
-		sleep(1);
-		close(fd);
-		break;
-	}
+        bzero(buffer, sizeof(buffer));
+        std::cout << "starting to read from socket" << std::endl;
+        int x = read(fd, buffer, sizeof(buffer));
+        if (x == 0) {
+            std::cout << "read failed" << std::endl;
+            break;
+        }
+        write(fd, ack, strlen(ack));
+        sleep(1);
+        close(fd);
+        break;
+    }
 
-	std::string config(buffer, sizeof(buffer));
-	MachineConfigurator *mc = service_graph_util::string_to_machine_configurator(config);
-	return *(mc);
+    std::string config(buffer, sizeof(buffer));
+    MachineConfigurator *mc = service_graph_util::string_to_machine_configurator(config);
+    return *(mc);
 }
 
 /**
  * Returns a list of nodes on this machine
  */
 std::vector<RuntimeNode*> get_internal_nodes(MachineConfigurator c) {
-	return c.get_nodes_for_machine(c.get_machine_id());
+    return c.get_nodes_for_machine(c.get_machine_id());
 }
 
 bool is_source_node(RuntimeNode* n, std::vector<RuntimeNode*> nodes) {
-	std::set<int> nbrs;
-	for (RuntimeNode* n : nodes) {
-		std::vector<int> ns = n->get_neighbors();
-		nbrs.insert(ns.begin(), ns.end());
-	}
+    std::set<int> nbrs;
+    for (RuntimeNode* n : nodes) {
+        std::vector<int> ns = n->get_neighbors();
+        nbrs.insert(ns.begin(), ns.end());
+    }
 
-	return nbrs.count(n->get_id()) == 0;
+    return nbrs.count(n->get_id()) == 0;
 }
 
 /**
@@ -138,7 +138,7 @@ void run_docker_command(std::string container_name, std::string cmd) {
 }
 
 void run_lst_docker_cmd(std::string container_name, std::string cmd) {
-	std::cout << ("docker exec -dit " + container_name + " " + cmd) << std::endl;
+    std::cout << ("docker exec -dit " + container_name + " " + cmd) << std::endl;
     system(("docker exec -dit " + container_name + " " + cmd).c_str());
 }
 
@@ -150,9 +150,9 @@ void setup_nodes(MachineConfigurator conf) {
     // function assumes ./src/runtime/config/configure is run 
     // from build directory
 
-	std::string to_root = "../../";
+    std::string to_root = "../../";
     // list of nodes on this machine
-	std::vector<RuntimeNode*> nodes = get_internal_nodes(conf);
+    std::vector<RuntimeNode*> nodes = get_internal_nodes(conf);
     std::cout << "Number of Nodes: " << nodes.size() << std::endl;
 
     int log_port = 12000;
@@ -176,28 +176,28 @@ void setup_bridge_ports(MachineConfigurator &conf) {
     system("sudo “PATH=$PATH” /home/ubuntu/ovs/utilities/ovs-ctl --system-id=random --no-ovs-vswitchd start");
     system("sudo “PATH=$PATH” /home/ubuntu/ovs/utilities/ovs-ctl --no-ovsdb-server start");
 
-	// create a bridge
-	system("sudo \"PATH=$PATH\" /home/ubuntu/ovs/utilities/ovs-vsctl add-br ovs-br");
-	
-	// get bridge ip
-	Machine* cur_machine = conf.get_machine_with_id(conf.get_machine_id());
-	std::string bridge_ip = cur_machine->get_bridge_ip();
-	
-	system(("sudo ifconfig ovs-br " + bridge_ip + " netmask 255.255.255.0 up").c_str());
+    // create a bridge
+    system("sudo \"PATH=$PATH\" /home/ubuntu/ovs/utilities/ovs-vsctl add-br ovs-br");
+    
+    // get bridge ip
+    Machine* cur_machine = conf.get_machine_with_id(conf.get_machine_id());
+    std::string bridge_ip = cur_machine->get_bridge_ip();
+    
+    system(("sudo ifconfig ovs-br " + bridge_ip + " netmask 255.255.255.0 up").c_str());
 
-	// getting ip info from bridges
-	int dotinx = bridge_ip.rfind(".");
-	std::string ip_assign = bridge_ip.substr(0, dotinx+1);
-	int ofport_inx = atoi(bridge_ip.substr(dotinx+1).c_str());
-	int ip_inx = ofport_inx + 1;
+    // getting ip info from bridges
+    int dotinx = bridge_ip.rfind(".");
+    std::string ip_assign = bridge_ip.substr(0, dotinx+1);
+    int ofport_inx = atoi(bridge_ip.substr(dotinx+1).c_str());
+    int ip_inx = ofport_inx + 1;
 
-	std::vector<RuntimeNode*> nodes = get_internal_nodes(conf);
+    std::vector<RuntimeNode*> nodes = get_internal_nodes(conf);
 
     // Container IP + Port assignment (all functions bind to port 8000 on container)
     int port  = 8000;
     auto arr = json::array();
-	std::string add_port_command = "sudo \"PATH=$PATH\" /home/ubuntu/ovs/utilities/ovs-docker add-port ovs-br";
-	for (RuntimeNode* n : nodes) {
+    std::string add_port_command = "sudo \"PATH=$PATH\" /home/ubuntu/ovs/utilities/ovs-docker add-port ovs-br";
+    for (RuntimeNode* n : nodes) {
         int nodeid = n->get_id();
         std::string container_name = conf.get_config_dir(n->get_id());
         std::string func_ip = ip_assign + std::to_string(ip_inx);
@@ -213,11 +213,11 @@ void setup_bridge_ports(MachineConfigurator &conf) {
             arr.push_back(obj);
         }
 
-		std::string command1 = add_port_command + " eth1 " + container_name +  " --ipaddress=" + func_ip + "/24";
-		std::cout << "command: " << command1 << std::endl;
-		system(command1.c_str());
-		ip_inx++;
-	}
+        std::string command1 = add_port_command + " eth1 " + container_name +  " --ipaddress=" + func_ip + "/24";
+        std::cout << "command: " << command1 << std::endl;
+        system(command1.c_str());
+        ip_inx++;
+    }
 
     //Assign Machine IP and PORT for all other Functions
     //Forwarder ip + port assignment (function forwards to 8000 - node_id - 1)
@@ -256,13 +256,13 @@ void setup_bridge_ports(MachineConfigurator &conf) {
  */
 void make_flow_rules(MachineConfigurator conf) {
     std::cout << "MAKE FLOW RULES CALLED" << std::endl;
-	//std::string add_flow_command = "sudo \"PATH=$PATH\" /home/ubuntu/ovs/utilities/ovs-ofctl add-flow ovs-br in_port=";
+    //std::string add_flow_command = "sudo \"PATH=$PATH\" /home/ubuntu/ovs/utilities/ovs-ofctl add-flow ovs-br in_port=";
 
     /* Forwarder Setup */
     std::string to_root = "../../";
     std::string to_fwd_exe = "./DeepNF/build/src/runtime/forwarder/forwarder ";
-	
-	std::vector<RuntimeNode*> nodes = get_internal_nodes(conf);
+    
+    std::vector<RuntimeNode*> nodes = get_internal_nodes(conf);
 
     for (RuntimeNode* node : nodes) {
         int nodeid = node->get_id();
@@ -395,29 +395,30 @@ void make_flow_rules(MachineConfigurator conf) {
 }
 
 void reset(MachineConfigurator conf) {
-	std::string del_ports_cmd = "sudo \"PATH=$PATH\" /home/ubuntu/ovs/utilities/ovs-docker del-ports ovs-br ";
+    std::string del_ports_cmd = "sudo \"PATH=$PATH\" /home/ubuntu/ovs/utilities/ovs-docker del-ports ovs-br ";
 
     std::cout << "deleting config directories" << std::endl;
     std::string remove_config_folders = "rm -rf ../../*_config ../../forwarder.txt";
     std::string remove_log_dirs = "sudo rm -rf log/*";
     system(remove_config_folders.c_str());
     system(remove_log_dirs.c_str());
-	// clean up merger_old and classifier
-	/*system((del_ports_cmd + "classifier").c_str());
-	system((del_ports_cmd + "merger_old").c_str());
-	system("docker stop classifier merger_old; docker rm classifier merger_old");*/
+    
+    // clean up merger_old and classifier
+    /*system((del_ports_cmd + "classifier").c_str());
+    system((del_ports_cmd + "merger_old").c_str());
+    system("docker stop classifier merger_old; docker rm classifier merger_old");*/
 
-	std::vector<RuntimeNode*> nodes = get_internal_nodes(conf);
-	for (RuntimeNode* n : nodes) {
-		// remove all veth pairs for this node
+    std::vector<RuntimeNode*> nodes = get_internal_nodes(conf);
+    for (RuntimeNode* n : nodes) {
+        // remove all veth pairs for this node
         std::string container_name = conf.get_config_dir(n->get_id());
-		system((del_ports_cmd + container_name).c_str());
-		// stop and remove the docker container for this node
-		system(("docker stop " + container_name + "; docker rm " + container_name).c_str());
-	}
+        system((del_ports_cmd + container_name).c_str());
+        // stop and remove the docker container for this node
+        system(("docker stop " + container_name + "; docker rm " + container_name).c_str());
+    }
 
-	// delete the bridge
-	system("sudo \"PATH=$PATH\" /home/ubuntu/ovs/utilities/ovs-vsctl del-br ovs-br");
+    // delete the bridge
+    system("sudo \"PATH=$PATH\" /home/ubuntu/ovs/utilities/ovs-vsctl del-br ovs-br");
     system("./../src/runtime/config/remveth");
 }
 
@@ -426,22 +427,22 @@ void reset(MachineConfigurator conf) {
  * Optional flag -r to remove all resources and undo the configuration.
  */
 int main(int argc, char *argv[]) {
-	int c;
-	int port = 10000;
-	opterr = 0;
-	bool needReset = false;
+    int c;
+    int port = 10000;
+    opterr = 0;
+    bool needReset = false;
 
-	while ((c = getopt(argc, argv, "p:r")) != -1) {
-		switch(c) {
-			case 'p':
-				port = atoi(optarg);
-				break;
-			case 'r':
+    while ((c = getopt(argc, argv, "p:r")) != -1) {
+        switch(c) {
+            case 'p':
+                port = atoi(optarg);
+                break;
+            case 'r':
                 std::cout << "resetting after getting graph\n";
-				needReset = true;
-				break;
-		}
-	}
+                needReset = true;
+                break;
+        }
+    }
 
     if (argc < 2) {
         perror("not enough arguments: need to pass in ip and port of merger");
@@ -450,24 +451,24 @@ int main(int argc, char *argv[]) {
 
     merger_ip = argv[optind];
     std::cout << "Merger IP = " << merger_ip << std::endl;
-	MachineConfigurator conf = get_machine_configurator(port);
+    MachineConfigurator conf = get_machine_configurator(port);
 
     
 
-	int machineId = conf.get_machine_id();
-	Machine* mac = conf.get_machine_with_id(machineId);
-	std::cout << mac->get_bridge_ip() << std::endl;
+    int machineId = conf.get_machine_id();
+    Machine* mac = conf.get_machine_with_id(machineId);
+    std::cout << mac->get_bridge_ip() << std::endl;
 
-	if (needReset) {
-		std::cout << "reset!" << std::endl;
-		reset(conf);
-	} 
-	std::string remove_config_folders = "rm -rf ../../forwarder.txt";
+    if (needReset) {
+        std::cout << "reset!" << std::endl;
+        reset(conf);
+    } 
+    std::string remove_config_folders = "rm -rf ../../forwarder.txt";
     system(remove_config_folders.c_str());
-	setup_nodes(conf);
-	setup_bridge_ports(conf);
-	make_flow_rules(conf);
+    setup_nodes(conf);
+    setup_bridge_ports(conf);
+    make_flow_rules(conf);
     std::cout << "CONFIGURE FINISHED!!!!" << std::endl;
-	return 0;
+    return 0;
 }
 

@@ -9,8 +9,8 @@
 #include <math.h>  
 #include <vector>
 
-#include "../../address_util.h"
-#include "../../socket_util.h"
+#include "address_util.h"
+#include "socket_util.h"
 
 // list of addresses to forward packets to
 std::vector<address*> addresses;
@@ -54,6 +54,7 @@ int main(int argc, char *argv[])
 	int sockfd = open_socket();
 	if (sockfd < 0) {
 		std::cerr << "Cannot open socket: " << strerror(errno) << std::endl;
+		close(sockfd);
 		exit(-1);
 	}  
 
