@@ -178,7 +178,7 @@ void setup_nodes(MachineConfigurator conf) {
         build_docker_image(image_name, func_config_dir);
 
         if (nf == pktgen) {
-            start_docker_pktgen(container_name, image_name)
+            start_docker_pktgen(container_name, image_name);
         } else {
             start_docker_container(container_name, image_name, ++log_port);
         }
