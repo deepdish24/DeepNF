@@ -11,8 +11,8 @@ COPY socket_util.cpp .
 COPY address_util.h .
 COPY address_util.cpp .
 COPY address.h .
-COPY log_util.h
-COPY log_util.cpp
+COPY log_util.h .
+COPY log_util.cpp .
 
 
 RUN apt-get update -y && \
