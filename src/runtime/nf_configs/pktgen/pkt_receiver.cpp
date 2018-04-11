@@ -60,7 +60,7 @@ int main(int argc,char **argv)
         }
         count++;
 
-        if (std::cout == num_packets) {
+        if (count == num_packets) {
             clock_t end = std::clock();
             std::cout << "TOTAL TIME: " << (double(end - begin) / CLOCKS_PER_SEC) * 1000;
         }
