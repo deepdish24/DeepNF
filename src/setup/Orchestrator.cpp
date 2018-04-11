@@ -607,7 +607,7 @@ void Orchestrator::write_graph_format(std::unordered_map<int, RuntimeNode*> idTo
 
     auto node_obj_receiver = json::object();
     node_obj_receiver["id"] = (int) functions.size() + 1;
-    node_obj_receiver["label"] = "receiver";
+    node_obj_receiver["label"] = "server";
     node_obj_receiver["group"] = dest_ip;
 
     auto edge_obj_merger = json::object();
