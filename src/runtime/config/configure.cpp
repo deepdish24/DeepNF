@@ -130,6 +130,13 @@ void start_docker_container(std::string container_name, std::string image_name, 
 }
 
 /**
+* Function for docker container PKTGEN
+*/
+void start_docker_pktgen(std::string container_name, std::string image_name) {
+    system(("docker run -d -t -i --name " + container_name + " " + image_name + " /bin/bash").c_str());
+}
+
+/**
 * Function starts network function via cmd in docker container
 */
 void run_docker_command(std::string container_name, std::string cmd) {
@@ -157,6 +164,7 @@ void setup_nodes(MachineConfigurator conf) {
 
     int log_port = 12000;
     for (RuntimeNode* node : nodes) {
+        NF nf = node->get_nf();
         std::cout << "curr node id: " << node->get_id() << std::endl;
         std::string func_name = node->get_name();
         std::string func_config_dir = to_root + conf.get_config_dir(node->get_id()) + "_config";
@@ -168,7 +176,12 @@ void setup_nodes(MachineConfigurator conf) {
         make_config_dir(func_config_dir);
         copy_dockerfile(path_to_dockerfile, func_config_dir, to_root, path_to_dependencies);
         build_docker_image(image_name, func_config_dir);
-        start_docker_container(container_name, image_name, ++log_port);
+
+        if (nf == pktgen) {
+            start_docker_pktgen(container_name, image_name)
+        } else {
+            start_docker_container(container_name, image_name, ++log_port);
+        }
     }
 }
 
