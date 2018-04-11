@@ -30,7 +30,7 @@ typedef struct threadParams {
 
 void *run_thread(void *arg) {
     auto *tp = (THREAD_PARAMS*) arg;
-    printf("initializing thread with port: %d, addr: %s\n", tp->real_port, tp->v_addr_str);
+    //printf("initializing thread with port: %d, addr: %s\n", tp->real_port, tp->v_addr_str);
 
     // open socket to listen for requests
     int r_sockfd = open_socket();
@@ -43,11 +43,11 @@ void *run_thread(void *arg) {
     int v_sockfd;
     while (true) {
         // receive a packet
-        printf("\nStarting to listen for requests....\n");
+        //printf("\nStarting to listen for requests....\n");
         sockdata *pkt_data = receive_data(r_sockfd);
         packet* p = packet_from_data(pkt_data);
 
-        printf("Received message on %d: [%s] (%d bytes)\n", tp->real_port, p->data, p->data_size);
+        //printf("Received message on %d: [%s] (%d bytes)\n", tp->real_port, p->data, p->data_size);
 
         // send received packet to virtual address
         v_sockfd = open_socket();
@@ -65,7 +65,7 @@ void *run_thread(void *arg) {
         log_util::log_nf(log, p, "forwarder", "Forwarding packet to " + std::string(tp->v_addr_str));
         pthread_mutex_unlock(&log_mutex);
 
-        printf("Sent packet to virtual address: %s\n", tp->v_addr_str);
+        //printf("Sent packet to virtual address: %s\n", tp->v_addr_str);
     }
 }
 
@@ -91,7 +91,7 @@ int main(int argc, char *argv[]) {
         num_threads++;
     }
 
-    printf("Read %d lines\n", num_threads);
+    //printf("Read %d lines\n", num_threads);
 
 
     pthread_t threads[num_threads];
