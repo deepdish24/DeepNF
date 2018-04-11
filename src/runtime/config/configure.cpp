@@ -340,15 +340,15 @@ void make_flow_rules(MachineConfigurator conf) {
             case proxy: 
             {
                 function_name = "proxy";
-                std::string server_ip("127.0.0.1");
-                std::string server_port = std::to_string(8000);
+                std::string server_ip("18.188.160.171");
+                std::string server_port = std::to_string(8888);
                 cmdArguments += "./proxy " + std::to_string(function_port) + " " + server_ip + " " + server_port;
                 break;
             }
             case compressor:
             {
                 function_name = "compressor";
-                std::string newMsg("Altered!");
+                std::string newMsg("compressed!");
                 cmdArguments += "./compressor " + std::to_string(function_port) + " " +  newMsg;
                 break;
             }
