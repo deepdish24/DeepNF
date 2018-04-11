@@ -45,13 +45,13 @@ int send_data(char *buf, int size, int sockfd, address *addr)
 		return -1;
 	}
 
-	std::cout << "sent " << num_bytes << " bytes\n";
+	//std::cout << "sent " << num_bytes << " bytes\n";
 	return num_bytes;
 }
 
 int send_packet(packet *p, int sockfd, address *addr)
 {
-	std::cout << "packet size = " << p->size << "\n";
+	//std::cout << "packet size = " << p->size << "\n";
 	return send_data((char*) p->pkt, p->size, sockfd, addr);
 }
 
