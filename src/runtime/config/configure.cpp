@@ -402,10 +402,6 @@ void make_flow_rules(MachineConfigurator conf) {
         std::cout << "pktgen is woke" << std::endl;
 
         run_lst_docker_cmd(pktgen_container_name, pktgenArgs);
-        struct timeval tp;
-        gettimeofday(&tp, NULL);
-        long long mslong = (long long) tp.tv_sec * 1000L + tp.tv_usec / 1000; //get current timestamp in milliseconds
-        std::cout << "EPOCH TIME: " <<  mslong << std::endl;
         std::cout << "=======================================\n";
     }
     
@@ -493,6 +489,10 @@ int main(int argc, char *argv[]) {
     setup_bridge_ports(conf);
     make_flow_rules(conf);
     std::cout << "CONFIGURE FINISHED!!!!" << std::endl;
+    struct timeval tp;
+        gettimeofday(&tp, NULL);
+        long long mslong = (long long) tp.tv_sec * 1000L + tp.tv_usec / 1000; //get current timestamp in milliseconds
+        std::cout << "EPOCH TIME: " <<  mslong << std::endl;
     return 0;
 }
 
