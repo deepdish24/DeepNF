@@ -133,12 +133,12 @@ void start_docker_container(std::string container_name, std::string image_name, 
 * Function starts network function via cmd in docker container
 */
 void run_docker_command(std::string container_name, std::string cmd) {
-    std::cout << ("docker exec -dit " + container_name + " " + cmd + " &") << std::endl;
+    std::cout << ("docker exec -dit -u root " + container_name + " " + cmd + " &") << std::endl;
     system(("docker exec -dit " + container_name + " " + cmd + " &").c_str());
 }
 
 void run_lst_docker_cmd(std::string container_name, std::string cmd) {
-    std::cout << ("docker exec -dit " + container_name + " " + cmd) << std::endl;
+    std::cout << ("docker exec -dit -u root " + container_name + " " + cmd) << std::endl;
     system(("docker exec -dit " + container_name + " " + cmd).c_str());
 }
 
@@ -402,7 +402,7 @@ void reset(MachineConfigurator conf) {
     std::string remove_log_dirs = "sudo rm -rf log/*";
     system(remove_config_folders.c_str());
     system(remove_log_dirs.c_str());
-    
+
     // clean up merger_old and classifier
     /*system((del_ports_cmd + "classifier").c_str());
     system((del_ports_cmd + "merger_old").c_str());
