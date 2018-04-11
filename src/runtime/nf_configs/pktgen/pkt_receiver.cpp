@@ -67,6 +67,7 @@ int main(int argc,char **argv)
             long long mslong = (long long) tp.tv_sec * 1000L + tp.tv_usec / 1000; //get current timestamp in milliseconds
 
             std::cout << "TOTAL TIME: " << mslong << std::endl;
+            exit(0);
         }
 
         packet *p = packet_from_data(pkt_data);
