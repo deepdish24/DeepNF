@@ -378,7 +378,7 @@ void make_flow_rules(MachineConfigurator conf) {
     //Set up pktgen container
     if (pktgenNode != NULL) {
         std::string pktgen_container_name = conf.get_config_dir(pktgenNode->get_id());
-        std::string pktgenArgs = "./sender -n 10 ";
+        std::string pktgenArgs = "./sender -n " + std::to_string(num_packets_sent);
         for (int neighbor : pktgenNode->get_neighbors()) {
             std::string neighbor_ip = nodeid_to_network[neighbor];
             std::string neighbor_port = std::to_string(nodeid_to_port[neighbor]);
