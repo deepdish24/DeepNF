@@ -68,6 +68,7 @@ int main(int argc,char **argv)
     // bind onto a port
     if (bind_socket(sockfd, bind_port) == -1) {
         std::cerr << "bind failure: " << strerror(errno) << std::endl;
+        close(sockfd);
         return -1;
     }
     printf("Firewall listening for packets on port: %d\n", bind_port);
@@ -102,11 +103,12 @@ int main(int argc,char **argv)
         for (address *addr : addresses) {
             if (send_packet(p, sockfd, addr) < 0) {
                 fprintf(stderr, "Send packet error: %s", strerror(errno));
+                close(sockfd);
                 exit(-1);
             }
         }
     }
-
+    close(sockfd);
     return 0;
 }
 

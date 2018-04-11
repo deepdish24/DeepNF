@@ -54,6 +54,7 @@ int main(int argc, char *argv[])
 	int sockfd = open_socket();
 	if (sockfd < 0) {
 		std::cerr << "Cannot open socket: " << strerror(errno) << std::endl;
+		close(sockfd);
 		exit(-1);
 	}  
 
