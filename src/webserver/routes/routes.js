@@ -30,6 +30,9 @@ function readFiles(dirname, onFileContent, onError) {
           onError(err);
           return;
         }
+        if (filenames.length == 0){
+            onFileContent(undefined);
+        }
         filenames.forEach(function(filename) {
           fs.readFile(dirname + folder + '/' + filename, 'utf-8', function(err, content){
             var contents_array = content.split('\n'); // Split text files by new line
