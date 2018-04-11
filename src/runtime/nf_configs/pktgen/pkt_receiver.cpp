@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include <fstream>
 #include <ctime>
+#include <sys/time.h>
 
 #include <runtime/log_util.h>
 #include <runtime/socket_util.h>
@@ -60,13 +61,12 @@ int main(int argc,char **argv)
         }
         count++;
 
-        if (count == 1) {
-            begin = std::clock();
-        }
-
         if (count == num_packets) {
-            clock_t end = std::clock();
-            std::cout << "TOTAL TIME: " << (double(end - begin) / CLOCKS_PER_SEC) * 1000;
+            struct timeval tp;
+            gettimeofday(&tp, NULL);
+            long long mslong = (long long) tp.tv_sec * 1000L + tp.tv_usec / 1000; //get current timestamp in milliseconds
+
+            std::cout << "TOTAL TIME: " << mslong << std::endl;
         }
 
         packet *p = packet_from_data(pkt_data);
