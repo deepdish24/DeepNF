@@ -6,3 +6,5 @@ DeepNF/src/runtime/socket_util.cpp
 DeepNF/src/runtime/address_util.h
 DeepNF/src/runtime/address_util.cpp
 DeepNF/src/runtime/address.h
+DeepNF/src/runtime/log_util.h
+DeepNF/src/runtime/log_util.cpp
