@@ -60,7 +60,7 @@ int main(int argc,char **argv)
     // setup log for this NF
     system("touch /log/log.txt");
     std::ofstream log("/log/log.txt", std::ios::out);
-    if (!log.is_open()) std::cerr << "Could not open the file!" << strerror(errno) << std::endl;s
+    if (!log.is_open()) std::cerr << "Could not open the file!" << strerror(errno) << std::endl;
 
     // create socket
     int sockfd = open_socket();

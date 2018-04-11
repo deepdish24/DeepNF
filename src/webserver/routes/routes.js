@@ -14,7 +14,9 @@ var getAbout = function(req, res) {
 function readFiles(dirname, onFileContent, onError) {
   fs.readdir(dirname, function(err, folders) {
     if (err) {
+        console.log(err);
       onError(err);
+
       return;
     }
     var data = {}; // object containing all text files results
@@ -27,11 +29,12 @@ function readFiles(dirname, onFileContent, onError) {
       //console.log(folder);
       fs.readdir(dirname + folder, function(err, filenames) {
         if (err) {
+            console.log(err);
           onError(err);
           return;
         }
         if (filenames.length == 0){
-            onFileContent(undefined);
+            data[folder] = {};
         }
         filenames.forEach(function(filename) {
           fs.readFile(dirname + folder + '/' + filename, 'utf-8', function(err, content){
@@ -45,6 +48,7 @@ function readFiles(dirname, onFileContent, onError) {
             }
             data[folder] = content_object;
             if (Object.keys(data).length == folders.length) {
+                console.log(data);
               onFileContent(data);
             }
           });
