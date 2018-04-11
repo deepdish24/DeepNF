@@ -23,7 +23,7 @@ int sockfd;
 
 int main(int argc,char **argv)
 {
-    clock_t begin = std::clock();
+    clock_t begin;
 	signal(SIGINT, int_handler);
 
 	if (argc != 3) {
@@ -59,6 +59,10 @@ int main(int argc,char **argv)
             continue;
         }
         count++;
+
+        if (count == 1) {
+            begin = std::clock();
+        }
 
         if (count == num_packets) {
             clock_t end = std::clock();
