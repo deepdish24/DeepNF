@@ -9,8 +9,9 @@
 #include <fstream>
 #include <ctime>
 
-#include "log_util.h"
-#include "socket_util.h"
+#include <runtime/log_util.h>
+#include <runtime/socket_util.h>
+#include <runtime/address_util.h>
 
 
 #pragma clang diagnostic push
@@ -22,10 +23,10 @@ int sockfd;
 
 int main(int argc,char **argv)
 {
-    clock_t begin = std::clock();
+    clock_t begin;
 	signal(SIGINT, int_handler);
 
-	if (argc != 2) {
+	if (argc != 3) {
 		std::cerr << "./receiver portno";
 		return -1;
 	}
@@ -59,7 +60,11 @@ int main(int argc,char **argv)
         }
         count++;
 
-        if (cout == num_packets) {
+        if (count == 1) {
+            begin = std::clock();
+        }
+
+        if (count == num_packets) {
             clock_t end = std::clock();
             std::cout << "TOTAL TIME: " << (double(end - begin) / CLOCKS_PER_SEC) * 1000;
         }
