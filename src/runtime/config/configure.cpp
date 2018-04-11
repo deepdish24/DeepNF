@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <sys/time.h>
 #include <unordered_map>
 #include "../../setup/json.hpp"
 
@@ -23,6 +24,7 @@ std::string merger_ip;
 // (non-leaf node -> port of current function)
 std::unordered_map<int, int> nodeid_to_port;
 std::unordered_map<int, std::string> nodeid_to_network;
+int num_packets_sent = 0;
 
 MachineConfigurator get_machine_configurator(int port) {
     std::cout << "get machine config called with port: " << port << std::endl;
@@ -398,6 +400,11 @@ void make_flow_rules(MachineConfigurator conf) {
         std::cout << "proceeding to wait for pktgen to startup" << std::endl;
         sleep(15);
         std::cout << "pktgen is woke" << std::endl;
+        struct timeval tp;
+        gettimeofday(&tp, NULL);
+        long long mslong = (long long) tp.tv_sec * 1000L + tp.tv_usec / 1000; //get current timestamp in milliseconds
+        std::cout << "EPOCH TIME: " <<  mslong << std::endl;
+
         run_lst_docker_cmd(pktgen_container_name, pktgenArgs);
         std::cout << "=======================================\n";
     }
@@ -445,7 +452,7 @@ int main(int argc, char *argv[]) {
     opterr = 0;
     bool needReset = false;
 
-    while ((c = getopt(argc, argv, "p:r")) != -1) {
+    while ((c = getopt(argc, argv, "p:n:r")) != -1) {
         switch(c) {
             case 'p':
                 port = atoi(optarg);
@@ -454,8 +461,12 @@ int main(int argc, char *argv[]) {
                 std::cout << "resetting after getting graph\n";
                 needReset = true;
                 break;
+            case 'n':
+                std::cout << "num packets" << std::endl;
+                num_packets_sent = atoi(optarg);
+                break;
         }
-    }
+    } 
 
     if (argc < 2) {
         perror("not enough arguments: need to pass in ip and port of merger");
