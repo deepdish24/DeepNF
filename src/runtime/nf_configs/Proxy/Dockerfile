@@ -22,3 +22,6 @@ RUN g++ -std=c++11 -c address.h address_util.h address_util.cpp && \
     g++ -std=c++11 -c packet.cpp log_util.h log_util.cpp && \
 	g++ -std=c++11 -c packet.cpp socket_util.h socket_util.cpp && \
 	g++ -std=c++11 packet.cpp address_util.cpp socket_util.cpp log_util.cpp proxy.cpp -o proxy
+
+RUN mkdir log
+RUN touch log/log.txt
