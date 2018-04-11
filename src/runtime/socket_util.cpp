@@ -66,7 +66,7 @@ sockdata *receive_data(int sockfd)
 	if (rlen < 0) {
 		return NULL;
 	}
-	std::cout << "received " << rlen << " bytes\n";
+	//std::cout << "received " << rlen << " bytes\n";
 	buf[rlen] = 0;
 
 	sockdata *d = new sockdata();
