@@ -7,6 +7,7 @@
 #include <signal.h>
 #include <unistd.h>
 #include <fstream>
+#include <ctime>
 
 #include "log_util.h"
 #include "socket_util.h"
@@ -21,6 +22,7 @@ int sockfd;
 
 int main(int argc,char **argv)
 {
+    clock_t begin = std::clock();
 	signal(SIGINT, int_handler);
 
 	if (argc != 2) {
@@ -33,8 +35,9 @@ int main(int argc,char **argv)
     if (!log) std::cerr << "Could not open the file!" << std::endl;
 
 	// get this server's bind port
-    int bind_port = atoi(argv[1]);
-    printf("Listening on port %s\n", argv[1]);
+    int num_packets = atoi(argv[1]);
+    int bind_port = atoi(argv[2]);
+    printf("Listening on port %s\n", argv[2]);
 
 	sockfd = open_socket();
 
@@ -55,6 +58,11 @@ int main(int argc,char **argv)
             continue;
         }
         count++;
+
+        if (cout == num_packets) {
+            clock_t end = std::clock();
+            std::cout << "TOTAL TIME: " << (double(end - begin) / CLOCKS_PER_SEC) * 1000;
+        }
 
         packet *p = packet_from_data(pkt_data);
 
