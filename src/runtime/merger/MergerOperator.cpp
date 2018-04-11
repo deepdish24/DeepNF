@@ -213,8 +213,8 @@ MergerOperator::PACKET_INFO* MergerOperator::resolve_packet_conflict(
  * @return Pointer to a packet with all changes merged
  */
 packet* MergerOperator::merge_packet(int pkt_id) {
-    struct packet p("127.0.0.1", 8080, "127.0.0.1", 8080, (int) 19, "hi");
-    return &p;
+    struct packet* p = new packet("127.0.0.1", 8080, "127.0.0.1", 8080, (int) 19, "hi");
+    return p;
 
 //    printf("MergerOperator::merge_packet\n");
 //    std::map<int, packet*>* this_pkt_map = packet_map.at(pkt_id);
