@@ -26,7 +26,7 @@ int main(int argc,char **argv)
     clock_t begin = std::clock();
 	signal(SIGINT, int_handler);
 
-	if (argc != 2) {
+	if (argc != 3) {
 		std::cerr << "./receiver portno";
 		return -1;
 	}
